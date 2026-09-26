@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test('learn a unit, practice it, and keep the XP after a reload', async ({ page }) => {
   await page.goto('/');
+  await expect(page).toHaveTitle('Cascade');
   await page.getByRole('button', { name: 'Grid basics, 4 cards' }).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Define columns');
 

@@ -1,6 +1,6 @@
-# Cascade (working title)
+# Cascade
 
-A Duolingo-style mobile app for learning CSS: short **Learn** lessons with live playgrounds, then bite-sized **Practice** quizzes in 7 question formats.
+A Duolingo-style mobile app for learning to code, one course at a time: short **Learn** lessons with live playgrounds, then bite-sized **Practice** quizzes. Courses: CSS (Rust is coming).
 
 Status: design prototype handed off for implementation. Start with `CLAUDE.md`.
 
