@@ -1,13 +1,20 @@
-import { useReducer } from 'react';
+import { useEffect, useReducer } from 'react';
 import { Quiz } from './quiz/Quiz';
 import { Home } from './screens/Home';
 import { Learn } from './screens/Learn';
 import { appReducer, initialState } from './state/app';
+import { localProgressStore, type ProgressStore } from './storage/progress';
 import styles from './App.module.css';
 
-export function App() {
-  const [state, dispatch] = useReducer(appReducer, initialState);
-  const { screen } = state;
+const defaultStore = localProgressStore();
+
+export function App({ store = defaultStore }: { store?: ProgressStore }) {
+  const [state, dispatch] = useReducer(appReducer, store, (s) => ({ ...initialState, ...s.load() }));
+  const { screen, completedUnits, completedSets, totalXp } = state;
+
+  useEffect(() => {
+    store.save({ completedUnits, completedSets, totalXp });
+  }, [store, completedUnits, completedSets, totalXp]);
 
   return (
     <div className={styles.frame}>

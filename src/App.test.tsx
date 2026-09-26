@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { App } from './App';
+import { STORAGE_KEY } from './storage/progress';
 
 const heading = () => screen.getByRole('heading', { level: 1 });
 
@@ -97,5 +98,31 @@ describe('Learn flow', () => {
     await user.click(screen.getByRole('button', { name: 'Flexbox basics, 5 cards' }));
     await user.click(screen.getByRole('button', { name: 'Close lesson' }));
     expect(screen.getByRole('button', { name: 'Flexbox basics, 5 cards' })).toBeInTheDocument();
+  });
+});
+
+describe('Persistence', () => {
+  it('restores completed units and XP from storage', () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ completedUnits: { basics: true }, completedSets: {}, totalXp: 40 }));
+    render(<App />);
+    expect(screen.getByText('40 XP')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'How CSS works, 3 cards, completed' })).toBeInTheDocument();
+    expect(screen.getByText('Up next')).toBeInTheDocument();
+  });
+
+  it('saves progress when a unit is finished', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: 'Grid basics, 4 cards' }));
+    for (let i = 0; i < 3; i++) await user.click(screen.getByRole('button', { name: 'Next' }));
+    await user.click(screen.getByRole('button', { name: 'Done' }));
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toMatchObject({ completedUnits: { grid: true }, totalXp: 0 });
+  });
+
+  it('starts fresh when stored progress is corrupt', () => {
+    localStorage.setItem(STORAGE_KEY, '{oops');
+    render(<App />);
+    expect(screen.getByText('0 XP')).toBeInTheDocument();
+    expect(screen.getByText('Start here')).toBeInTheDocument();
   });
 });

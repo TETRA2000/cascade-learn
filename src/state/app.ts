@@ -1,5 +1,4 @@
-// App navigation + progress state. Pure reducer so it is easy to test and,
-// in step 7, to hydrate from / persist to storage.
+// App navigation + progress state. Pure reducer; App hydrates it from and saves it to a ProgressStore.
 import { unitByKey, type LessonKey } from '../content';
 import { initialSelection } from '../lib/demo';
 
