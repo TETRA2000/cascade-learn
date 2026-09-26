@@ -1,10 +1,10 @@
-import type { VersusQuestion } from '../../content';
-import { CodePanel } from '../../components/CodePanel';
-import { CssBox } from '../../components/CssBox';
-import { tone, toneLabel } from '../tone';
-import { ToneMark } from '../ToneMark';
-import toneStyles from '../tone.module.css';
-import type { RendererProps } from './types';
+import type { VersusQuestion } from '../../../content';
+import { CodePanel } from '../../../components/CodePanel';
+import { CssBox } from '../../../components/CssBox';
+import { tone, toneLabel } from '../../tone';
+import { ToneMark } from '../../ToneMark';
+import toneStyles from '../../tone.module.css';
+import type { RendererProps } from '../types';
 import styles from './Versus.module.css';
 
 /** Pick the color the cascade produces; the reveal shows each rule's specificity. */

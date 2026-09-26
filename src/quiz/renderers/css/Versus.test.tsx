@@ -1,6 +1,6 @@
 import { screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { renderQuiz } from '../testUtils';
+import { renderQuiz } from '../../testUtils';
 
 describe('Which rule wins?', () => {
   it('draws each option in its own color and reveals specificity scores after checking', async () => {

@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { renderQuiz } from '../testUtils';
+import { renderQuiz } from '../../testUtils';
 
 // tune-1: gap on the row, start 8px, target 24px, step 4, range 0–48
 const btn = (name: string) => screen.getByRole('button', { name });

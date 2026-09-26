@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
-import type { PairsQuestion } from '../../content';
-import { CssBox } from '../../components/CssBox';
-import { PAIR_MISS_FLASH_MS } from '../../state/rules';
-import { ToneMark } from '../ToneMark';
-import toneStyles from '../tone.module.css';
-import type { AnswerState } from '../types';
-import type { RendererProps } from './types';
+import type { PairsQuestion } from '../../../content';
+import { CssBox } from '../../../components/CssBox';
+import { PAIR_MISS_FLASH_MS } from '../../../state/rules';
+import { ToneMark } from '../../ToneMark';
+import toneStyles from '../../tone.module.css';
+import type { AnswerState } from '../../types';
+import type { RendererProps } from '../types';
 import styles from './Pairs.module.css';
 
 type PairTone = 'idle' | 'selected' | 'wrong' | 'done';

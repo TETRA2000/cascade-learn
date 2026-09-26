@@ -1,10 +1,10 @@
-import type { PredictQuestion } from '../../content';
-import { CodePanel } from '../../components/CodePanel';
-import { CssBox } from '../../components/CssBox';
-import { tone, toneLabel } from '../tone';
-import { ToneMark } from '../ToneMark';
-import toneStyles from '../tone.module.css';
-import type { RendererProps } from './types';
+import type { PredictQuestion } from '../../../content';
+import { CodePanel } from '../../../components/CodePanel';
+import { CssBox } from '../../../components/CssBox';
+import { tone, toneLabel } from '../../tone';
+import { ToneMark } from '../../ToneMark';
+import toneStyles from '../../tone.module.css';
+import type { RendererProps } from '../types';
 import styles from './Predict.module.css';
 
 /** Read CSS, pick the picture. Every option is drawn with real CSS from the question data. */

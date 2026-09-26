@@ -1,8 +1,8 @@
-import type { BuildQuestion } from '../../content';
-import { CodeTokens } from '../../components/CodePanel';
-import { CssBox } from '../../components/CssBox';
-import { buildPreview, type BuildPreview } from '../previews';
-import type { RendererProps } from './types';
+import type { BuildQuestion } from '../../../content';
+import { CodeTokens } from '../../../components/CodePanel';
+import { CssBox } from '../../../components/CssBox';
+import { buildPreview, type BuildPreview } from '../../previews';
+import type { RendererProps } from '../types';
 import preview from './preview.module.css';
 import styles from './Build.module.css';
 

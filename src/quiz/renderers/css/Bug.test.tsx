@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { renderQuiz } from '../testUtils';
+import { renderQuiz } from '../../testUtils';
 
 // bug-1: line 4 "border-radius: 12px" is missing its semicolon
 describe('Spot the bug', () => {

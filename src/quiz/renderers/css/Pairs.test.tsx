@@ -1,6 +1,6 @@
 import { act, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { renderQuiz } from '../testUtils';
+import { renderQuiz } from '../../testUtils';
 
 // pairs-1: a "opacity: .4" ↔ "Faded square", b "border-radius: 50%" ↔ "Circle",
 //          c "rotate: 45deg" ↔ "Tilted square", d "scale: .5" ↔ "Half-size square"

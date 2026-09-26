@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { renderQuiz } from '../testUtils';
+import { renderQuiz } from '../../testUtils';
 
 // type-1: .headline { text-transform: uppercase; }
 describe('Type the value', () => {

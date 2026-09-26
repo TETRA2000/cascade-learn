@@ -1,8 +1,8 @@
-import type { TuneQuestion } from '../../content';
-import { CssBox } from '../../components/CssBox';
-import { MinusIcon, PlusIcon } from '../../components/icons';
-import { tuneLayer, type TuneLayer } from '../previews';
-import type { RendererProps } from './types';
+import type { TuneQuestion } from '../../../content';
+import { CssBox } from '../../../components/CssBox';
+import { MinusIcon, PlusIcon } from '../../../components/icons';
+import { tuneLayer, type TuneLayer } from '../../previews';
+import type { RendererProps } from '../types';
 import styles from './Tune.module.css';
 
 /** Nudge a value until your boxes fill the dashed ghost target. */

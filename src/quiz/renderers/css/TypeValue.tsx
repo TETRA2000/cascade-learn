@@ -1,8 +1,8 @@
 import { useId } from 'react';
-import type { TypeQuestion } from '../../content';
-import { CssBox } from '../../components/CssBox';
-import { typePreviewCss } from '../previews';
-import type { RendererProps } from './types';
+import type { TypeQuestion } from '../../../content';
+import { CssBox } from '../../../components/CssBox';
+import { typePreviewCss } from '../../previews';
+import type { RendererProps } from '../types';
 import preview from './preview.module.css';
 import styles from './TypeValue.module.css';
 

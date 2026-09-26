@@ -1,9 +1,9 @@
-import type { BugQuestion } from '../../content';
-import { CodeTokens } from '../../components/CodePanel';
-import { CssBox } from '../../components/CssBox';
-import { tone, toneLabel } from '../tone';
-import { ToneMark } from '../ToneMark';
-import type { RendererProps } from './types';
+import type { BugQuestion } from '../../../content';
+import { CodeTokens } from '../../../components/CodePanel';
+import { CssBox } from '../../../components/CssBox';
+import { tone, toneLabel } from '../../tone';
+import { ToneMark } from '../../ToneMark';
+import type { RendererProps } from '../types';
 import preview from './preview.module.css';
 import styles from './Bug.module.css';
 

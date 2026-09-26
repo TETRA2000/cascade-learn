@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { renderQuiz } from '../testUtils';
+import { renderQuiz } from '../../testUtils';
 
 // build-1: .box { display: [grid]; place-items: [center]; } — bank: flex grid center middle block start
 const btn = (name: string) => screen.getByRole('button', { name });
