@@ -21,7 +21,10 @@ export function Home({ state, dispatch }: Props) {
             <span className={styles.wordmark}>Cascade</span>
             <span className={styles.tagline}>CSS, one tap at a time</span>
           </div>
-          <HeartCount count={HEARTS_PER_LESSON} />
+          <div className={styles.stats}>
+            <p className={styles.xp}>{state.totalXp} XP</p>
+            <HeartCount count={HEARTS_PER_LESSON} />
+          </div>
         </header>
         {state.tab === 'learn' ? <LearnTab state={state} dispatch={dispatch} /> : <PracticeTab state={state} dispatch={dispatch} />}
       </div>

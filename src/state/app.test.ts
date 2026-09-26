@@ -46,4 +46,14 @@ describe('appReducer', () => {
     expect(s.completedUnits).toEqual({ grid: true });
     expect(s.screen).toEqual({ name: 'quiz', lessonKey: 'topic:grid' });
   });
+
+  it('records a finished quiz and banks its XP', () => {
+    const s = run(
+      { type: 'startQuiz', lessonKey: 'bug' },
+      { type: 'completeQuiz', lessonKey: 'bug', xp: 25 },
+      { type: 'completeQuiz', lessonKey: 'mixed', xp: 10 },
+    );
+    expect(s.completedSets).toEqual({ bug: true, mixed: true });
+    expect(s.totalXp).toBe(35);
+  });
 });

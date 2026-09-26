@@ -1,12 +1,12 @@
 import { useReducer } from 'react';
+import { Quiz } from './quiz/Quiz';
 import { Home } from './screens/Home';
 import { Learn } from './screens/Learn';
-import { QuizPlaceholder } from './screens/QuizPlaceholder';
-import { appReducer, initialState, type AppState } from './state/app';
+import { appReducer, initialState } from './state/app';
 import styles from './App.module.css';
 
-export function App({ initial = initialState }: { initial?: AppState }) {
-  const [state, dispatch] = useReducer(appReducer, initial);
+export function App() {
+  const [state, dispatch] = useReducer(appReducer, initialState);
   const { screen } = state;
 
   return (
@@ -15,7 +15,14 @@ export function App({ initial = initialState }: { initial?: AppState }) {
       {screen.name === 'learn' && (
         <Learn key={screen.unitKey} unitKey={screen.unitKey} card={screen.card} selection={screen.selection} dispatch={dispatch} />
       )}
-      {screen.name === 'quiz' && <QuizPlaceholder key={screen.lessonKey} lessonKey={screen.lessonKey} dispatch={dispatch} />}
+      {screen.name === 'quiz' && (
+        <Quiz
+          key={screen.lessonKey}
+          lessonKey={screen.lessonKey}
+          onExit={() => dispatch({ type: 'goHome' })}
+          onComplete={({ lessonKey, xp }) => dispatch({ type: 'completeQuiz', lessonKey, xp })}
+        />
+      )}
     </div>
   );
 }

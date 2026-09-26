@@ -15,6 +15,11 @@ describe('Home', () => {
     expect(screen.getAllByRole('button', { name: /cards$/ })).toHaveLength(5);
   });
 
+  it('shows total XP in the header', () => {
+    render(<App />);
+    expect(screen.getByText('0 XP')).toBeInTheDocument();
+  });
+
   it('switches to the Practice tab', async () => {
     const user = userEvent.setup();
     render(<App />);
@@ -82,8 +87,8 @@ describe('Learn flow', () => {
     await user.click(screen.getByRole('button', { name: 'Grid basics, 4 cards' }));
     for (let i = 0; i < 3; i++) await user.click(screen.getByRole('button', { name: 'Next' }));
     await user.click(screen.getByRole('button', { name: 'Practice this' }));
-    expect(heading()).toHaveTextContent('Grid basics — practice');
-    expect(screen.getByText(/3 questions queued/)).toBeInTheDocument();
+    expect(heading()).toHaveTextContent('Which layout does this grid draw?');
+    expect(screen.getByText('Predict the render')).toBeInTheDocument();
   });
 
   it('closes a lesson without completing it', async () => {

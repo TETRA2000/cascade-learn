@@ -73,3 +73,53 @@ export function BulbIcon({ size = 24, ...rest }: IconProps) {
     </Svg>
   );
 }
+
+export function CheckIcon({ size = 16, ...rest }: IconProps) {
+  return (
+    <Svg size={size} {...stroke} strokeWidth={3} {...rest}>
+      <path d="M5 12.5l4.5 4.5L19 7.5" />
+    </Svg>
+  );
+}
+
+export function XCircleIcon({ size = 22, ...rest }: IconProps) {
+  return (
+    <Svg size={size} {...stroke} strokeWidth={2.5} {...rest}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9 9l6 6M15 9l-6 6" />
+    </Svg>
+  );
+}
+
+export function StarIcon({ size = 96, ...rest }: IconProps) {
+  return (
+    <Svg size={size} fill="var(--primary-soft)" stroke="var(--primary)" strokeWidth={1.6} strokeLinejoin="round" {...rest}>
+      <path d="M12 2.8l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.1 6.4 20l1.1-6.2L3 9.4l6.2-.9z" />
+    </Svg>
+  );
+}
+
+export function BrokenHeartIcon({ size = 96, ...rest }: IconProps) {
+  return (
+    <Svg size={size} fill="none" stroke="var(--wrong)" strokeWidth={1.6} strokeLinejoin="round" {...rest}>
+      <path d="M12 21s-7.5-4.6-9.5-9.4C1.2 8.4 3.3 5 6.6 5c2 0 3.4 1.1 4.4 2.5C12 6.1 13.4 5 15.4 5c3.3 0 5.4 3.4 4.1 6.6C19.5 16.4 12 21 12 21z" />
+      <path d="M12 7.5l-1.5 3.5 3 2-1.5 3.5" />
+    </Svg>
+  );
+}
+
+export function MinusIcon({ size = 24, ...rest }: IconProps) {
+  return (
+    <Svg size={size} {...stroke} strokeWidth={3} {...rest}>
+      <path d="M5 12h14" />
+    </Svg>
+  );
+}
+
+export function PlusIcon({ size = 24, ...rest }: IconProps) {
+  return (
+    <Svg size={size} {...stroke} strokeWidth={3} {...rest}>
+      <path d="M5 12h14M12 5v14" />
+    </Svg>
+  );
+}

@@ -17,6 +17,8 @@ export interface AppState {
   completedUnits: Record<string, true>;
   /** Practice runs (by LessonKey) finished at least once. */
   completedSets: Partial<Record<LessonKey, true>>;
+  /** XP banked from finished practice runs. */
+  totalXp: number;
 }
 
 export type Action =
@@ -26,6 +28,7 @@ export type Action =
   | { type: 'pickOption'; control: number; option: number }
   | { type: 'finishUnit'; practice: boolean }
   | { type: 'startQuiz'; lessonKey: LessonKey }
+  | { type: 'completeQuiz'; lessonKey: LessonKey; xp: number }
   | { type: 'goHome' };
 
 export const initialState: AppState = {
@@ -33,6 +36,7 @@ export const initialState: AppState = {
   tab: 'learn',
   completedUnits: {},
   completedSets: {},
+  totalXp: 0,
 };
 
 function cardScreen(unitKey: string, card: number): Screen | null {
@@ -77,6 +81,13 @@ export function appReducer(state: AppState, action: Action): AppState {
 
     case 'startQuiz':
       return { ...state, screen: { name: 'quiz', lessonKey: action.lessonKey } };
+
+    case 'completeQuiz':
+      return {
+        ...state,
+        completedSets: { ...state.completedSets, [action.lessonKey]: true },
+        totalXp: state.totalXp + action.xp,
+      };
 
     case 'goHome':
       return { ...state, screen: { name: 'home' } };

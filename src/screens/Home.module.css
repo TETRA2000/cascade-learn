@@ -198,3 +198,14 @@
   background: var(--primary-soft);
   color: var(--primary);
 }
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.xp {
+  font-weight: 700;
+  color: var(--primary);
+}

@@ -1,0 +1,27 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  text-align: left;
+}
+
+/* Stage frame; the question's `stage` + option CSS is inline, so it can override these. */
+.stage {
+  height: 72px;
+  padding: 6px;
+  background: var(--bg);
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+}
+
+.letter {
+  font-weight: 700;
+  font-size: 15px;
+}

@@ -1,0 +1,48 @@
+/* Light answer tiles (predict, versus, pairs). Bug lines have their own dark variant. */
+.tile {
+  position: relative;
+  border: 2px solid var(--line);
+  border-bottom-width: 5px;
+  border-radius: var(--radius-tile);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.idle {
+  border-color: var(--line);
+}
+
+.selected {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.correct {
+  border-color: var(--correct);
+  background: var(--correct-bg);
+}
+
+.wrong {
+  border-color: var(--wrong);
+  background: var(--wrong-bg);
+}
+
+.mark {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+}
+
+.markCorrect {
+  background: var(--correct);
+}
+
+.markWrong {
+  background: var(--wrong);
+}
