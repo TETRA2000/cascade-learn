@@ -1,0 +1,688 @@
+[
+  {
+    "id": "predict-1",
+    "type": "predict",
+    "prompt": "Which row does this CSS draw?",
+    "code": [
+      ".row {",
+      "  display: flex;",
+      "  justify-content: space-between;",
+      "  align-items: center;",
+      "}"
+    ],
+    "stage": "display:flex;",
+    "kids": [
+      "width:20px;height:20px;background:#4338CA;border-radius:4px;flex-shrink:0",
+      "width:20px;height:36px;background:#E4572E;border-radius:4px;flex-shrink:0",
+      "width:20px;height:20px;background:#1D1B26;border-radius:4px;flex-shrink:0"
+    ],
+    "opts": [
+      {
+        "s": "justify-content:flex-start;align-items:center",
+        "d": "packed left, centered vertically"
+      },
+      {
+        "s": "justify-content:space-between;align-items:flex-start",
+        "d": "spread out, top-aligned"
+      },
+      {
+        "s": "justify-content:space-between;align-items:center",
+        "d": "spread out, centered vertically"
+      },
+      {
+        "s": "justify-content:space-around;align-items:flex-end",
+        "d": "spaced around, bottom-aligned"
+      }
+    ],
+    "answer": 2,
+    "explain": "`justify-content` places items along the main axis (→). `align-items` places them on the cross axis (↓)."
+  },
+  {
+    "id": "predict-2",
+    "type": "predict",
+    "prompt": "Which stack does this CSS draw?",
+    "code": [
+      ".stack {",
+      "  display: flex;",
+      "  flex-direction: column;",
+      "  align-items: flex-end;",
+      "}"
+    ],
+    "stage": "display:flex;gap:4px;",
+    "kids": [
+      "width:36px;height:12px;background:#4338CA;border-radius:4px;flex-shrink:0",
+      "width:24px;height:12px;background:#E4572E;border-radius:4px;flex-shrink:0",
+      "width:48px;height:12px;background:#1D1B26;border-radius:4px;flex-shrink:0"
+    ],
+    "opts": [
+      {
+        "s": "flex-direction:column;align-items:flex-end",
+        "d": "stacked, right-aligned"
+      },
+      {
+        "s": "flex-direction:column;align-items:flex-start",
+        "d": "stacked, left-aligned"
+      },
+      {
+        "s": "flex-direction:row;align-items:flex-end",
+        "d": "in a row, bottom-aligned"
+      },
+      {
+        "s": "flex-direction:column;align-items:center",
+        "d": "stacked, centered"
+      }
+    ],
+    "answer": 0,
+    "explain": "`flex-direction: column` turns the main axis vertical, so `align-items` now works sideways — `flex-end` pushes items to the right."
+  },
+  {
+    "id": "predict-3",
+    "type": "predict",
+    "prompt": "Which layout does this grid draw?",
+    "code": [
+      ".layout {",
+      "  display: grid;",
+      "  grid-template-columns: 1fr 2fr;",
+      "  gap: 6px;",
+      "}"
+    ],
+    "stage": "display:grid;gap:6px;",
+    "kids": [
+      "background:#4338CA;border-radius:4px",
+      "background:#E4572E;border-radius:4px"
+    ],
+    "opts": [
+      {
+        "s": "grid-template-columns:2fr 1fr",
+        "d": "wide column, then narrow"
+      },
+      {
+        "s": "grid-template-columns:1fr 1fr",
+        "d": "two equal columns"
+      },
+      {
+        "s": "grid-template-columns:1fr",
+        "d": "two stacked rows"
+      },
+      {
+        "s": "grid-template-columns:1fr 2fr",
+        "d": "narrow column, then wide"
+      }
+    ],
+    "answer": 3,
+    "explain": "`fr` units share out the free space: `1fr 2fr` makes the second column twice as wide as the first."
+  },
+  {
+    "id": "predict-4",
+    "type": "predict",
+    "prompt": "Item .a is orange. Which grid is this?",
+    "code": [
+      ".grid {",
+      "  display: grid;",
+      "  grid-template-columns: repeat(3, 1fr);",
+      "  gap: 4px;",
+      "}",
+      ".a { grid-column: span 2; }"
+    ],
+    "stage": "display:grid;gap:4px;",
+    "kids": [
+      "background:#E4572E;border-radius:3px",
+      "background:#4338CA;border-radius:3px",
+      "background:#4338CA;border-radius:3px",
+      "background:#4338CA;border-radius:3px"
+    ],
+    "opts": [
+      {
+        "s": "grid-template-columns:repeat(3,1fr)",
+        "d": "three columns, nothing spans"
+      },
+      {
+        "s": "grid-template-columns:repeat(3,1fr)",
+        "d": "three columns, orange item spans two",
+        "kids": [
+          "background:#E4572E;border-radius:3px;grid-column:span 2",
+          "background:#4338CA;border-radius:3px",
+          "background:#4338CA;border-radius:3px",
+          "background:#4338CA;border-radius:3px"
+        ]
+      },
+      {
+        "s": "grid-template-columns:repeat(3,1fr)",
+        "d": "orange item spans the whole row",
+        "kids": [
+          "background:#E4572E;border-radius:3px;grid-column:span 3",
+          "background:#4338CA;border-radius:3px",
+          "background:#4338CA;border-radius:3px",
+          "background:#4338CA;border-radius:3px"
+        ]
+      },
+      {
+        "s": "grid-template-columns:repeat(2,1fr)",
+        "d": "two columns, orange item spans both",
+        "kids": [
+          "background:#E4572E;border-radius:3px;grid-column:span 2",
+          "background:#4338CA;border-radius:3px",
+          "background:#4338CA;border-radius:3px",
+          "background:#4338CA;border-radius:3px"
+        ]
+      }
+    ],
+    "answer": 1,
+    "explain": "`span 2` stretches an item across two column tracks. The rest keep flowing into the next free cells, left to right."
+  },
+  {
+    "id": "pairs-1",
+    "type": "pairs",
+    "prompt": "Match each property to what it draws",
+    "items": [
+      {
+        "id": "a",
+        "code": "opacity: .4",
+        "shape": "width:36px;height:36px;background:#4338CA;border-radius:6px;opacity:.4",
+        "text": "",
+        "label": "Faded square"
+      },
+      {
+        "id": "b",
+        "code": "border-radius: 50%",
+        "shape": "width:36px;height:36px;background:#4338CA;border-radius:6px;border-radius:50%",
+        "text": "",
+        "label": "Circle"
+      },
+      {
+        "id": "c",
+        "code": "rotate: 45deg",
+        "shape": "width:36px;height:36px;background:#4338CA;border-radius:6px;rotate:45deg",
+        "text": "",
+        "label": "Tilted square"
+      },
+      {
+        "id": "d",
+        "code": "scale: .5",
+        "shape": "width:36px;height:36px;background:#4338CA;border-radius:6px;scale:.5",
+        "text": "",
+        "label": "Half-size square"
+      }
+    ],
+    "order": [
+      "b",
+      "d",
+      "a",
+      "c"
+    ],
+    "explain": "`rotate` and `scale` are standalone shortcuts for `transform: rotate()` and `scale()`. Both forms work in modern browsers."
+  },
+  {
+    "id": "pairs-2",
+    "type": "pairs",
+    "prompt": "Match each border or shadow to its shape",
+    "items": [
+      {
+        "id": "a",
+        "code": "border: 4px dashed",
+        "shape": "width:36px;height:36px;box-sizing:border-box;border:4px dashed #1D1B26;border-radius:6px;background:#EEF0FF",
+        "text": "",
+        "label": "Square with dashed border"
+      },
+      {
+        "id": "b",
+        "code": "box-shadow: 6px 6px 0 tomato",
+        "shape": "width:36px;height:36px;background:#4338CA;border-radius:6px;box-shadow:6px 6px 0 #E4572E",
+        "text": "",
+        "label": "Square with offset shadow"
+      },
+      {
+        "id": "c",
+        "code": "border-radius: 0 50%",
+        "shape": "width:36px;height:36px;background:#4338CA;border-radius:6px;border-radius:0 50%",
+        "text": "",
+        "label": "Leaf shape"
+      },
+      {
+        "id": "d",
+        "code": "width: 64px",
+        "shape": "width:64px;height:36px;background:#4338CA;border-radius:6px",
+        "text": "",
+        "label": "Wide rectangle"
+      }
+    ],
+    "order": [
+      "c",
+      "a",
+      "d",
+      "b"
+    ],
+    "explain": "`box-shadow` paints outside the box without taking up space. Two-value `border-radius` pairs opposite corners: top-left & bottom-right, then the other two."
+  },
+  {
+    "id": "pairs-3",
+    "type": "pairs",
+    "prompt": "Match each text property to its look",
+    "items": [
+      {
+        "id": "a",
+        "code": "font-weight: 800",
+        "shape": "font-size:26px;line-height:1;color:#1D1B26;font-weight:800",
+        "text": "Aa",
+        "label": "Bold Aa"
+      },
+      {
+        "id": "b",
+        "code": "font-style: italic",
+        "shape": "font-size:26px;line-height:1;color:#1D1B26;font-style:italic",
+        "text": "Aa",
+        "label": "Slanted Aa"
+      },
+      {
+        "id": "c",
+        "code": "text-decoration: underline",
+        "shape": "font-size:26px;line-height:1;color:#1D1B26;text-decoration:underline",
+        "text": "Aa",
+        "label": "Underlined Aa"
+      },
+      {
+        "id": "d",
+        "code": "letter-spacing: 8px",
+        "shape": "font-size:26px;line-height:1;color:#1D1B26;letter-spacing:8px",
+        "text": "Aa",
+        "label": "Widely spaced Aa"
+      }
+    ],
+    "order": [
+      "d",
+      "b",
+      "a",
+      "c"
+    ],
+    "explain": "All four change how text looks without touching the words in your HTML — style lives in CSS, content lives in markup."
+  },
+  {
+    "id": "versus-1",
+    "type": "versus",
+    "prompt": "What color is “Hello”?",
+    "code": [
+      "§<p id=\"intro\" class=\"lead\">Hello</p>",
+      "#intro { color: teal; }",
+      "p.lead { color: tomato; }"
+    ],
+    "opts": [
+      "teal",
+      "tomato"
+    ],
+    "answer": "teal",
+    "scores": [
+      {
+        "sel": "#intro",
+        "score": "1 · 0 · 0",
+        "win": true
+      },
+      {
+        "sel": "p.lead",
+        "score": "0 · 1 · 1",
+        "win": false
+      }
+    ],
+    "explain": "Specificity is compared before source order. One ID beats any number of classes and tags, so `teal` wins even though `p.lead` comes later."
+  },
+  {
+    "id": "versus-2",
+    "type": "versus",
+    "prompt": "Same score — now what color?",
+    "code": [
+      "§<p class=\"alert note\">Hello</p>",
+      ".note { color: crimson; }",
+      ".alert { color: navy; }"
+    ],
+    "opts": [
+      "crimson",
+      "navy"
+    ],
+    "answer": "navy",
+    "scores": [
+      {
+        "sel": ".note",
+        "score": "0 · 1 · 0",
+        "win": false
+      },
+      {
+        "sel": ".alert",
+        "score": "0 · 1 · 0",
+        "win": true
+      }
+    ],
+    "explain": "A tie in specificity goes to the rule written later in the CSS. The order of classes in the HTML `class` attribute doesn’t matter at all."
+  },
+  {
+    "id": "versus-3",
+    "type": "versus",
+    "prompt": "Three rules, one link. What color?",
+    "code": [
+      "§<a id=\"cta\" style=\"color:royalblue\">",
+      "§  Hello</a>",
+      "#cta { color: crimson; }",
+      "a { color: chocolate; }"
+    ],
+    "opts": [
+      "royalblue",
+      "crimson",
+      "chocolate"
+    ],
+    "answer": "royalblue",
+    "scores": [
+      {
+        "sel": "style=\"\"",
+        "score": "inline",
+        "win": true
+      },
+      {
+        "sel": "#cta",
+        "score": "1 · 0 · 0",
+        "win": false
+      },
+      {
+        "sel": "a",
+        "score": "0 · 0 · 1",
+        "win": false
+      }
+    ],
+    "explain": "Inline styles beat every selector in a stylesheet, even an ID. Only `!important` can override them — which is why inline styles are hard to maintain."
+  },
+  {
+    "id": "build-1",
+    "type": "build",
+    "prompt": "Center the card in its box",
+    "apply": "parent",
+    "boxBase": "height:84px;background:#FFFFFF;border:2px solid #E4DFD4;border-radius:12px;box-sizing:border-box;",
+    "kids": [
+      {
+        "s": "width:56px;height:36px;background:#4338CA;border-radius:8px",
+        "t": ""
+      }
+    ],
+    "code": [
+      ".box {",
+      {
+        "slot": 0
+      },
+      {
+        "slot": 1
+      },
+      "}"
+    ],
+    "props": [
+      "display",
+      "place-items"
+    ],
+    "defaults": [
+      "block",
+      "normal"
+    ],
+    "answer": [
+      "grid",
+      "center"
+    ],
+    "bank": [
+      "flex",
+      "grid",
+      "center",
+      "middle",
+      "block",
+      "start"
+    ],
+    "explain": "`place-items` sets `align-items` and `justify-items` at once. Grid honors both; flexbox ignores `justify-items`, so it only centers vertically."
+  },
+  {
+    "id": "build-2",
+    "type": "build",
+    "prompt": "Park the badge in the bottom-right corner",
+    "apply": "parent",
+    "boxBase": "height:84px;background:#FFFFFF;border:2px solid #E4DFD4;border-radius:12px;box-sizing:border-box;display:flex;padding:8px;",
+    "kids": [
+      {
+        "s": "width:40px;height:26px;background:#E4572E;border-radius:13px",
+        "t": ""
+      }
+    ],
+    "code": [
+      ".box {",
+      "  display: flex;",
+      {
+        "slot": 0
+      },
+      {
+        "slot": 1
+      },
+      "}"
+    ],
+    "props": [
+      "justify-content",
+      "align-items"
+    ],
+    "defaults": [
+      "normal",
+      "normal"
+    ],
+    "answer": [
+      "flex-end",
+      "flex-end"
+    ],
+    "bank": [
+      "flex-end",
+      "center",
+      "bottom",
+      "flex-end",
+      "flex-start",
+      "space-between"
+    ],
+    "explain": "In a row, `justify-content` moves items along → and `align-items` along ↓. `flex-end` on both lands the badge bottom-right. `bottom` isn’t a valid value, so the browser drops it."
+  },
+  {
+    "id": "build-3",
+    "type": "build",
+    "prompt": "Turn the button into a pill",
+    "apply": "child",
+    "boxBase": "height:84px;background:#FFFFFF;border:2px solid #E4DFD4;border-radius:12px;box-sizing:border-box;display:grid;place-items:center;",
+    "kids": [
+      {
+        "s": "background:#4338CA;color:#FFFFFF;font-weight:700;font-size:14px;line-height:1;",
+        "t": "Save"
+      }
+    ],
+    "code": [
+      ".btn {",
+      "  background: #4338CA;",
+      {
+        "slot": 0
+      },
+      {
+        "slot": 1
+      },
+      "}"
+    ],
+    "props": [
+      "border-radius",
+      "padding"
+    ],
+    "defaults": [
+      "0",
+      "0"
+    ],
+    "answer": [
+      "999px",
+      "10px 28px"
+    ],
+    "bank": [
+      "50%",
+      "10px 28px",
+      "999px",
+      "28px 10px",
+      "round",
+      "0"
+    ],
+    "explain": "A huge `border-radius` is capped at half the height, so the ends become perfect semicircles. `50%` makes an ellipse instead. `padding` with two values is vertical first, then horizontal."
+  },
+  {
+    "id": "tune-1",
+    "type": "tune",
+    "prompt": "Set the gap so your boxes fill the outlines",
+    "prop": "gap",
+    "unit": "px",
+    "min": 0,
+    "max": 48,
+    "step": 4,
+    "start": 8,
+    "target": 24,
+    "apply": "parent",
+    "count": 3,
+    "text": "",
+    "ghost": "width:56px;height:56px;box-sizing:border-box;border:2px dashed #4338CA;border-radius:10px;",
+    "yours": "width:56px;height:56px;box-sizing:border-box;background:#E4572E;opacity:.85;border-radius:10px;",
+    "explain": "`gap` adds space only between items — never before the first or after the last. That’s why it replaced margin tricks for spacing flex and grid children."
+  },
+  {
+    "id": "tune-2",
+    "type": "tune",
+    "prompt": "Set the padding so the tag fills the outline",
+    "prop": "padding",
+    "unit": "px",
+    "min": 0,
+    "max": 40,
+    "step": 4,
+    "start": 4,
+    "target": 20,
+    "apply": "child",
+    "count": 1,
+    "text": "New",
+    "ghost": "box-sizing:border-box;border:2px dashed #4338CA;border-radius:10px;font-size:20px;font-weight:700;line-height:1;color:transparent;",
+    "yours": "box-sizing:border-box;border:2px solid transparent;background:#E4572E;opacity:.9;border-radius:10px;font-size:20px;font-weight:700;line-height:1;color:#FFFFFF;",
+    "explain": "`padding` adds space inside the element, between its border and its content — so the whole box grows around the text."
+  },
+  {
+    "id": "tune-3",
+    "type": "tune",
+    "prompt": "Round the corners to match the outline",
+    "prop": "border-radius",
+    "unit": "px",
+    "min": 0,
+    "max": 48,
+    "step": 4,
+    "start": 0,
+    "target": 32,
+    "apply": "child",
+    "count": 1,
+    "text": "",
+    "ghost": "width:110px;height:110px;box-sizing:border-box;border:2px dashed #4338CA;",
+    "yours": "width:110px;height:110px;box-sizing:border-box;background:#E4572E;opacity:.85;",
+    "explain": "`border-radius` rounds each corner along a circle of that radius. Once it passes half the box’s size, it can’t get any rounder."
+  },
+  {
+    "id": "bug-1",
+    "type": "bug",
+    "prompt": "No rounded corners, no shadow. Tap the buggy line.",
+    "stage": "height:90px;display:grid;place-items:center;background:#EDE8DD;border-radius:12px",
+    "expected": {
+      "s": "width:110px;height:52px;background:#FFFFFF;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.2)",
+      "t": ""
+    },
+    "actual": {
+      "s": "width:110px;height:52px;background:#FFFFFF",
+      "t": ""
+    },
+    "code": [
+      ".card {",
+      "  padding: 16px;",
+      "  background: white;",
+      "  border-radius: 12px",
+      "  box-shadow: 0 4px 12px #0003;",
+      "}"
+    ],
+    "answer": 4,
+    "explain": "Line 4 is missing its `;` so lines 4–5 read as one invalid declaration. The browser silently drops it — no error, no radius, no shadow."
+  },
+  {
+    "id": "bug-2",
+    "type": "bug",
+    "prompt": "The label should be white. Tap the buggy line.",
+    "stage": "height:90px;display:grid;place-items:center;background:#EDE8DD;border-radius:12px",
+    "expected": {
+      "s": "padding:10px 16px;background:#4338CA;color:#FFFFFF;font-weight:700;font-size:14px;border-radius:10px",
+      "t": "Buy now"
+    },
+    "actual": {
+      "s": "padding:10px 16px;background:#4338CA;color:#1D1B26;font-weight:700;font-size:14px;border-radius:10px",
+      "t": "Buy now"
+    },
+    "code": [
+      ".btn {",
+      "  background: #4338CA;",
+      "  colour: white;",
+      "  padding: 10px 16px;",
+      "}"
+    ],
+    "answer": 3,
+    "explain": "CSS uses American spelling: `color`. An unknown property like `colour` is silently ignored, so the text keeps its default color."
+  },
+  {
+    "id": "bug-3",
+    "type": "bug",
+    "prompt": "The bar should be 120px wide. Tap the buggy line.",
+    "stage": "height:90px;display:flex;flex-direction:column;justify-content:center;padding:0 12px;background:#EDE8DD;border-radius:12px",
+    "expected": {
+      "s": "height:16px;width:120px;max-width:100%;background:#E4572E;border-radius:8px",
+      "t": ""
+    },
+    "actual": {
+      "s": "height:16px;background:#E4572E;border-radius:8px",
+      "t": ""
+    },
+    "code": [
+      ".bar {",
+      "  height: 16px;",
+      "  width: 120;",
+      "  background: #E4572E;",
+      "}"
+    ],
+    "answer": 3,
+    "explain": "Lengths other than 0 need a unit. `width: 120` is invalid, so the browser drops it and the bar stretches to full width."
+  },
+  {
+    "id": "type-1",
+    "type": "type",
+    "prompt": "Make the headline all caps — without retyping it",
+    "sel": ".headline",
+    "prop": "text-transform",
+    "accept": [
+      "uppercase"
+    ],
+    "text": "Ship it on Friday",
+    "base": "font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#1D1B26;",
+    "explain": "`text-transform` changes how text looks, not the HTML. The content stays in natural case, so the design can change later without rewriting copy."
+  },
+  {
+    "id": "type-2",
+    "type": "type",
+    "prompt": "Slant the quote",
+    "sel": ".quote",
+    "prop": "font-style",
+    "accept": [
+      "italic",
+      "oblique"
+    ],
+    "text": "“Less, but better.”",
+    "base": "font-family:Georgia,serif;font-size:26px;color:#1D1B26;",
+    "explain": "`font-style: italic` uses the font’s real italic letters when it has them; `oblique` just slants the regular ones."
+  },
+  {
+    "id": "type-3",
+    "type": "type",
+    "prompt": "Center the title inside its box",
+    "sel": ".title",
+    "prop": "text-align",
+    "accept": [
+      "center"
+    ],
+    "text": "Chapter One",
+    "base": "display:block;width:100%;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#1D1B26;",
+    "explain": "`text-align` lines up text inside its own box. To center the box itself, reach for `margin: auto` or flexbox instead."
+  }
+]

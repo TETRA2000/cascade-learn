@@ -1,0 +1,172 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Bug.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "6 · Spot the bug",
+      "w": 390,
+      "x": 940,
+      "y": 1440
+    },
+    "Build.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "4 · Word bank",
+      "w": 390,
+      "x": 0,
+      "y": 1440
+    },
+    "Main.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "1 · Predict the render",
+      "w": 390,
+      "x": 0,
+      "y": 0
+    },
+    "Pairs.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "2 · Match pairs",
+      "w": 390,
+      "x": 470,
+      "y": 0
+    },
+    "Tune.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "5 · Tune to target",
+      "w": 390,
+      "x": 470,
+      "y": 1440
+    },
+    "Type.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "7 · Type the value",
+      "w": 390,
+      "x": 1410,
+      "y": 1440
+    },
+    "Versus.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "3 · Which rule wins?",
+      "w": 390,
+      "x": 940,
+      "y": 0
+    },
+    "Prototype.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "▶ Working prototype — Learn + Practice",
+      "w": 390,
+      "x": 1570,
+      "y": 0
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-09-26T09:00:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "t1": {
+      "kind": "title1",
+      "maxW": 1330,
+      "text": "Recognize — read CSS, predict pixels",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "t2": {
+      "kind": "title1",
+      "maxW": 1800,
+      "text": "Produce — build, tune, debug, recall",
+      "w": 240,
+      "x": 0,
+      "y": 1140
+    },
+    "w1": {
+      "fill": "blue",
+      "maxH": 220,
+      "text": "Why: reading comes before writing. Mapping code → picture builds a mental renderer. Every distractor is a real misconception (mixing up justify-content and align-items). Options are drawn with real CSS, so they can never lie.",
+      "w": 390,
+      "x": 0,
+      "y": 884
+    },
+    "w2": {
+      "fill": "blue",
+      "maxH": 220,
+      "text": "Why: a fast warm-up for vocabulary. The right column is visual, so learners link property → effect rather than word → word. It checks on every tap, so the rhythm stays quick and low-stakes.",
+      "w": 390,
+      "x": 470,
+      "y": 884
+    },
+    "w3": {
+      "fill": "blue",
+      "maxH": 220,
+      "text": "Why: two choices, one concept — the cascade. The trap (\"the later rule wins\") is the most common specificity mistake. The reveal shows the scores, so the rule sticks, not just the answer.",
+      "w": 390,
+      "x": 940,
+      "y": 884
+    },
+    "w4": {
+      "fill": "blue",
+      "maxH": 220,
+      "text": "Why: Duolingo's word bank, adapted to syntax. Recall with guardrails — no typos to punish. The live preview renders wrong picks too, so 'flex + center' shows why it only centers one way.",
+      "w": 390,
+      "x": 0,
+      "y": 2324
+    },
+    "w5": {
+      "fill": "blue",
+      "maxH": 220,
+      "text": "Why: CSS is visual, so train the eye. Direct manipulation with instant feedback, like nudging a value in DevTools. The dashed ghost target makes 'close but not quite' visible.",
+      "w": 390,
+      "x": 470,
+      "y": 2324
+    },
+    "w6": {
+      "fill": "blue",
+      "maxH": 220,
+      "text": "Why: most real CSS time is debugging, and CSS fails silently — no errors. Expected-vs-actual mirrors how developers actually spot bugs, and tapping a line is easy on a phone.",
+      "w": 390,
+      "x": 940,
+      "y": 2324
+    },
+    "w7": {
+      "fill": "blue",
+      "maxH": 220,
+      "text": "Why: the hardest step — free recall with no options. Use it late in a lesson, after recognition. The live preview rewards partial progress and makes a misspelling visibly fail.",
+      "w": 390,
+      "x": 1410,
+      "y": 2324
+    },
+    "p1": {
+      "fill": "green",
+      "maxH": 300,
+      "text": "Press Play to run the app. LEARN tab: 5 lessons (How CSS works, Box model, Flexbox, Grid, Common properties), 19 cards, each with a live playground — tap values and watch the demo and code update. The last card jumps to topic practice. PRACTICE tab: Mixed review or one question type. 5 hearts; misses come back at the end. +10 XP first try, +5 on retry.",
+      "w": 390,
+      "x": 1570,
+      "y": 884
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Pairs.dc.html",
+    "Versus.dc.html",
+    "Build.dc.html",
+    "Tune.dc.html",
+    "Bug.dc.html",
+    "Type.dc.html",
+    "Prototype.dc.html"
+  ],
+  "pages": [],
+  "title": "CSS Learning App — Question Types"
+}

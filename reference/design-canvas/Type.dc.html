@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Type the value</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FBF8F2;color:#1D1B26;font-family:'DM Sans',system-ui,sans-serif}
+button{font-family:inherit;cursor:pointer}
+button:disabled{cursor:not-allowed}
+button:focus-visible,input:focus-visible{outline:3px solid #A5B4FC;outline-offset:2px}
+input::placeholder{color:#9C98B3}
+.k{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(29,27,38,.08);padding:1px 5px;border-radius:5px}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; box-sizing: border-box; background: #FBF8F2; overflow: hidden">
+<header style="display: flex; align-items: center; gap: 12px; padding: 12px 16px 8px">
+<button type="button" aria-label="Quit lesson" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: transparent; border: 0; border-radius: 12px; color: #5B5868"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+<div role="progressbar" aria-label="Lesson progress" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100" style="flex-grow: 1; height: 14px; background: #E4DFD4; border-radius: 999px; overflow: hidden"><div style="width: 95%; height: 100%; background: #4338CA; border-radius: 999px"></div></div>
+<div aria-label="4 hearts left" style="display: flex; align-items: center; gap: 4px; font-weight: 700; color: #B4461B"><svg width="22" height="22" viewBox="0 0 24 24" fill="#E4572E" stroke="#B4461B" stroke-width="1.5" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.4C1.2 8.4 3.3 5 6.6 5c2 0 3.4 1.1 4.4 2.5C12 6.1 13.4 5 15.4 5c3.3 0 5.4 3.4 4.1 6.6C19.5 16.4 12 21 12 21z"></path></svg><span>4</span></div>
+</header>
+<div style="padding: 8px 20px 0; display: flex; flex-direction: column; gap: 10px; align-items: flex-start">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #4338CA; background: #EEF0FF; padding: 6px 10px; border-radius: 999px">Type the value</span>
+<h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 26px; line-height: 1.15">Make the headline all caps — without retyping it</h1>
+</div>
+<main style="display: flex; flex-direction: column; gap: 14px; padding: 16px 20px 0">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 700; color: #5B5868">Live preview</span>
+<div style="height: 110px; display: flex; align-items: center; justify-content: center; padding: 0 16px; background: #FFFFFF; border: 2px solid #E4DFD4; border-radius: 16px">
+<span style="{{headStyle}}">Ship it on Friday</span>
+</div>
+</div>
+<div style="padding: 12px 16px; background: #1D1B26; color: #D6D3E0; border-radius: 16px; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.65">
+<div><span style="color: #F9A8D4">.headline</span> {</div>
+<div style="display: flex; align-items: center; gap: 6px; min-height: 52px; padding-left: 2ch"><label for="tt-value" style="color: #A5B4FC">text-transform</label>:<input id="tt-value" type="text" value="{{val}}" onChange="{{onType}}" disabled="{{checked}}" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="value" style="width: 150px; height: 40px; box-sizing: border-box; padding: 0 10px; background: #2A2740; border: 2px solid #7C7896; border-radius: 8px; color: #FCD34D; font-family: 'JetBrains Mono', monospace; font-size: 15px">;</div>
+<div>}</div>
+</div>
+<p style="margin: 0; font-size: 14px; color: #5B5868">No options this time — type it from memory.</p>
+</main>
+<div style="margin-top: auto">
+<sc-if value="{{showCheck}}" hint-placeholder-val="{{true}}">
+<div style="padding: 16px 20px 28px; border-top: 2px solid #E4DFD4">
+<button type="button" disabled="{{cantCheck}}" onClick="{{check}}" style="{{checkStyle}}">Check</button>
+</div>
+</sc-if>
+<sc-if value="{{checked}}" hint-placeholder-val="{{false}}">
+<section aria-live="polite" style="{{fbStyle}}">
+<div style="display: flex; align-items: center; gap: 10px">
+<sc-if value="{{ok}}" hint-placeholder-val="{{true}}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M7.5 12.5l3 3 6-6.5"></path></svg></sc-if>
+<sc-if value="{{bad}}" hint-placeholder-val="{{false}}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B4461B" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9 9l6 6M15 9l-6 6"></path></svg></sc-if>
+<h2 style="{{fbTitleStyle}}">{{fbTitle}}</h2>
+</div>
+<sc-if value="{{bad}}" hint-placeholder-val="{{false}}"><p style="margin: 0; font-size: 15px; font-weight: 700">Answer: <span class="k">text-transform: uppercase;</span></p></sc-if>
+<p style="margin: 0; font-size: 15px; line-height: 1.45"><span class="k">text-transform</span> changes how text looks, not the HTML. The content stays in natural case, so the design can change later without rewriting copy.</p>
+<button type="button" onClick="{{reset}}" style="{{contStyle}}">Continue</button>
+</section>
+</sc-if>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = this.fresh();
+  }
+  fresh() {
+    return { val: '', checked: false };
+  }
+  footer(ok, can) {
+    const s = this.state;
+    const ink = ok ? '#15803D' : '#B4461B';
+    const deep = ok ? '#0F5E2C' : '#8A3413';
+    const btn = 'width:100%;height:52px;border-radius:16px;font-size:16px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:0;';
+    return {
+      showCheck: !s.checked,
+      checked: s.checked,
+      ok: ok,
+      bad: s.checked && !ok,
+      cantCheck: !can,
+      checkStyle: btn + 'border-bottom:5px solid ' + (can ? '#2E2690' : '#D3CCBE') + ';background:' + (can ? '#4338CA' : '#E4DFD4') + ';color:' + (can ? '#FFFFFF' : '#6F6B7B'),
+      fbStyle: 'display:flex;flex-direction:column;gap:12px;padding:20px 20px 28px;background:' + (ok ? '#E3F4E8' : '#FCEBDF'),
+      fbTitleStyle: "margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:" + ink,
+      fbTitle: ok ? 'Loud and clear!' : 'Not quite',
+      contStyle: btn + 'border-bottom:5px solid ' + deep + ';background:' + ink + ';color:#FFFFFF',
+      check: () => { if (can) this.setState({ checked: true }); },
+      reset: () => this.setState(this.fresh())
+    };
+  }
+  renderVals() {
+    const s = this.state;
+    const clean = s.val.replace(/[^a-zA-Z-]/g, '').toLowerCase();
+    const ok = s.checked && clean === 'uppercase';
+    return Object.assign({
+      val: s.val,
+      headStyle: "font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;color:#1D1B26;text-transform:" + (clean || 'none'),
+      onType: (e) => this.setState({ val: e.target.value })
+    }, this.footer(ok, s.val.trim().length > 0));
+  }
+}
+</script>
+</body>
+</html>

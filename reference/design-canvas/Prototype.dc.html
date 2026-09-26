@@ -1,0 +1,1475 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cascade — CSS lessons prototype</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FBF8F2;color:#1D1B26;font-family:'DM Sans',system-ui,sans-serif}
+button{font-family:inherit;cursor:pointer}
+button:disabled{cursor:not-allowed}
+button:focus-visible,input:focus-visible{outline:3px solid #818CF8;outline-offset:2px}
+input::placeholder{color:#9C98B3}
+.k{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(29,27,38,.08);padding:1px 5px;border-radius:5px}
+.slide{animation:slideup .18s ease-out}
+@keyframes slideup{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion: reduce){.slide{animation:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; box-sizing: border-box; background: #FBF8F2; overflow: hidden">
+
+<sc-if value="{{isHome}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; height: 100%">
+<div style="flex-grow: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding: 16px 20px 24px">
+<header style="display: flex; align-items: center; justify-content: space-between; min-height: 48px">
+<div style="display: flex; flex-direction: column">
+<span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 28px; color: #4338CA; line-height: 1">Cascade</span>
+<span style="font-size: 13px; color: #5B5868">CSS, one tap at a time</span>
+</div>
+<div aria-label="5 hearts" style="display: flex; align-items: center; gap: 4px; font-weight: 700; color: #B4461B"><svg width="22" height="22" viewBox="0 0 24 24" fill="#E4572E" stroke="#B4461B" stroke-width="1.5" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.4C1.2 8.4 3.3 5 6.6 5c2 0 3.4 1.1 4.4 2.5C12 6.1 13.4 5 15.4 5c3.3 0 5.4 3.4 4.1 6.6C19.5 16.4 12 21 12 21z"></path></svg><span>5</span></div>
+</header>
+
+<sc-if value="{{tabLearn}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 20px; background: #4338CA; border-radius: 20px; border-bottom: 6px solid #2E2690; color: #FFFFFF">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #C7CBFF">{{nextKicker}}</span>
+<h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 26px">{{nextName}}</h1>
+<p style="margin: 0; font-size: 15px; color: #E0E3FF">{{nextBlurb}}</p>
+<button type="button" onClick="{{nextGo}}" style="height: 48px; margin-top: 6px; border: 0; border-bottom: 4px solid #C9C3B6; border-radius: 14px; background: #FFFFFF; color: #4338CA; font-weight: 800; font-size: 16px; letter-spacing: 0.06em; text-transform: uppercase">{{nextLabel}}</button>
+</div>
+<h2 style="margin: 4px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 20px">Lessons</h2>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{units}}" as="un" hint-placeholder-count="5">
+<button type="button" onClick="{{un.go}}" aria-label="{{un.aria}}" style="display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 8px 14px; background: #FFFFFF; border: 2px solid #E4DFD4; border-bottom-width: 5px; border-radius: 16px; text-align: left; color: #1D1B26">
+<span style="width: 34px; height: 34px; flex-shrink: 0; display: grid; place-items: center; border-radius: 10px; background: #FFF7DB; color: #8A5A00; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800">{{un.n}}</span>
+<span style="flex-grow: 1; display: flex; flex-direction: column"><span style="font-weight: 700; font-size: 16px">{{un.name}}</span><span style="font-size: 13px; color: #5B5868">{{un.sub}}</span></span>
+<sc-if value="{{un.done}}" hint-placeholder-val="{{false}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M7.5 12.5l3 3 6-6.5"></path></svg></sc-if>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8C88A3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{tabPractice}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 20px; background: #4338CA; border-radius: 20px; border-bottom: 6px solid #2E2690; color: #FFFFFF">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #C7CBFF">Today’s practice</span>
+<h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 26px">Mixed review</h1>
+<p style="margin: 0; font-size: 15px; color: #E0E3FF">7 questions — one of every type, easiest to hardest.</p>
+<button type="button" onClick="{{startMixed}}" style="height: 48px; margin-top: 6px; border: 0; border-bottom: 4px solid #C9C3B6; border-radius: 14px; background: #FFFFFF; color: #4338CA; font-weight: 800; font-size: 16px; letter-spacing: 0.06em; text-transform: uppercase">{{mixedLabel}}</button>
+</div>
+<h2 style="margin: 4px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 20px">Practice by type</h2>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{sets}}" as="st" hint-placeholder-count="7">
+<button type="button" onClick="{{st.go}}" aria-label="{{st.aria}}" style="display: flex; align-items: center; gap: 14px; min-height: 60px; padding: 0 14px; background: #FFFFFF; border: 2px solid #E4DFD4; border-bottom-width: 5px; border-radius: 16px; text-align: left; color: #1D1B26">
+<span style="width: 34px; height: 34px; flex-shrink: 0; display: grid; place-items: center; border-radius: 10px; background: #EEF0FF; color: #4338CA; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800">{{st.n}}</span>
+<span style="flex-grow: 1; display: flex; flex-direction: column"><span style="font-weight: 700; font-size: 16px">{{st.name}}</span><span style="font-size: 13px; color: #5B5868">{{st.blurb}}</span></span>
+<sc-if value="{{st.done}}" hint-placeholder-val="{{false}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M7.5 12.5l3 3 6-6.5"></path></svg></sc-if>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8C88A3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+</div>
+<nav aria-label="Sections" style="flex-shrink: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 8px 16px 20px; background: #FFFFFF; border-top: 2px solid #E4DFD4">
+<button type="button" onClick="{{goLearnTab}}" aria-pressed="{{learnPressed}}" style="{{learnTabStyle}}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"></path><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"></path></svg><span>Learn</span></button>
+<button type="button" onClick="{{goPracticeTab}}" aria-pressed="{{practicePressed}}" style="{{practiceTabStyle}}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="5"></circle><circle cx="12" cy="12" r="1.5"></circle></svg><span>Practice</span></button>
+</nav>
+</div>
+</sc-if>
+
+<sc-if value="{{isLearn}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; height: 100%">
+<header style="display: flex; align-items: center; gap: 12px; padding: 12px 16px 8px; flex-shrink: 0">
+<button type="button" onClick="{{exitLearn}}" aria-label="Close lesson" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: transparent; border: 0; border-radius: 12px; color: #5B5868"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+<div role="progressbar" aria-label="Lesson progress" aria-valuenow="{{learnPct}}" aria-valuemin="0" aria-valuemax="100" style="flex-grow: 1; height: 14px; background: #E4DFD4; border-radius: 999px; overflow: hidden"><div style="{{learnBar}}"></div></div>
+<span style="min-width: 40px; text-align: right; font-weight: 700; font-size: 14px; color: #5B5868">{{cardPos}}</span>
+</header>
+<div style="padding: 6px 20px 0; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; flex-shrink: 0">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #8A5A00; background: #FFF7DB; padding: 6px 10px; border-radius: 999px">{{unitName}}</span>
+<h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 26px; line-height: 1.15">{{cardTitle}}</h1>
+</div>
+<main style="flex-grow: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding: 12px 20px 20px">
+<p style="margin: 0; font-size: 16px; line-height: 1.5"><sc-for list="{{bodyParts}}" as="bp" hint-placeholder-count="3"><span class="{{bp.cls}}">{{bp.t}}</span></sc-for></p>
+<sc-if value="{{hasDemo}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="{{dStage}}"><sc-for list="{{dKids}}" as="dk" hint-placeholder-count="3"><div style="{{dk.w}}"><div style="{{dk.s}}">{{dk.t}}</div></div></sc-for></div>
+<sc-if value="{{hasLegend}}" hint-placeholder-val="{{false}}"><div style="display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: #5B5868"><sc-for list="{{legend}}" as="lg" hint-placeholder-count="4"><span style="display: flex; align-items: center; gap: 6px"><span style="{{lg.sw}}"></span>{{lg.l}}</span></sc-for></div></sc-if>
+<sc-if value="{{hasCaption}}" hint-placeholder-val="{{false}}"><p style="margin: 0; font-size: 14px; font-weight: 700; color: #4338CA">{{caption}}</p></sc-if>
+<div style="padding: 12px 16px; background: #1D1B26; border-radius: 16px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7">
+<sc-for list="{{dCode}}" as="dl" hint-placeholder-count="4">
+<div style="white-space: pre-wrap"><sc-for list="{{dl.segs}}" as="ds" hint-placeholder-count="3"><span style="{{ds.c}}">{{ds.t}}</span></sc-for></div>
+</sc-for>
+</div>
+<sc-for list="{{dKnobs}}" as="kn" hint-placeholder-count="1">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; color: #5B5868">{{kn.label}}</span>
+<div role="group" aria-label="{{kn.label}}" style="display: flex; flex-wrap: wrap; gap: 8px"><sc-for list="{{kn.opts}}" as="ko" hint-placeholder-count="3"><button type="button" onClick="{{ko.pick}}" aria-pressed="{{ko.pressed}}" style="{{ko.style}}">{{ko.label}}</button></sc-for></div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{hasTip}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; gap: 12px; padding: 14px 16px; background: #FFF7DB; border: 2px solid #F2D675; border-radius: 16px">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8A5A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1.1 2V16h5v-.2c.1-.8.5-1.5 1.1-2A6 6 0 0 0 12 3z"></path></svg>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #8A5A00">Key idea</span>
+<p style="margin: 0; font-size: 15px; line-height: 1.45"><sc-for list="{{tipParts}}" as="tp" hint-placeholder-count="3"><span class="{{tp.cls}}">{{tp.t}}</span></sc-for></p>
+</div>
+</div>
+</sc-if>
+</main>
+<div style="flex-shrink: 0; display: flex; gap: 12px; padding: 16px 20px 28px; border-top: 2px solid #E4DFD4">
+<button type="button" onClick="{{leftAct}}" disabled="{{leftOff}}" style="{{leftStyle}}">{{leftLabel}}</button>
+<button type="button" onClick="{{rightAct}}" style="{{rightStyle}}">{{rightLabel}}</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isQuiz}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; height: 100%">
+<header style="display: flex; align-items: center; gap: 12px; padding: 12px 16px 8px; flex-shrink: 0">
+<button type="button" onClick="{{quit}}" aria-label="Quit lesson" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: transparent; border: 0; border-radius: 12px; color: #5B5868"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+<div role="progressbar" aria-label="Lesson progress" aria-valuenow="{{pct}}" aria-valuemin="0" aria-valuemax="100" style="flex-grow: 1; height: 14px; background: #E4DFD4; border-radius: 999px; overflow: hidden"><div style="{{progressStyle}}"></div></div>
+<div aria-label="{{heartsAria}}" style="display: flex; align-items: center; gap: 4px; font-weight: 700; color: #B4461B"><svg width="22" height="22" viewBox="0 0 24 24" fill="#E4572E" stroke="#B4461B" stroke-width="1.5" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.4C1.2 8.4 3.3 5 6.6 5c2 0 3.4 1.1 4.4 2.5C12 6.1 13.4 5 15.4 5c3.3 0 5.4 3.4 4.1 6.6C19.5 16.4 12 21 12 21z"></path></svg><span>{{hearts}}</span></div>
+</header>
+<div style="padding: 6px 20px 0; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; flex-shrink: 0">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #4338CA; background: #EEF0FF; padding: 6px 10px; border-radius: 999px">{{typeLabel}}</span>
+<h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 24px; line-height: 1.15">{{prompt}}</h1>
+</div>
+<main style="flex-grow: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding: 14px 20px 16px">
+
+<sc-if value="{{showCode}}" hint-placeholder-val="{{true}}">
+<div style="padding: 12px 16px; background: #1D1B26; border-radius: 16px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; flex-shrink: 0">
+<sc-for list="{{code}}" as="ln" hint-placeholder-count="5">
+<div style="white-space: pre-wrap"><sc-for list="{{ln.segs}}" as="sg" hint-placeholder-count="3"><span style="{{sg.c}}">{{sg.t}}</span></sc-for></div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{isPredict}}" hint-placeholder-val="{{true}}">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{pOpts}}" as="o" hint-placeholder-count="4">
+<button type="button" onClick="{{o.pick}}" aria-pressed="{{o.pressed}}" aria-label="{{o.aria}}" style="{{o.tileStyle}}">
+<div style="{{o.stageStyle}}"><sc-for list="{{o.kids}}" as="kd" hint-placeholder-count="3"><div style="{{kd}}"></div></sc-for></div>
+<span style="font-weight: 700; font-size: 15px">{{o.letter}}</span>
+</button>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{isPairs}}" hint-placeholder-val="{{false}}">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<sc-for list="{{pLeft}}" as="pl" hint-placeholder-count="4">
+<button type="button" onClick="{{pl.pick}}" disabled="{{pl.done}}" aria-pressed="{{pl.pressed}}" style="{{pl.style}}">{{pl.code}}</button>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<sc-for list="{{pRight}}" as="pr" hint-placeholder-count="4">
+<button type="button" onClick="{{pr.pick}}" disabled="{{pr.done}}" aria-pressed="{{pr.pressed}}" aria-label="{{pr.label}}" style="{{pr.style}}"><div style="{{pr.shape}}">{{pr.text}}</div></button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isVersus}}" hint-placeholder-val="{{false}}">
+<div style="{{vGrid}}">
+<sc-for list="{{vOpts}}" as="vo" hint-placeholder-count="2">
+<button type="button" onClick="{{vo.pick}}" aria-pressed="{{vo.pressed}}" style="{{vo.style}}">
+<span style="{{vo.helloStyle}}">Hello</span>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; color: #1D1B26">{{vo.name}}</span>
+</button>
+</sc-for>
+</div>
+<sc-if value="{{showScores}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; background: #FFFFFF; border: 2px solid #E4DFD4; border-radius: 16px; overflow: hidden; flex-shrink: 0">
+<div style="display: grid; grid-template-columns: 1fr 1fr 60px; padding: 8px 14px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #5B5868; background: #F3F0E8"><span>Rule</span><span>ID · Class · Tag</span><span></span></div>
+<sc-for list="{{vScores}}" as="sc" hint-placeholder-count="2">
+<div style="display: grid; grid-template-columns: 1fr 1fr 60px; align-items: center; padding: 9px 14px; font-family: 'JetBrains Mono', monospace; font-size: 13px; border-top: 1px solid #E4DFD4"><span>{{sc.sel}}</span><span>{{sc.score}}</span><span style="{{sc.badge}}">{{sc.win}}</span></div>
+</sc-for>
+</div>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{isBuild}}" hint-placeholder-val="{{false}}">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; flex-shrink: 0">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 700; color: #5B5868">Goal</span>
+<div style="{{goalBox}}"><sc-for list="{{goalKids}}" as="gk" hint-placeholder-count="1"><div style="{{gk.s}}">{{gk.t}}</div></sc-for></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 700; color: #5B5868">Yours (live)</span>
+<div style="{{yourBox}}"><sc-for list="{{yourKids}}" as="yk" hint-placeholder-count="1"><div style="{{yk.s}}">{{yk.t}}</div></sc-for></div>
+</div>
+</div>
+<div style="padding: 10px 16px; background: #1D1B26; border-radius: 16px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: #D6D3E0; flex-shrink: 0">
+<sc-for list="{{bLines}}" as="bl" hint-placeholder-count="4">
+<sc-if value="{{bl.plain}}" hint-placeholder-val="{{true}}"><div style="white-space: pre"><sc-for list="{{bl.segs}}" as="bs" hint-placeholder-count="3"><span style="{{bs.c}}">{{bs.t}}</span></sc-for></div></sc-if>
+<sc-if value="{{bl.isSlot}}" hint-placeholder-val="{{false}}"><div style="display: flex; align-items: center; min-height: 46px; padding-left: 2ch"><span style="color: #A5B4FC">{{bl.prop}}</span>:<button type="button" onClick="{{bl.clear}}" aria-label="{{bl.aria}}" style="{{bl.style}}">{{bl.word}}</button>;</div></sc-if>
+</sc-for>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center">
+<sc-for list="{{bBank}}" as="bw" hint-placeholder-count="6">
+<button type="button" onClick="{{bw.pick}}" disabled="{{bw.off}}" aria-label="{{bw.aria}}" style="{{bw.style}}">{{bw.word}}</button>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{isTune}}" hint-placeholder-val="{{false}}">
+<div style="position: relative; height: 170px; flex-shrink: 0; background: #FFFFFF; border: 2px solid #E4DFD4; border-radius: 16px; overflow: hidden">
+<div style="{{ghostRow}}"><sc-for list="{{ghostKids}}" as="gh" hint-placeholder-count="3"><div style="{{gh.s}}">{{gh.t}}</div></sc-for></div>
+<div style="{{yourRow}}"><sc-for list="{{tuneKids}}" as="tk" hint-placeholder-count="3"><div style="{{tk.s}}">{{tk.t}}</div></sc-for></div>
+</div>
+<div style="display: flex; gap: 16px; font-size: 13px; color: #5B5868">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; height: 14px; box-sizing: border-box; border: 2px dashed #4338CA; border-radius: 4px"></span>Target</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; height: 14px; background: #E4572E; border-radius: 4px"></span>Yours</span>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<button type="button" aria-label="Decrease value" onClick="{{dec}}" disabled="{{decOff}}" style="{{stepStyleDec}}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+<div aria-live="polite" style="flex-grow: 1; height: 56px; display: flex; align-items: center; justify-content: center; background: #1D1B26; border-radius: 16px; font-family: 'JetBrains Mono', monospace; font-size: 16px; color: #D6D3E0; white-space: pre"><span style="color: #A5B4FC">{{tProp}}</span>: <span style="color: #FCD34D">{{tVal}}</span>;</div>
+<button type="button" aria-label="Increase value" onClick="{{inc}}" disabled="{{incOff}}" style="{{stepStyleInc}}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M12 5v14"></path></svg></button>
+</div>
+</sc-if>
+
+<sc-if value="{{isBug}}" hint-placeholder-val="{{false}}">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; flex-shrink: 0">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 700; color: #5B5868">Expected</span>
+<div style="{{bugStage}}"><div style="{{expS}}">{{expT}}</div></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 700; color: #5B5868">Actual</span>
+<div style="{{bugStage}}"><div style="{{actS}}">{{actT}}</div></div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 10px; background: #1D1B26; border-radius: 16px; flex-shrink: 0">
+<sc-for list="{{gLines}}" as="gl" hint-placeholder-count="5">
+<button type="button" onClick="{{gl.pick}}" aria-pressed="{{gl.pressed}}" aria-label="{{gl.aria}}" style="{{gl.style}}">
+<span style="width: 2ch; flex-shrink: 0; color: #8C88A3; text-align: right">{{gl.n}}</span>
+<span style="white-space: pre"><sc-for list="{{gl.segs}}" as="gs" hint-placeholder-count="3"><span style="{{gs.c}}">{{gs.t}}</span></sc-for></span>
+</button>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{isType}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 6px; flex-shrink: 0">
+<span style="font-size: 13px; font-weight: 700; color: #5B5868">Live preview</span>
+<div style="{{yBox}}"><span style="{{yStyle}}">{{yText}}</span></div>
+</div>
+<div style="padding: 12px 16px; background: #1D1B26; color: #D6D3E0; border-radius: 16px; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.65; flex-shrink: 0">
+<div><span style="color: #F9A8D4">{{ySel}}</span> {</div>
+<div style="display: flex; align-items: center; gap: 6px; min-height: 52px; padding-left: 2ch; flex-wrap: wrap"><label for="answer-input" style="color: #A5B4FC">{{yProp}}</label>:<input id="answer-input" type="text" value="{{val}}" onChange="{{onType}}" onKeyDown="{{onKey}}" disabled="{{checked}}" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="value" style="width: 140px; height: 40px; box-sizing: border-box; padding: 0 10px; background: #2A2740; border: 2px solid #7C7896; border-radius: 8px; color: #FCD34D; font-family: 'JetBrains Mono', monospace; font-size: 15px">;</div>
+<div>}</div>
+</div>
+<p style="margin: 0; font-size: 14px; color: #5B5868">No options this time — type it from memory. Press Enter to check.</p>
+</sc-if>
+
+</main>
+<div style="flex-shrink: 0">
+<sc-if value="{{showCheck}}" hint-placeholder-val="{{true}}">
+<div style="padding: 16px 20px 28px; border-top: 2px solid #E4DFD4">
+<button type="button" disabled="{{cantCheck}}" onClick="{{check}}" style="{{checkStyle}}">Check</button>
+</div>
+</sc-if>
+<sc-if value="{{showHint}}" hint-placeholder-val="{{false}}">
+<div style="padding: 16px 20px 28px; border-top: 2px solid #E4DFD4; display: flex; align-items: center; justify-content: space-between; min-height: 52px">
+<p style="margin: 0; font-size: 15px; color: #5B5868">Tap a property, then its result.</p>
+<span style="font-weight: 700; font-size: 15px">{{pCount}} / 4</span>
+</div>
+</sc-if>
+<sc-if value="{{checked}}" hint-placeholder-val="{{false}}">
+<section class="slide" aria-live="polite" style="{{fbStyle}}">
+<div style="display: flex; align-items: center; gap: 10px">
+<sc-if value="{{ok}}" hint-placeholder-val="{{true}}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M7.5 12.5l3 3 6-6.5"></path></svg></sc-if>
+<sc-if value="{{bad}}" hint-placeholder-val="{{false}}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B4461B" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9 9l6 6M15 9l-6 6"></path></svg></sc-if>
+<h2 style="{{fbTitleStyle}}">{{fbTitle}}</h2>
+</div>
+<sc-if value="{{hasSub}}" hint-placeholder-val="{{false}}"><p style="margin: 0; font-size: 15px; font-weight: 700">{{fbSub}}</p></sc-if>
+<p style="margin: 0; font-size: 15px; line-height: 1.45"><sc-for list="{{fbParts}}" as="fp" hint-placeholder-count="3"><span class="{{fp.cls}}">{{fp.t}}</span></sc-for></p>
+<button type="button" onClick="{{next}}" style="{{contStyle}}">Continue</button>
+</section>
+</sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isDone}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; height: 100%; padding: 32px 24px; box-sizing: border-box; text-align: center">
+<svg width="96" height="96" viewBox="0 0 24 24" fill="#EEF0FF" stroke="#4338CA" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.8l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.1 6.4 20l1.1-6.2L3 9.4l6.2-.9z"></path></svg>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 32px; color: #4338CA">Lesson complete!</h1>
+<p style="margin: 0; font-size: 16px; color: #5B5868">{{lessonName}}</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%">
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 14px 8px; background: #FFFFFF; border: 2px solid #E4DFD4; border-radius: 16px"><span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #5B5868">XP</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 26px">+{{xp}}</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 14px 8px; background: #FFFFFF; border: 2px solid #E4DFD4; border-radius: 16px"><span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #5B5868">First try</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 26px">{{acc}}%</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 14px 8px; background: #FFFFFF; border: 2px solid #E4DFD4; border-radius: 16px"><span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #5B5868">Hearts</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 26px; color: #B4461B">{{hearts}}</span></div>
+</div>
+<p style="margin: 0; font-size: 15px; color: #5B5868">{{doneNote}}</p>
+<div style="display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 8px">
+<button type="button" onClick="{{goHome}}" style="width: 100%; height: 52px; border-radius: 16px; font-size: 16px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; border: 0; border-bottom: 5px solid #2E2690; background: #4338CA; color: #FFFFFF">Continue</button>
+<button type="button" onClick="{{retry}}" style="width: 100%; height: 52px; border-radius: 16px; font-size: 16px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; border: 2px solid #E4DFD4; border-bottom-width: 5px; background: #FFFFFF; color: #4338CA">Practice again</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isOut}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; height: 100%; padding: 32px 24px; box-sizing: border-box; text-align: center">
+<svg width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="#B4461B" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.4C1.2 8.4 3.3 5 6.6 5c2 0 3.4 1.1 4.4 2.5C12 6.1 13.4 5 15.4 5c3.3 0 5.4 3.4 4.1 6.6C19.5 16.4 12 21 12 21z"></path><path d="M12 7.5l-1.5 3.5 3 2-1.5 3.5"></path></svg>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 32px; color: #B4461B">Out of hearts</h1>
+<p style="margin: 0; font-size: 16px; line-height: 1.45; color: #5B5868">Mistakes are how CSS sticks. Every question you missed will be waiting for you next run.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 8px">
+<button type="button" onClick="{{retry}}" style="width: 100%; height: 52px; border-radius: 16px; font-size: 16px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; border: 0; border-bottom: 5px solid #2E2690; background: #4338CA; color: #FFFFFF">Try again</button>
+<button type="button" onClick="{{goHome}}" style="width: 100%; height: 52px; border-radius: 16px; font-size: 16px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; border: 2px solid #E4DFD4; border-bottom-width: 5px; background: #FFFFFF; color: #4338CA">Back to home</button>
+</div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      screen: 'home', lessonKey: null, queue: [], idx: 0, total: 0,
+      hearts: 5, solved: 0, firstTry: 0, xp: 0, missed: {}, doneSets: {},
+      q: this.freshQ(null),
+      tab: 'learn', unit: null, card: 0, knobs: [], seenUnits: {}
+    };
+  }
+
+  // Which practice questions belong to each learning unit.
+  topics() {
+    return {
+      basics: ['versus-1', 'versus-2', 'versus-3', 'bug-2', 'bug-1'],
+      box: ['pairs-2', 'tune-2', 'tune-3', 'build-3', 'bug-3'],
+      flex: ['predict-1', 'predict-2', 'build-2', 'tune-1'],
+      grid: ['predict-3', 'predict-4', 'build-1'],
+      props: ['pairs-1', 'pairs-3', 'type-1', 'type-2', 'type-3']
+    };
+  }
+
+  // Learning units: short cards, each with a live playground.
+  units() {
+    if (this._units) return this._units;
+    const IT = "background:#4338CA;color:#FFFFFF;font-weight:700;font-size:15px;border-radius:8px;padding:10px 14px;text-align:center;";
+    const IO = "background:#E4572E;color:#FFFFFF;font-weight:700;font-size:15px;border-radius:8px;padding:10px 14px;text-align:center;";
+    const nums = (n) => { const a = []; for (let i = 0; i < n; i++) a.push({ s: i % 2 ? IO : IT, t: String(i + 1) }); return a; };
+    const mono = "font-family:'JetBrains Mono',monospace;font-size:13px;";
+    const pRow = mono + 'padding:10px 12px;border-radius:8px;';
+    const off = 'background:#F3F0E8;color:#1D1B26;';
+    const on = 'background:gold;color:#1D1B26;';
+    const tags = ['<p id="intro">', '<p class="note">', '<p>'];
+    const selKids = (hits) => tags.map((t, i) => ({ s: pRow + (hits.indexOf(i) !== -1 ? on : off), t: t }));
+    const hello = (c) => [{ s: "font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:34px;color:" + c, t: 'Hello' }];
+    const boxKid = "background:linear-gradient(#FFFFFF,#FFFFFF) content-box,#C7CBFF;" + mono;
+    const sw = (c) => 'width:14px;height:14px;border-radius:4px;border:1px solid #C9C3B6;background:' + c;
+    this._units = [
+      {
+        key: 'basics', name: 'How CSS works', blurb: 'Rules, selectors and the cascade',
+        cards: [
+          {
+            title: 'A rule = selector + declarations',
+            body: 'Every CSS rule picks elements with a selector, then sets `property: value` pairs inside braces. Tap a value below and watch the text change.',
+            demo: {
+              base: 'display:grid;place-items:center;',
+              kids: [{ s: "margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;", t: 'Hello, CSS' }],
+              knobs: [
+                { prop: 'color', opts: ['black', 'indigo', 'tomato', 'seagreen'], target: 0, sel: 'p', start: 1 },
+                { prop: 'font-size', opts: ['16px', '24px', '32px'], target: 0, sel: 'p', start: 1 }
+              ]
+            },
+            tip: 'Each declaration ends with a `;`. Forget one and the browser quietly throws away the next declaration too.'
+          },
+          {
+            title: 'Selectors choose who gets styled',
+            body: '`p` matches every paragraph. `.note` matches anything with `class="note"`. `#intro` matches the one element with `id="intro"`.',
+            demo: {
+              kind: 'choice', label: 'selector', start: 0,
+              base: 'display:flex;flex-direction:column;gap:8px;',
+              opts: [
+                { label: 'p', code: ['p { background: gold; }'], kids: selKids([0, 1, 2]), note: 'Matches all 3 paragraphs' },
+                { label: '.note', code: ['.note { background: gold; }'], kids: selKids([1]), note: 'Matches 1 element — the one with class="note"' },
+                { label: '#intro', code: ['#intro { background: gold; }'], kids: selKids([0]), note: 'Matches 1 element — ids are unique' },
+                { label: 'div', code: ['div { background: gold; }'], kids: selKids([]), note: 'Matches nothing — and that’s not an error' }
+              ]
+            },
+            tip: 'A selector can match many elements, one, or none. CSS never complains when nothing matches — it just does nothing.'
+          },
+          {
+            title: 'The cascade settles conflicts',
+            body: 'When two rules set the same property on the same element, the more specific selector wins. If they tie, the rule written later wins. Change the second rule’s selector:',
+            demo: {
+              kind: 'choice', label: 'second rule’s selector', start: 0,
+              base: 'display:grid;place-items:center;',
+              opts: [
+                { label: 'p', code: ['§<p id="intro" class="lead">', '.lead { color: tomato; }', 'p { color: teal; }'], kids: hello('tomato'), note: '.lead (0·1·0) beats p (0·0·1) → tomato' },
+                { label: '.lead', code: ['§<p id="intro" class="lead">', '.lead { color: tomato; }', '.lead { color: teal; }'], kids: hello('teal'), note: 'A tie at 0·1·0 → the later rule wins → teal' },
+                { label: '#intro', code: ['§<p id="intro" class="lead">', '.lead { color: tomato; }', '#intro { color: teal; }'], kids: hello('teal'), note: '#intro (1·0·0) beats .lead → teal' }
+              ]
+            },
+            tip: 'Specificity first, then source order. Read the score as ID · class · tag and compare left to right.'
+          }
+        ]
+      },
+      {
+        key: 'box', name: 'The box model', blurb: 'Content, padding, border, margin',
+        cards: [
+          {
+            title: 'Every element is a box',
+            body: 'Each box has four layers: content in the middle, then `padding`, then `border`, then `margin` on the outside. Grow each one and see where the space goes.',
+            demo: {
+              base: 'display:grid;place-items:center;min-height:190px;',
+              kids: [{ w: 'display:flex;background:#FCD9C8;border-radius:4px', s: boxKid, t: 'content' }],
+              knobs: [
+                { prop: 'padding', opts: ['0', '12px', '24px'], target: 0, sel: '.box', start: 1 },
+                { prop: 'border', opts: ['none', '4px solid', '8px solid'], target: 0, sel: '.box', start: 1 },
+                { prop: 'margin', opts: ['0', '12px', '24px'], target: 0, sel: '.box', start: 1 }
+              ],
+              legend: [{ sw: sw('#FCD9C8'), l: 'margin' }, { sw: sw('#1D1B26'), l: 'border' }, { sw: sw('#C7CBFF'), l: 'padding' }, { sw: sw('#FFFFFF'), l: 'content' }]
+            },
+            tip: 'Padding is inside the border and shows the background. Margin is outside, always transparent, and pushes neighbors away.'
+          },
+          {
+            title: 'box-sizing: what does width mean?',
+            body: 'By default `width` sets only the content. Add padding and border and the box grows wider than you asked. `border-box` makes `width` include them.',
+            demo: {
+              base: 'display:flex;flex-direction:column;align-items:center;gap:10px;',
+              kids: [
+                { s: 'width:160px;height:22px;box-sizing:border-box;border:2px solid #5B5868;border-top:0;display:flex;justify-content:center;font-size:12px;font-weight:700;color:#5B5868;line-height:1;', t: '160px' },
+                { s: 'width:160px;background:#C7CBFF;border:4px solid #1D1B26;text-align:center;' + mono, t: 'box' }
+              ],
+              show: { '.box': ['width: 160px', 'border: 4px solid'] },
+              knobs: [
+                { prop: 'box-sizing', opts: ['content-box', 'border-box'], target: 1, sel: '.box', start: 0 },
+                { prop: 'padding', opts: ['0', '16px', '32px'], target: 1, sel: '.box', start: 2 }
+              ]
+            },
+            tip: 'Most projects start with `*, *::before, *::after { box-sizing: border-box; }` so sizes mean what they say.'
+          },
+          {
+            title: 'Shorthand: one to four values',
+            body: 'One value sets all four sides. Two values mean vertical, then horizontal. Four values go clockwise: top, right, bottom, left.',
+            demo: {
+              base: 'display:grid;place-items:center;min-height:170px;',
+              kids: [{ s: boxKid + 'border:2px solid #1D1B26;', t: 'content' }],
+              show: { '.box': ['border: 2px solid'] },
+              knobs: [{ prop: 'padding', opts: ['16px', '8px 32px', '0 32px 24px 0', '24px 8px 0'], target: 0, sel: '.box', start: 1 }],
+              legend: [{ sw: sw('#C7CBFF'), l: 'padding' }, { sw: sw('#FFFFFF'), l: 'content' }]
+            },
+            tip: 'Clockwise from the top — think “TRouBLe”: Top, Right, Bottom, Left. Works for margin, padding and border-width.'
+          }
+        ]
+      },
+      {
+        key: 'flex', name: 'Flexbox basics', blurb: 'Line items up in a row or column',
+        cards: [
+          {
+            title: 'Turn on flex',
+            body: 'Put `display: flex` on a parent and its children line up in a row. The parent is the flex container; its children are flex items.',
+            demo: {
+              base: 'gap:8px;',
+              kids: nums(3),
+              show: { '.row': ['gap: 8px'] },
+              knobs: [{ prop: 'display', opts: ['block', 'flex'], target: 'parent', sel: '.row', start: 0 }]
+            },
+            tip: 'Flexbox is one-dimensional: it arranges items along one line at a time. `gap` only works once the parent is flex or grid.'
+          },
+          {
+            title: 'Main axis: justify-content',
+            body: '`justify-content` shares out space along the main axis — left to right in a row.',
+            demo: {
+              base: 'display:flex;gap:8px;',
+              kids: nums(3),
+              show: { '.row': ['display: flex', 'gap: 8px'] },
+              knobs: [{ prop: 'justify-content', opts: ['flex-start', 'center', 'space-between', 'space-around', 'flex-end'], target: 'parent', sel: '.row', start: 2 }]
+            },
+            tip: 'The main axis is the direction items flow. In a row that’s horizontal.'
+          },
+          {
+            title: 'Cross axis: align-items',
+            body: '`align-items` positions items on the cross axis — top to bottom in a row. Items of different heights make it easy to see.',
+            demo: {
+              base: 'display:flex;gap:8px;min-height:170px;',
+              kids: [{ s: IT, t: '1' }, { s: IO + 'white-space:pre-line;', t: 'Two\nlines' }, { s: IT, t: '3' }],
+              show: { '.row': ['display: flex'] },
+              knobs: [{ prop: 'align-items', opts: ['stretch', 'flex-start', 'center', 'flex-end'], target: 'parent', sel: '.row', start: 0 }]
+            },
+            tip: 'The default is `stretch`: items grow to fill the cross axis unless they have a fixed height.'
+          },
+          {
+            title: 'Direction swaps the axes',
+            body: '`flex-direction: column` turns the main axis vertical. Now `justify-content` moves items up and down instead of left and right.',
+            demo: {
+              base: 'display:flex;gap:8px;height:200px;',
+              kids: nums(3),
+              show: { '.row': ['display: flex'] },
+              knobs: [
+                { prop: 'flex-direction', opts: ['row', 'column'], target: 'parent', sel: '.row', start: 1 },
+                { prop: 'justify-content', opts: ['flex-start', 'center', 'space-between'], target: 'parent', sel: '.row', start: 2 }
+              ]
+            },
+            tip: '`justify-content` and `align-items` follow the axes, not the screen. Change direction and they change jobs.'
+          },
+          {
+            title: 'Share leftover space: flex-grow',
+            body: '`flex-grow` lets an item soak up spare room in the row. Items with 0 keep their natural size.',
+            demo: {
+              base: 'display:flex;',
+              kids: nums(3),
+              show: { '.row': ['display: flex'] },
+              knobs: [
+                { prop: 'gap', opts: ['0', '8px', '16px'], target: 'parent', sel: '.row', start: 1 },
+                { prop: 'flex-grow', opts: ['0', '1', '2'], target: 1, sel: '.item:nth-child(2)', start: 1 }
+              ]
+            },
+            tip: '`flex: 1` is the everyday shorthand for “take the remaining space”.'
+          }
+        ]
+      },
+      {
+        key: 'grid', name: 'Grid basics', blurb: 'Rows and columns at once',
+        cards: [
+          {
+            title: 'Define columns',
+            body: '`display: grid` plus `grid-template-columns` draws columns. Items fill the cells left to right, then wrap onto the next row.',
+            demo: {
+              base: 'display:grid;gap:8px;',
+              kids: nums(6),
+              show: { '.grid': ['display: grid', 'gap: 8px'] },
+              knobs: [{ prop: 'grid-template-columns', opts: ['1fr', '1fr 1fr', '1fr 1fr 1fr', '100px 1fr'], target: 'parent', sel: '.grid', start: 2 }]
+            },
+            tip: 'Grid is two-dimensional: you shape rows and columns together. Flexbox is for a single row or column.'
+          },
+          {
+            title: 'The fr unit',
+            body: '`fr` means a fraction of the free space. `1fr 2fr` splits it one third and two thirds. `repeat(3, 1fr)` is shorthand for three equal columns.',
+            demo: {
+              base: 'display:grid;gap:8px;',
+              kids: nums(3),
+              show: { '.grid': ['display: grid', 'gap: 8px'] },
+              knobs: [{ prop: 'grid-template-columns', opts: ['1fr 1fr', '1fr 2fr', '2fr 1fr', 'repeat(3, 1fr)'], target: 'parent', sel: '.grid', start: 1 }]
+            },
+            tip: '`fr` shares what’s left after fixed sizes and gaps are taken, so `100px 1fr` means “100px, then the rest”.'
+          },
+          {
+            title: 'Spanning cells',
+            body: 'An item can stretch across several columns with `grid-column: span 2`. The other items flow around it.',
+            demo: {
+              base: 'display:grid;gap:8px;grid-template-columns:repeat(3,1fr);',
+              kids: nums(5),
+              show: { '.grid': ['display: grid', 'grid-template-columns: repeat(3, 1fr)'] },
+              knobs: [{ prop: 'grid-column', opts: ['auto', 'span 2', 'span 3'], target: 0, sel: '.item:first-child', start: 1 }]
+            },
+            tip: 'Spans are how you build “one big card, several small ones” layouts without extra wrappers.'
+          },
+          {
+            title: 'Centering with grid',
+            body: '`place-items` positions every item inside its cell. `center` is the shortest way to center anything in CSS.',
+            demo: {
+              base: 'display:grid;min-height:180px;',
+              kids: [{ s: IT, t: 'Hi' }],
+              show: { '.box': ['display: grid'] },
+              knobs: [{ prop: 'place-items', opts: ['normal', 'start', 'center', 'end'], target: 'parent', sel: '.box', start: 2 }]
+            },
+            tip: '`place-items` is shorthand for `align-items` + `justify-items`. In grid both apply, so one line centers both ways.'
+          }
+        ]
+      },
+      {
+        key: 'props', name: 'Common properties', blurb: 'Color, type, units, borders',
+        cards: [
+          {
+            title: 'Color and background',
+            body: '`color` sets the text color. `background` paints behind the content and padding. Try combinations — some aren’t readable.',
+            demo: {
+              base: 'display:grid;place-items:center;',
+              kids: [{ s: 'padding:16px 24px;border-radius:12px;font-size:22px;font-weight:700;border:2px solid #E4DFD4;', t: 'Readable?' }],
+              knobs: [
+                { prop: 'color', opts: ['#1D1B26', '#FFFFFF', '#4338CA'], target: 0, sel: '.badge', start: 0 },
+                { prop: 'background', opts: ['#FFFFFF', '#4338CA', '#FCD34D'], target: 0, sel: '.badge', start: 2 }
+              ]
+            },
+            tip: 'Keep contrast high: body text needs at least 4.5:1 against its background (3:1 for large text).'
+          },
+          {
+            title: 'Typography',
+            body: 'Three properties do most of the work: `font-size` for scale, `font-weight` for emphasis, `text-align` for alignment.',
+            demo: {
+              base: 'display:flex;align-items:center;',
+              kids: [{ s: 'width:100%;line-height:1.3;', t: 'The quick brown fox jumps.' }],
+              knobs: [
+                { prop: 'font-size', opts: ['14px', '20px', '28px'], target: 0, sel: '.title', start: 1 },
+                { prop: 'font-weight', opts: ['400', '500', '700'], target: 0, sel: '.title', start: 2 },
+                { prop: 'text-align', opts: ['left', 'center', 'right'], target: 0, sel: '.title', start: 0 }
+              ]
+            },
+            tip: 'Fewer sizes, used consistently, look more polished than many. Pick a small scale and stick to it.'
+          },
+          {
+            title: 'Units: px, %, rem',
+            body: '`px` is fixed. `%` is relative to the parent. `rem` is relative to the root font size — usually 16px, so `10rem` is 160px.',
+            demo: {
+              base: 'display:flex;flex-direction:column;',
+              kids: [{ s: IT + 'text-align:left;white-space:nowrap;', t: 'bar' }],
+              knobs: [{ prop: 'width', opts: ['120px', '50%', '100%', '10rem'], target: 0, sel: '.bar', start: 1 }]
+            },
+            tip: 'Use `rem` for font sizes so text respects the reader’s browser settings. Use `%` when something should follow its container.'
+          },
+          {
+            title: 'Borders and corners',
+            body: '`border` takes a width, a style and an optional color. `border-radius` rounds the corners — a huge value makes a pill.',
+            demo: {
+              base: 'display:grid;place-items:center;',
+              kids: [{ s: 'padding:12px 24px;background:#FFFFFF;font-weight:700;font-size:16px;color:#1D1B26;', t: 'Button' }],
+              knobs: [
+                { prop: 'border', opts: ['none', '2px solid', '4px dashed'], target: 0, sel: '.btn', start: 1 },
+                { prop: 'border-radius', opts: ['0', '12px', '999px'], target: 0, sel: '.btn', start: 1 }
+              ]
+            },
+            tip: 'Leave out the border color and it uses the text color (`currentColor`), so borders follow your text automatically.'
+          }
+        ]
+      }
+    ];
+    return this._units;
+  }
+
+  unitByKey(key) {
+    return this.units().find((u) => u.key === key);
+  }
+
+  initKnobs(card) {
+    const d = card && card.demo;
+    if (!d) return [];
+    if (d.kind === 'choice') return [d.start || 0];
+    return d.knobs.map((k) => k.start || 0);
+  }
+
+  openUnit(key) {
+    const u = this.unitByKey(key);
+    this.setState({ screen: 'learn', unit: key, card: 0, knobs: this.initKnobs(u.cards[0]) });
+  }
+
+  gotoCard(i) {
+    const u = this.unitByKey(this.state.unit);
+    this.setState({ card: i, knobs: this.initKnobs(u.cards[i]) });
+  }
+
+  markUnit() {
+    const seen = Object.assign({}, this.state.seenUnits);
+    seen[this.state.unit] = true;
+    return seen;
+  }
+
+  pickKnob(i, oi) {
+    const k = this.state.knobs.slice();
+    k[i] = oi;
+    this.setState({ knobs: k });
+  }
+
+  chip(active) {
+    return active
+      ? "min-height:44px;padding:0 14px;border-radius:12px;border:2px solid #2E2690;border-bottom-width:4px;background:#4338CA;color:#FFFFFF;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600"
+      : "min-height:44px;padding:0 14px;border-radius:12px;border:2px solid #E4DFD4;border-bottom-width:4px;background:#FFFFFF;color:#1D1B26;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600";
+  }
+
+  demoVm(card, sel) {
+    const d = card.demo;
+    const empty = { hasDemo: false, dStage: '', dKids: [], dCode: [], dKnobs: [], hasCaption: false, caption: '', hasLegend: false, legend: [] };
+    if (!d) return empty;
+    const frame = 'min-height:150px;padding:14px;box-sizing:border-box;background:#FFFFFF;border:2px solid #E4DFD4;border-radius:16px;overflow:hidden;';
+    const wrap = (k, extra) => ({ w: k.w || 'display:contents', s: k.s + ';' + (extra || ''), t: k.t });
+    if (d.kind === 'choice') {
+      const oi = sel[0] || 0;
+      const o = d.opts[oi];
+      return {
+        hasDemo: true,
+        dStage: frame + d.base,
+        dKids: o.kids.map((k) => wrap(k)),
+        dCode: o.code.map((l) => ({ segs: this.hl(l) })),
+        dKnobs: [{ label: d.label, opts: d.opts.map((x, i) => ({ label: x.label, pressed: i === oi ? 'true' : 'false', style: this.chip(i === oi), pick: () => this.pickKnob(0, i) })) }],
+        hasCaption: !!o.note, caption: o.note || '',
+        hasLegend: false, legend: []
+      };
+    }
+    const vals = d.knobs.map((k, i) => k.opts[sel[i] === undefined ? (k.start || 0) : sel[i]]);
+    let parent = frame + d.base + ';';
+    const kidCss = d.kids.map(() => '');
+    const groups = {};
+    const order = [];
+    const add = (s, line) => { if (!groups[s]) { groups[s] = []; order.push(s); } groups[s].push(line); };
+    Object.keys(d.show || {}).forEach((s) => d.show[s].forEach((l) => add(s, l)));
+    d.knobs.forEach((k, i) => {
+      const decl = k.prop + ':' + vals[i] + ';';
+      add(k.sel, k.prop + ': ' + vals[i]);
+      if (k.target === 'parent') parent += decl;
+      else d.kids.forEach((kd, j) => { if (k.target === 'kids' || k.target === j) kidCss[j] += decl; });
+    });
+    const code = [];
+    order.forEach((s) => { code.push(s + ' {'); groups[s].forEach((l) => code.push('  ' + l + ';')); code.push('}'); });
+    return {
+      hasDemo: true,
+      dStage: parent,
+      dKids: d.kids.map((k, j) => wrap(k, kidCss[j])),
+      dCode: code.map((l) => ({ segs: this.hl(l) })),
+      dKnobs: d.knobs.map((k, i) => ({
+        label: k.prop,
+        opts: k.opts.map((v, oi) => {
+          const active = (sel[i] === undefined ? (k.start || 0) : sel[i]) === oi;
+          return { label: v, pressed: active ? 'true' : 'false', style: this.chip(active), pick: () => this.pickKnob(i, oi) };
+        })
+      })),
+      hasCaption: false, caption: '',
+      hasLegend: !!d.legend, legend: d.legend || []
+    };
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.t);
+  }
+
+  types() {
+    return [
+      { key: 'predict', name: 'Predict the render', blurb: 'Read CSS, pick the picture' },
+      { key: 'pairs', name: 'Match pairs', blurb: 'Property ↔ what it draws' },
+      { key: 'versus', name: 'Which rule wins?', blurb: 'Specificity and the cascade' },
+      { key: 'build', name: 'Word bank', blurb: 'Fill the blanks, see it live' },
+      { key: 'tune', name: 'Tune to target', blurb: 'Train your eye for spacing' },
+      { key: 'bug', name: 'Spot the bug', blurb: 'Find the silent failure' },
+      { key: 'type', name: 'Type the value', blurb: 'Recall it from memory' }
+    ];
+  }
+
+  // Colours a line of CSS. Lines starting with § are HTML (shown grey).
+  hl(line) {
+    const P = 'color:#D6D3E0', SEL = 'color:#F9A8D4', PR = 'color:#A5B4FC', V = 'color:#FCD34D', H = 'color:#9C98B3';
+    const seg = (t, c) => ({ t: t, c: c });
+    if (line.charAt(0) === '§') return [seg(line.slice(1), H)];
+    let m = line.match(/^(.*?)\{\s*([\w-]+)(\s*:\s*)(.*?);\s*\}\s*$/);
+    if (m) return [seg(m[1], SEL), seg('{ ', P), seg(m[2], PR), seg(m[3], P), seg(m[4], V), seg('; }', P)];
+    if (/\{\s*$/.test(line)) return [seg(line.replace(/\s*\{\s*$/, ''), SEL), seg(' {', P)];
+    m = line.match(/^(\s*)([\w-]+)(\s*:\s*)(.*?)(;?)\s*$/);
+    if (m) return [seg(m[1] + m[2], PR), seg(m[3], P), seg(m[4], V), seg(m[5], P)].filter((x) => x.t);
+    return [seg(line, P)];
+  }
+
+  box(w, h, bg) {
+    return 'width:' + w + 'px;height:' + h + 'px;background:' + bg + ';border-radius:4px;flex-shrink:0';
+  }
+
+  questions() {
+    if (this._qs) return this._qs;
+    const I = '#4338CA', O = '#E4572E', K = '#1D1B26';
+    const sq = 'width:36px;height:36px;background:#4338CA;border-radius:6px;';
+    const aa = 'font-size:26px;line-height:1;color:#1D1B26;';
+    const bugStage = 'height:90px;display:grid;place-items:center;background:#EDE8DD;border-radius:12px';
+    const buildBox = 'height:84px;background:#FFFFFF;border:2px solid #E4DFD4;border-radius:12px;box-sizing:border-box;';
+    this._qs = [
+      // ---------- Predict the render ----------
+      {
+        id: 'predict-1', type: 'predict', prompt: 'Which row does this CSS draw?',
+        code: ['.row {', '  display: flex;', '  justify-content: space-between;', '  align-items: center;', '}'],
+        stage: 'display:flex;', kids: [this.box(20, 20, I), this.box(20, 36, O), this.box(20, 20, K)],
+        opts: [
+          { s: 'justify-content:flex-start;align-items:center', d: 'packed left, centered vertically' },
+          { s: 'justify-content:space-between;align-items:flex-start', d: 'spread out, top-aligned' },
+          { s: 'justify-content:space-between;align-items:center', d: 'spread out, centered vertically' },
+          { s: 'justify-content:space-around;align-items:flex-end', d: 'spaced around, bottom-aligned' }
+        ],
+        answer: 2,
+        explain: '`justify-content` places items along the main axis (→). `align-items` places them on the cross axis (↓).'
+      },
+      {
+        id: 'predict-2', type: 'predict', prompt: 'Which stack does this CSS draw?',
+        code: ['.stack {', '  display: flex;', '  flex-direction: column;', '  align-items: flex-end;', '}'],
+        stage: 'display:flex;gap:4px;', kids: [this.box(36, 12, I), this.box(24, 12, O), this.box(48, 12, K)],
+        opts: [
+          { s: 'flex-direction:column;align-items:flex-end', d: 'stacked, right-aligned' },
+          { s: 'flex-direction:column;align-items:flex-start', d: 'stacked, left-aligned' },
+          { s: 'flex-direction:row;align-items:flex-end', d: 'in a row, bottom-aligned' },
+          { s: 'flex-direction:column;align-items:center', d: 'stacked, centered' }
+        ],
+        answer: 0,
+        explain: '`flex-direction: column` turns the main axis vertical, so `align-items` now works sideways — `flex-end` pushes items to the right.'
+      },
+      {
+        id: 'predict-3', type: 'predict', prompt: 'Which layout does this grid draw?',
+        code: ['.layout {', '  display: grid;', '  grid-template-columns: 1fr 2fr;', '  gap: 6px;', '}'],
+        stage: 'display:grid;gap:6px;', kids: ['background:#4338CA;border-radius:4px', 'background:#E4572E;border-radius:4px'],
+        opts: [
+          { s: 'grid-template-columns:2fr 1fr', d: 'wide column, then narrow' },
+          { s: 'grid-template-columns:1fr 1fr', d: 'two equal columns' },
+          { s: 'grid-template-columns:1fr', d: 'two stacked rows' },
+          { s: 'grid-template-columns:1fr 2fr', d: 'narrow column, then wide' }
+        ],
+        answer: 3,
+        explain: '`fr` units share out the free space: `1fr 2fr` makes the second column twice as wide as the first.'
+      },
+      {
+        id: 'predict-4', type: 'predict', prompt: 'Item .a is orange. Which grid is this?',
+        code: ['.grid {', '  display: grid;', '  grid-template-columns: repeat(3, 1fr);', '  gap: 4px;', '}', '.a { grid-column: span 2; }'],
+        stage: 'display:grid;gap:4px;',
+        kids: ['background:#E4572E;border-radius:3px', 'background:#4338CA;border-radius:3px', 'background:#4338CA;border-radius:3px', 'background:#4338CA;border-radius:3px'],
+        opts: [
+          { s: 'grid-template-columns:repeat(3,1fr)', d: 'three columns, nothing spans' },
+          { s: 'grid-template-columns:repeat(3,1fr)', d: 'three columns, orange item spans two', kids: ['background:#E4572E;border-radius:3px;grid-column:span 2', 'background:#4338CA;border-radius:3px', 'background:#4338CA;border-radius:3px', 'background:#4338CA;border-radius:3px'] },
+          { s: 'grid-template-columns:repeat(3,1fr)', d: 'orange item spans the whole row', kids: ['background:#E4572E;border-radius:3px;grid-column:span 3', 'background:#4338CA;border-radius:3px', 'background:#4338CA;border-radius:3px', 'background:#4338CA;border-radius:3px'] },
+          { s: 'grid-template-columns:repeat(2,1fr)', d: 'two columns, orange item spans both', kids: ['background:#E4572E;border-radius:3px;grid-column:span 2', 'background:#4338CA;border-radius:3px', 'background:#4338CA;border-radius:3px', 'background:#4338CA;border-radius:3px'] }
+        ],
+        answer: 1,
+        explain: '`span 2` stretches an item across two column tracks. The rest keep flowing into the next free cells, left to right.'
+      },
+
+      // ---------- Match pairs ----------
+      {
+        id: 'pairs-1', type: 'pairs', prompt: 'Match each property to what it draws',
+        items: [
+          { id: 'a', code: 'opacity: .4', shape: sq + 'opacity:.4', text: '', label: 'Faded square' },
+          { id: 'b', code: 'border-radius: 50%', shape: sq + 'border-radius:50%', text: '', label: 'Circle' },
+          { id: 'c', code: 'rotate: 45deg', shape: sq + 'rotate:45deg', text: '', label: 'Tilted square' },
+          { id: 'd', code: 'scale: .5', shape: sq + 'scale:.5', text: '', label: 'Half-size square' }
+        ],
+        order: ['b', 'd', 'a', 'c'],
+        explain: '`rotate` and `scale` are standalone shortcuts for `transform: rotate()` and `scale()`. Both forms work in modern browsers.'
+      },
+      {
+        id: 'pairs-2', type: 'pairs', prompt: 'Match each border or shadow to its shape',
+        items: [
+          { id: 'a', code: 'border: 4px dashed', shape: 'width:36px;height:36px;box-sizing:border-box;border:4px dashed #1D1B26;border-radius:6px;background:#EEF0FF', text: '', label: 'Square with dashed border' },
+          { id: 'b', code: 'box-shadow: 6px 6px 0 tomato', shape: sq + 'box-shadow:6px 6px 0 #E4572E', text: '', label: 'Square with offset shadow' },
+          { id: 'c', code: 'border-radius: 0 50%', shape: sq + 'border-radius:0 50%', text: '', label: 'Leaf shape' },
+          { id: 'd', code: 'width: 64px', shape: 'width:64px;height:36px;background:#4338CA;border-radius:6px', text: '', label: 'Wide rectangle' }
+        ],
+        order: ['c', 'a', 'd', 'b'],
+        explain: '`box-shadow` paints outside the box without taking up space. Two-value `border-radius` pairs opposite corners: top-left & bottom-right, then the other two.'
+      },
+      {
+        id: 'pairs-3', type: 'pairs', prompt: 'Match each text property to its look',
+        items: [
+          { id: 'a', code: 'font-weight: 800', shape: aa + 'font-weight:800', text: 'Aa', label: 'Bold Aa' },
+          { id: 'b', code: 'font-style: italic', shape: aa + 'font-style:italic', text: 'Aa', label: 'Slanted Aa' },
+          { id: 'c', code: 'text-decoration: underline', shape: aa + 'text-decoration:underline', text: 'Aa', label: 'Underlined Aa' },
+          { id: 'd', code: 'letter-spacing: 8px', shape: aa + 'letter-spacing:8px', text: 'Aa', label: 'Widely spaced Aa' }
+        ],
+        order: ['d', 'b', 'a', 'c'],
+        explain: 'All four change how text looks without touching the words in your HTML — style lives in CSS, content lives in markup.'
+      },
+
+      // ---------- Which rule wins? ----------
+      {
+        id: 'versus-1', type: 'versus', prompt: 'What color is “Hello”?',
+        code: ['§<p id="intro" class="lead">Hello</p>', '#intro { color: teal; }', 'p.lead { color: tomato; }'],
+        opts: ['teal', 'tomato'], answer: 'teal',
+        scores: [{ sel: '#intro', score: '1 · 0 · 0', win: true }, { sel: 'p.lead', score: '0 · 1 · 1', win: false }],
+        explain: 'Specificity is compared before source order. One ID beats any number of classes and tags, so `teal` wins even though `p.lead` comes later.'
+      },
+      {
+        id: 'versus-2', type: 'versus', prompt: 'Same score — now what color?',
+        code: ['§<p class="alert note">Hello</p>', '.note { color: crimson; }', '.alert { color: navy; }'],
+        opts: ['crimson', 'navy'], answer: 'navy',
+        scores: [{ sel: '.note', score: '0 · 1 · 0', win: false }, { sel: '.alert', score: '0 · 1 · 0', win: true }],
+        explain: 'A tie in specificity goes to the rule written later in the CSS. The order of classes in the HTML `class` attribute doesn’t matter at all.'
+      },
+      {
+        id: 'versus-3', type: 'versus', prompt: 'Three rules, one link. What color?',
+        code: ['§<a id="cta" style="color:royalblue">', '§  Hello</a>', '#cta { color: crimson; }', 'a { color: chocolate; }'],
+        opts: ['royalblue', 'crimson', 'chocolate'], answer: 'royalblue',
+        scores: [{ sel: 'style=""', score: 'inline', win: true }, { sel: '#cta', score: '1 · 0 · 0', win: false }, { sel: 'a', score: '0 · 0 · 1', win: false }],
+        explain: 'Inline styles beat every selector in a stylesheet, even an ID. Only `!important` can override them — which is why inline styles are hard to maintain.'
+      },
+
+      // ---------- Word bank ----------
+      {
+        id: 'build-1', type: 'build', prompt: 'Center the card in its box', apply: 'parent',
+        boxBase: buildBox, kids: [{ s: 'width:56px;height:36px;background:#4338CA;border-radius:8px', t: '' }],
+        code: ['.box {', { slot: 0 }, { slot: 1 }, '}'],
+        props: ['display', 'place-items'], defaults: ['block', 'normal'],
+        answer: ['grid', 'center'], bank: ['flex', 'grid', 'center', 'middle', 'block', 'start'],
+        explain: '`place-items` sets `align-items` and `justify-items` at once. Grid honors both; flexbox ignores `justify-items`, so it only centers vertically.'
+      },
+      {
+        id: 'build-2', type: 'build', prompt: 'Park the badge in the bottom-right corner', apply: 'parent',
+        boxBase: buildBox + 'display:flex;padding:8px;', kids: [{ s: 'width:40px;height:26px;background:#E4572E;border-radius:13px', t: '' }],
+        code: ['.box {', '  display: flex;', { slot: 0 }, { slot: 1 }, '}'],
+        props: ['justify-content', 'align-items'], defaults: ['normal', 'normal'],
+        answer: ['flex-end', 'flex-end'], bank: ['flex-end', 'center', 'bottom', 'flex-end', 'flex-start', 'space-between'],
+        explain: 'In a row, `justify-content` moves items along → and `align-items` along ↓. `flex-end` on both lands the badge bottom-right. `bottom` isn’t a valid value, so the browser drops it.'
+      },
+      {
+        id: 'build-3', type: 'build', prompt: 'Turn the button into a pill', apply: 'child',
+        boxBase: buildBox + 'display:grid;place-items:center;',
+        kids: [{ s: 'background:#4338CA;color:#FFFFFF;font-weight:700;font-size:14px;line-height:1;', t: 'Save' }],
+        code: ['.btn {', '  background: #4338CA;', { slot: 0 }, { slot: 1 }, '}'],
+        props: ['border-radius', 'padding'], defaults: ['0', '0'],
+        answer: ['999px', '10px 28px'], bank: ['50%', '10px 28px', '999px', '28px 10px', 'round', '0'],
+        explain: 'A huge `border-radius` is capped at half the height, so the ends become perfect semicircles. `50%` makes an ellipse instead. `padding` with two values is vertical first, then horizontal.'
+      },
+
+      // ---------- Tune to target ----------
+      {
+        id: 'tune-1', type: 'tune', prompt: 'Set the gap so your boxes fill the outlines',
+        prop: 'gap', unit: 'px', min: 0, max: 48, step: 4, start: 8, target: 24, apply: 'parent', count: 3, text: '',
+        ghost: 'width:56px;height:56px;box-sizing:border-box;border:2px dashed #4338CA;border-radius:10px;',
+        yours: 'width:56px;height:56px;box-sizing:border-box;background:#E4572E;opacity:.85;border-radius:10px;',
+        explain: '`gap` adds space only between items — never before the first or after the last. That’s why it replaced margin tricks for spacing flex and grid children.'
+      },
+      {
+        id: 'tune-2', type: 'tune', prompt: 'Set the padding so the tag fills the outline',
+        prop: 'padding', unit: 'px', min: 0, max: 40, step: 4, start: 4, target: 20, apply: 'child', count: 1, text: 'New',
+        ghost: 'box-sizing:border-box;border:2px dashed #4338CA;border-radius:10px;font-size:20px;font-weight:700;line-height:1;color:transparent;',
+        yours: 'box-sizing:border-box;border:2px solid transparent;background:#E4572E;opacity:.9;border-radius:10px;font-size:20px;font-weight:700;line-height:1;color:#FFFFFF;',
+        explain: '`padding` adds space inside the element, between its border and its content — so the whole box grows around the text.'
+      },
+      {
+        id: 'tune-3', type: 'tune', prompt: 'Round the corners to match the outline',
+        prop: 'border-radius', unit: 'px', min: 0, max: 48, step: 4, start: 0, target: 32, apply: 'child', count: 1, text: '',
+        ghost: 'width:110px;height:110px;box-sizing:border-box;border:2px dashed #4338CA;',
+        yours: 'width:110px;height:110px;box-sizing:border-box;background:#E4572E;opacity:.85;',
+        explain: '`border-radius` rounds each corner along a circle of that radius. Once it passes half the box’s size, it can’t get any rounder.'
+      },
+
+      // ---------- Spot the bug ----------
+      {
+        id: 'bug-1', type: 'bug', prompt: 'No rounded corners, no shadow. Tap the buggy line.',
+        stage: bugStage,
+        expected: { s: 'width:110px;height:52px;background:#FFFFFF;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.2)', t: '' },
+        actual: { s: 'width:110px;height:52px;background:#FFFFFF', t: '' },
+        code: ['.card {', '  padding: 16px;', '  background: white;', '  border-radius: 12px', '  box-shadow: 0 4px 12px #0003;', '}'],
+        answer: 4,
+        explain: 'Line 4 is missing its `;` so lines 4–5 read as one invalid declaration. The browser silently drops it — no error, no radius, no shadow.'
+      },
+      {
+        id: 'bug-2', type: 'bug', prompt: 'The label should be white. Tap the buggy line.',
+        stage: bugStage,
+        expected: { s: 'padding:10px 16px;background:#4338CA;color:#FFFFFF;font-weight:700;font-size:14px;border-radius:10px', t: 'Buy now' },
+        actual: { s: 'padding:10px 16px;background:#4338CA;color:#1D1B26;font-weight:700;font-size:14px;border-radius:10px', t: 'Buy now' },
+        code: ['.btn {', '  background: #4338CA;', '  colour: white;', '  padding: 10px 16px;', '}'],
+        answer: 3,
+        explain: 'CSS uses American spelling: `color`. An unknown property like `colour` is silently ignored, so the text keeps its default color.'
+      },
+      {
+        id: 'bug-3', type: 'bug', prompt: 'The bar should be 120px wide. Tap the buggy line.',
+        stage: 'height:90px;display:flex;flex-direction:column;justify-content:center;padding:0 12px;background:#EDE8DD;border-radius:12px',
+        expected: { s: 'height:16px;width:120px;max-width:100%;background:#E4572E;border-radius:8px', t: '' },
+        actual: { s: 'height:16px;background:#E4572E;border-radius:8px', t: '' },
+        code: ['.bar {', '  height: 16px;', '  width: 120;', '  background: #E4572E;', '}'],
+        answer: 3,
+        explain: 'Lengths other than 0 need a unit. `width: 120` is invalid, so the browser drops it and the bar stretches to full width.'
+      },
+
+      // ---------- Type the value ----------
+      {
+        id: 'type-1', type: 'type', prompt: 'Make the headline all caps — without retyping it',
+        sel: '.headline', prop: 'text-transform', accept: ['uppercase'], text: 'Ship it on Friday',
+        base: "font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#1D1B26;",
+        explain: '`text-transform` changes how text looks, not the HTML. The content stays in natural case, so the design can change later without rewriting copy.'
+      },
+      {
+        id: 'type-2', type: 'type', prompt: 'Slant the quote',
+        sel: '.quote', prop: 'font-style', accept: ['italic', 'oblique'], text: '“Less, but better.”',
+        base: 'font-family:Georgia,serif;font-size:26px;color:#1D1B26;',
+        explain: '`font-style: italic` uses the font’s real italic letters when it has them; `oblique` just slants the regular ones.'
+      },
+      {
+        id: 'type-3', type: 'type', prompt: 'Center the title inside its box',
+        sel: '.title', prop: 'text-align', accept: ['center'], text: 'Chapter One',
+        base: "display:block;width:100%;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#1D1B26;",
+        explain: '`text-align` lines up text inside its own box. To center the box itself, reach for `margin: auto` or flexbox instead.'
+      }
+    ];
+    return this._qs;
+  }
+
+  byId(id) {
+    return this.questions().find((q) => q.id === id);
+  }
+
+  freshQ(q) {
+    return {
+      sel: null,
+      slots: q && q.type === 'build' ? q.answer.map(() => null) : [],
+      num: q && q.type === 'tune' ? q.start : 0,
+      val: '',
+      l: null, r: null, pdone: {}, miss: null, misses: 0,
+      checked: false, ok: false
+    };
+  }
+
+  current() {
+    return this.byId(this.state.queue[this.state.idx]);
+  }
+
+  setQ(patch) {
+    this.setState({ q: Object.assign({}, this.state.q, patch) });
+  }
+
+  start(key) {
+    const all = this.questions();
+    let ids;
+    if (key === 'mixed') {
+      ids = this.types().map((t) => {
+        const list = all.filter((q) => q.type === t.key);
+        return list[Math.floor(Math.random() * list.length)].id;
+      });
+    } else if (key.indexOf('topic:') === 0) {
+      ids = (this.topics()[key.slice(6)] || []).slice();
+    } else {
+      ids = all.filter((q) => q.type === key).map((q) => q.id);
+    }
+    clearTimeout(this.t);
+    this.setState({
+      screen: 'quiz', lessonKey: key, queue: ids, idx: 0, total: ids.length,
+      hearts: 5, solved: 0, firstTry: 0, xp: 0, missed: {},
+      q: this.freshQ(this.byId(ids[0]))
+    });
+  }
+
+  grade(ok, extra) {
+    const s = this.state;
+    const q = this.current();
+    const upd = { q: Object.assign({}, s.q, extra || {}, { checked: true, ok: ok }) };
+    if (ok) {
+      upd.solved = s.solved + 1;
+      if (!s.missed[q.id]) { upd.firstTry = s.firstTry + 1; upd.xp = s.xp + 10; }
+      else { upd.xp = s.xp + 5; }
+    } else {
+      upd.hearts = Math.max(0, s.hearts - 1);
+      const missed = Object.assign({}, s.missed);
+      missed[q.id] = true;
+      upd.missed = missed;
+      upd.queue = s.queue.concat([q.id]);
+    }
+    this.setState(upd);
+  }
+
+  clean(v) {
+    return v.replace(/[^a-zA-Z-]/g, '').toLowerCase();
+  }
+
+  check() {
+    const x = this.state.q;
+    const q = this.current();
+    if (!q || x.checked) return;
+    let ok = false;
+    if (q.type === 'predict' || q.type === 'bug' || q.type === 'versus') {
+      if (x.sel === null) return;
+      ok = x.sel === q.answer;
+    } else if (q.type === 'build') {
+      if (x.slots.some((v) => v === null)) return;
+      ok = x.slots.every((ci, i) => q.bank[ci] === q.answer[i]);
+    } else if (q.type === 'tune') {
+      ok = x.num === q.target;
+    } else if (q.type === 'type') {
+      if (!x.val.trim()) return;
+      ok = q.accept.indexOf(this.clean(x.val)) !== -1;
+    } else {
+      return;
+    }
+    this.grade(ok);
+  }
+
+  next() {
+    const s = this.state;
+    if (s.hearts <= 0) { this.setState({ screen: 'out' }); return; }
+    const idx = s.idx + 1;
+    if (idx >= s.queue.length) {
+      const doneSets = Object.assign({}, s.doneSets);
+      doneSets[s.lessonKey] = true;
+      this.setState({ screen: 'done', doneSets: doneSets });
+      return;
+    }
+    this.setState({ idx: idx, q: this.freshQ(this.byId(s.queue[idx])) });
+  }
+
+  resolvePair(l, r) {
+    const x = this.state.q;
+    const q = this.current();
+    if (l === r) {
+      const pd = Object.assign({}, x.pdone);
+      pd[l] = true;
+      const patch = { pdone: pd, l: null, r: null, miss: null };
+      if (q.items.every((it) => pd[it.id])) this.grade(true, patch);
+      else this.setQ(patch);
+    } else {
+      this.setQ({ miss: { l: l, r: r }, l: null, r: null, misses: x.misses + 1 });
+      clearTimeout(this.t);
+      this.t = setTimeout(() => { if (this.state.q.miss) this.setQ({ miss: null }); }, 700);
+    }
+  }
+
+  tone(picked, isAnswer, checked) {
+    if (checked && isAnswer) return ['#15803D', '#E3F4E8'];
+    if (checked && picked) return ['#B4461B', '#FCEBDF'];
+    if (picked) return ['#4338CA', '#EEF0FF'];
+    return ['#E4DFD4', '#FFFFFF'];
+  }
+
+  parts(text) {
+    return text.split('`').map((t, i) => ({ t: t, cls: i % 2 ? 'k' : '' })).filter((p) => p.t);
+  }
+
+  renderVals() {
+    const s = this.state;
+    const T = this.types();
+    const lessonMeta = T.find((t) => t.key === s.lessonKey);
+    const vm = {
+      isHome: s.screen === 'home', isQuiz: s.screen === 'quiz', isDone: s.screen === 'done', isOut: s.screen === 'out',
+      hearts: s.hearts,
+      heartsAria: s.hearts + (s.hearts === 1 ? ' heart left' : ' hearts left'),
+      startMixed: () => this.start('mixed'),
+      mixedLabel: s.doneSets.mixed ? 'Go again' : 'Start',
+      goHome: () => this.setState({ screen: 'home' }),
+      retry: () => this.start(s.lessonKey || 'mixed'),
+      quit: () => { clearTimeout(this.t); this.setState({ screen: 'home' }); },
+      sets: T.map((t, i) => ({
+        n: i + 1, name: t.name, blurb: t.blurb, done: !!s.doneSets[t.key],
+        aria: t.name + ', ' + this.questions().filter((qq) => qq.type === t.key).length + ' questions' + (s.doneSets[t.key] ? ', completed' : ''),
+        go: () => this.start(t.key)
+      })),
+      xp: s.xp,
+      acc: s.total ? Math.round((s.firstTry / s.total) * 100) : 0,
+      lessonName: s.lessonKey === 'mixed' ? 'Mixed review'
+        : (s.lessonKey && s.lessonKey.indexOf('topic:') === 0 ? ((this.unitByKey(s.lessonKey.slice(6)) || {}).name || '') + ' — practice'
+        : (lessonMeta ? lessonMeta.name : '')),
+      doneNote: s.firstTry === s.total ? 'Perfect run — every answer right on the first try.' : 'Missed questions came back until you got them. That’s the point.',
+      // quiz defaults
+      isPredict: false, isPairs: false, isVersus: false, isBuild: false, isTune: false, isBug: false, isType: false,
+      showCode: false, code: [], pOpts: [], pLeft: [], pRight: [], pCount: 0,
+      vOpts: [], vGrid: '', vScores: [], showScores: false,
+      goalBox: '', goalKids: [], yourBox: '', yourKids: [], bLines: [], bBank: [],
+      ghostRow: '', ghostKids: [], yourRow: '', tuneKids: [], tProp: '', tVal: '', dec: null, inc: null, decOff: true, incOff: true, stepStyleDec: '', stepStyleInc: '',
+      bugStage: '', expS: '', expT: '', actS: '', actT: '', gLines: [],
+      ySel: '', yProp: '', val: '', yBox: '', yStyle: '', yText: '', onType: null, onKey: null,
+      typeLabel: '', prompt: '', pct: 0, progressStyle: '',
+      showCheck: false, showHint: false, checked: false, ok: false, bad: false, cantCheck: true,
+      checkStyle: '', fbStyle: '', fbTitleStyle: '', fbTitle: '', fbSub: '', hasSub: false, fbParts: [], contStyle: '',
+      check: () => this.check(), next: () => this.next()
+    };
+
+    // ----- Home tabs -----
+    const tabStyle = (active) => 'height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:0;border-radius:12px;font-size:13px;font-weight:700;background:' + (active ? '#EEF0FF' : 'transparent') + ';color:' + (active ? '#4338CA' : '#5B5868');
+    const U = this.units();
+    const nextU = U.find((u) => !s.seenUnits[u.key]);
+    const allSeen = !nextU;
+    const hero = nextU || U[0];
+    Object.assign(vm, {
+      isLearn: s.screen === 'learn',
+      tabLearn: s.tab === 'learn', tabPractice: s.tab === 'practice',
+      learnPressed: s.tab === 'learn' ? 'true' : 'false', practicePressed: s.tab === 'practice' ? 'true' : 'false',
+      learnTabStyle: tabStyle(s.tab === 'learn'), practiceTabStyle: tabStyle(s.tab === 'practice'),
+      goLearnTab: () => this.setState({ tab: 'learn' }),
+      goPracticeTab: () => this.setState({ tab: 'practice' }),
+      nextKicker: allSeen ? 'All lessons done — review any time' : (Object.keys(s.seenUnits).length ? 'Up next' : 'Start here'),
+      nextName: hero.name,
+      nextBlurb: hero.blurb + ' · ' + hero.cards.length + ' short cards with live playgrounds',
+      nextLabel: allSeen ? 'Review' : 'Start',
+      nextGo: () => this.openUnit(hero.key),
+      units: U.map((u, i) => ({
+        n: i + 1, name: u.name, sub: u.blurb + ' · ' + u.cards.length + ' cards', done: !!s.seenUnits[u.key],
+        aria: u.name + ', ' + u.cards.length + ' cards' + (s.seenUnits[u.key] ? ', completed' : ''),
+        go: () => this.openUnit(u.key)
+      })),
+      exitLearn: () => this.setState({ screen: 'home', tab: 'learn' }),
+      unitName: '', cardTitle: '', cardPos: '', learnPct: 0, learnBar: '', bodyParts: [], hasTip: false, tipParts: [],
+      leftAct: null, leftOff: true, leftStyle: '', leftLabel: '', rightAct: null, rightStyle: '', rightLabel: '',
+      hasDemo: false, dStage: '', dKids: [], dCode: [], dKnobs: [], hasCaption: false, caption: '', hasLegend: false, legend: []
+    });
+
+    if (s.screen === 'learn') {
+      const u = this.unitByKey(s.unit);
+      if (!u) return vm;
+      const n = u.cards.length;
+      const i = Math.min(s.card, n - 1);
+      const c = u.cards[i];
+      const last = i === n - 1;
+      const first = i === 0;
+      const pct = Math.round(((i + 1) / n) * 100);
+      const base = 'height:52px;border-radius:16px;font-size:16px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;';
+      return Object.assign(vm, this.demoVm(c, s.knobs), {
+        unitName: u.name,
+        cardTitle: c.title,
+        cardPos: (i + 1) + ' / ' + n,
+        learnPct: pct,
+        learnBar: 'width:' + pct + '%;height:100%;background:#E3A008;border-radius:999px;transition:width .3s ease',
+        bodyParts: this.parts(c.body),
+        hasTip: !!c.tip,
+        tipParts: this.parts(c.tip || ''),
+        leftLabel: last ? 'Done' : 'Back',
+        leftOff: first && !last,
+        leftStyle: base + 'flex:1;border:2px solid #E4DFD4;border-bottom-width:5px;background:#FFFFFF;color:#4338CA;' + (first && !last ? 'opacity:.45' : ''),
+        leftAct: () => {
+          if (last) this.setState({ screen: 'home', tab: 'learn', seenUnits: this.markUnit() });
+          else if (!first) this.gotoCard(i - 1);
+        },
+        rightLabel: last ? 'Practice this' : 'Next',
+        rightStyle: base + 'flex:2;border:0;border-bottom:5px solid #2E2690;background:#4338CA;color:#FFFFFF',
+        rightAct: () => {
+          if (last) { const seen = this.markUnit(); this.start('topic:' + s.unit); this.setState({ seenUnits: seen }); }
+          else this.gotoCard(i + 1);
+        }
+      });
+    }
+
+    const q = this.current();
+    if (s.screen !== 'quiz' || !q) return vm;
+
+    const x = s.q;
+    const meta = T.find((t) => t.key === q.type);
+    const pct = s.total ? Math.round((s.solved / s.total) * 100) : 0;
+    vm.typeLabel = meta.name;
+    vm.prompt = q.prompt;
+    vm.pct = pct;
+    vm.progressStyle = 'width:' + pct + '%;height:100%;background:#4338CA;border-radius:999px;transition:width .3s ease';
+    let can = false;
+    let sub = '';
+
+    if (q.type === 'predict') {
+      vm.isPredict = true;
+      vm.showCode = true;
+      vm.code = q.code.map((l) => ({ segs: this.hl(l) }));
+      vm.pOpts = q.opts.map((o, i) => {
+        const picked = x.sel === i;
+        const c = this.tone(picked, i === q.answer, x.checked);
+        const letter = String.fromCharCode(65 + i);
+        return {
+          letter: letter,
+          aria: 'Option ' + letter + ': ' + o.d,
+          pressed: picked ? 'true' : 'false',
+          kids: o.kids || q.kids,
+          tileStyle: 'display:flex;flex-direction:column;gap:8px;padding:10px;background:' + c[1] + ';border:2px solid ' + c[0] + ';border-bottom-width:5px;border-radius:16px;text-align:left;color:#1D1B26',
+          stageStyle: 'height:72px;padding:6px;box-sizing:border-box;background:#FBF8F2;border:1px dashed #C9C3B6;border-radius:8px;' + q.stage + o.s,
+          pick: () => { if (!this.state.q.checked) this.setQ({ sel: i }); }
+        };
+      });
+      can = x.sel !== null;
+      sub = 'Answer: ' + String.fromCharCode(65 + q.answer);
+    }
+
+    if (q.type === 'pairs') {
+      vm.isPairs = true;
+      const stateOf = (id, side) => {
+        if (x.pdone[id]) return 'done';
+        if (x.miss && x.miss[side] === id) return 'miss';
+        if (x[side] === id) return 'sel';
+        return 'idle';
+      };
+      const tile = (st) => {
+        let border = '#E4DFD4', bg = '#FFFFFF', extra = '';
+        if (st === 'done') { bg = '#F3F0E8'; extra = 'opacity:.45;'; }
+        else if (st === 'miss') { border = '#B4461B'; bg = '#FCEBDF'; }
+        else if (st === 'sel') { border = '#4338CA'; bg = '#EEF0FF'; }
+        return 'min-height:76px;width:100%;display:flex;align-items:center;justify-content:center;padding:6px 8px;background:' + bg + ';border:2px solid ' + border + ';border-bottom-width:5px;border-radius:16px;color:#1D1B26;' + extra;
+      };
+      const byId = {};
+      q.items.forEach((it) => { byId[it.id] = it; });
+      vm.pLeft = q.items.map((it) => {
+        const st = stateOf(it.id, 'l');
+        return {
+          code: it.code, done: st === 'done', pressed: st === 'sel' ? 'true' : 'false',
+          style: tile(st) + "font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;text-align:center;line-height:1.35",
+          pick: () => {
+            const cur = this.state.q;
+            if (cur.checked) return;
+            if (cur.r) this.resolvePair(it.id, cur.r); else this.setQ({ l: it.id, miss: null });
+          }
+        };
+      });
+      vm.pRight = q.order.map((id) => {
+        const it = byId[id];
+        const st = stateOf(id, 'r');
+        return {
+          label: it.label, shape: it.shape, text: it.text, done: st === 'done', pressed: st === 'sel' ? 'true' : 'false',
+          style: tile(st),
+          pick: () => {
+            const cur = this.state.q;
+            if (cur.checked) return;
+            if (cur.l) this.resolvePair(cur.l, id); else this.setQ({ r: id, miss: null });
+          }
+        };
+      });
+      vm.pCount = Object.keys(x.pdone).length;
+      sub = x.misses === 0 ? 'Flawless — no mismatches.' : x.misses + (x.misses === 1 ? ' mismatch' : ' mismatches') + ' along the way.';
+    }
+
+    if (q.type === 'versus') {
+      vm.isVersus = true;
+      vm.showCode = true;
+      vm.code = q.code.map((l) => ({ segs: this.hl(l) }));
+      const n = q.opts.length;
+      vm.vGrid = 'display:grid;grid-template-columns:repeat(' + n + ',minmax(0,1fr));gap:12px;flex-shrink:0';
+      vm.vOpts = q.opts.map((c) => {
+        const picked = x.sel === c;
+        const t = this.tone(picked, c === q.answer, x.checked);
+        return {
+          name: c, pressed: picked ? 'true' : 'false',
+          style: 'height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:0 4px;background:' + t[1] + ';border:2px solid ' + t[0] + ';border-bottom-width:5px;border-radius:16px',
+          helloStyle: "font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:" + (n > 2 ? 24 : 32) + 'px;color:' + c,
+          pick: () => { if (!this.state.q.checked) this.setQ({ sel: c }); }
+        };
+      });
+      vm.showScores = x.checked;
+      vm.vScores = q.scores.map((r) => ({
+        sel: r.sel, score: r.score, win: r.win ? 'wins' : '',
+        badge: r.win ? "font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;color:#FFFFFF;background:#15803D;padding:3px 8px;border-radius:999px;text-align:center" : ''
+      }));
+      can = x.sel !== null;
+    }
+
+    if (q.type === 'build') {
+      vm.isBuild = true;
+      const words = x.slots.map((ci) => (ci === null ? null : q.bank[ci]));
+      const decl = (vals) => q.props.map((p, i) => p + ':' + (vals[i] || q.defaults[i])).join(';');
+      const paint = (vals) => {
+        if (q.apply === 'parent') return { box: q.boxBase + decl(vals), kids: q.kids };
+        return { box: q.boxBase, kids: q.kids.map((k) => ({ s: k.s + decl(vals), t: k.t })) };
+      };
+      const goal = paint(q.answer);
+      const yours = paint(words);
+      vm.goalBox = goal.box; vm.goalKids = goal.kids;
+      vm.yourBox = yours.box; vm.yourKids = yours.kids;
+      vm.bLines = q.code.map((l) => {
+        if (typeof l === 'string') return { plain: true, isSlot: false, segs: this.hl(l), prop: '', word: '', aria: '', style: '', clear: null };
+        const i = l.slot;
+        const w = words[i];
+        return {
+          plain: false, isSlot: true, segs: [], prop: q.props[i], word: w || '',
+          aria: w ? 'Blank ' + (i + 1) + ': ' + w + '. Tap to remove' : 'Blank ' + (i + 1) + ', empty',
+          style: w
+            ? "min-width:88px;height:36px;margin:0 4px;padding:0 10px;border-radius:8px;border:2px solid #FCD34D;background:#FCD34D;color:#1D1B26;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600"
+            : 'min-width:88px;height:36px;margin:0 4px;border-radius:8px;border:2px dashed #7C7896;background:transparent',
+          clear: () => {
+            const cur = this.state.q;
+            if (cur.checked || cur.slots[i] === null) return;
+            const nx = cur.slots.slice();
+            nx[i] = null;
+            this.setQ({ slots: nx });
+          }
+        };
+      });
+      vm.bBank = q.bank.map((word, ci) => {
+        const used = x.slots.indexOf(ci) !== -1;
+        return {
+          word: word, off: used || x.checked, aria: used ? word + ', placed' : word,
+          style: used
+            ? "height:44px;padding:0 14px;border-radius:12px;border:2px solid #E4DFD4;background:#E4DFD4;color:transparent;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600"
+            : "height:44px;padding:0 14px;border-radius:12px;border:2px solid #1D1B26;border-bottom-width:4px;background:#FFFFFF;color:#1D1B26;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600",
+          pick: () => {
+            const cur = this.state.q;
+            if (cur.checked || cur.slots.indexOf(ci) !== -1) return;
+            const nx = cur.slots.slice();
+            const at = nx.indexOf(null);
+            if (at === -1) return;
+            nx[at] = ci;
+            this.setQ({ slots: nx });
+          }
+        };
+      });
+      can = x.slots.every((v) => v !== null);
+      sub = 'Answer: ' + q.props.map((p, i) => p + ': ' + q.answer[i] + ';').join(' ');
+    }
+
+    if (q.type === 'tune') {
+      vm.isTune = true;
+      const row = 'position:absolute;inset:0;display:flex;justify-content:center;align-items:center;';
+      const decl = (v) => q.prop + ':' + v + q.unit + ';';
+      const kidsFor = (styleBase, v) => {
+        const out = [];
+        for (let i = 0; i < q.count; i++) out.push({ s: styleBase + (q.apply === 'child' ? decl(v) : ''), t: q.text });
+        return out;
+      };
+      vm.ghostRow = row + (q.apply === 'parent' ? decl(q.target) : '');
+      vm.yourRow = row + (q.apply === 'parent' ? decl(x.num) : '');
+      vm.ghostKids = kidsFor(q.ghost, q.target);
+      vm.tuneKids = kidsFor(q.yours, x.num);
+      vm.tProp = q.prop;
+      vm.tVal = x.num + q.unit;
+      vm.decOff = x.checked || x.num <= q.min;
+      vm.incOff = x.checked || x.num >= q.max;
+      const step = (off) => 'width:56px;height:56px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#FFFFFF;border:2px solid #1D1B26;border-bottom-width:5px;border-radius:16px;color:#1D1B26;' + (off ? 'opacity:.4' : '');
+      vm.stepStyleDec = step(vm.decOff);
+      vm.stepStyleInc = step(vm.incOff);
+      vm.dec = () => { const c = this.state.q; if (!c.checked) this.setQ({ num: Math.max(q.min, c.num - q.step) }); };
+      vm.inc = () => { const c = this.state.q; if (!c.checked) this.setQ({ num: Math.min(q.max, c.num + q.step) }); };
+      can = true;
+      sub = 'You set ' + x.num + q.unit + ' — the target is ' + q.target + q.unit + '.';
+    }
+
+    if (q.type === 'bug') {
+      vm.isBug = true;
+      vm.bugStage = q.stage;
+      vm.expS = q.expected.s; vm.expT = q.expected.t;
+      vm.actS = q.actual.s; vm.actT = q.actual.t;
+      vm.gLines = q.code.map((l, i) => {
+        const n = i + 1;
+        const picked = x.sel === n;
+        let border = 'transparent', bg = 'transparent';
+        if (x.checked && n === q.answer) { border = '#4ADE80'; bg = 'rgba(21,128,61,.35)'; }
+        else if (x.checked && picked) { border = '#FB923C'; bg = 'rgba(180,70,27,.4)'; }
+        else if (picked) { border = '#A5B4FC'; bg = '#34305A'; }
+        return {
+          n: n, aria: 'Line ' + n + ': ' + l.trim(), pressed: picked ? 'true' : 'false', segs: this.hl(l),
+          style: "display:flex;align-items:center;gap:12px;width:100%;min-height:42px;padding:0 10px;border:2px solid " + border + ';background:' + bg + ";border-radius:8px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:13px",
+          pick: () => { if (!this.state.q.checked) this.setQ({ sel: n }); }
+        };
+      });
+      can = x.sel !== null;
+    }
+
+    if (q.type === 'type') {
+      vm.isType = true;
+      const cleaned = this.clean(x.val);
+      vm.ySel = q.sel;
+      vm.yProp = q.prop;
+      vm.val = x.val;
+      vm.yText = q.text;
+      vm.yBox = 'height:104px;display:flex;align-items:center;justify-content:center;padding:0 16px;background:#FFFFFF;border:2px solid #E4DFD4;border-radius:16px';
+      vm.yStyle = q.base + q.prop + ':' + (cleaned || 'initial');
+      vm.onType = (e) => this.setQ({ val: e.target.value });
+      vm.onKey = (e) => { if (e.key === 'Enter') { e.preventDefault(); this.check(); } };
+      can = x.val.trim().length > 0;
+      sub = 'Answer: ' + q.prop + ': ' + q.accept[0] + ';';
+    }
+
+    const ok = x.checked && x.ok;
+    const bad = x.checked && !x.ok;
+    const ink = ok ? '#15803D' : '#B4461B';
+    const deep = ok ? '#0F5E2C' : '#8A3413';
+    const btn = 'width:100%;height:52px;border-radius:16px;font-size:16px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:0;';
+    const praise = ['Nice — that’s right!', 'Nailed it!', 'Exactly right!', 'Sharp eye!'];
+    let title = ok ? praise[s.idx % praise.length] : 'Not quite';
+    if (q.type === 'pairs') title = 'All pairs matched!';
+    if (bad && q.type === 'versus') title = 'Not quite — it’s ' + q.answer;
+    if (bad && q.type === 'bug') title = 'Not that one — it’s line ' + q.answer;
+    if (bad && q.type === 'tune') title = 'Close, but not aligned';
+    const showSub = q.type === 'pairs' ? x.checked : bad && !!sub;
+
+    return Object.assign(vm, {
+      showCheck: !x.checked && q.type !== 'pairs',
+      showHint: !x.checked && q.type === 'pairs',
+      checked: x.checked, ok: ok, bad: bad, cantCheck: !can,
+      checkStyle: btn + 'border-bottom:5px solid ' + (can ? '#2E2690' : '#D3CCBE') + ';background:' + (can ? '#4338CA' : '#E4DFD4') + ';color:' + (can ? '#FFFFFF' : '#6F6B7B'),
+      fbStyle: 'display:flex;flex-direction:column;gap:12px;padding:20px 20px 28px;background:' + (ok ? '#E3F4E8' : '#FCEBDF'),
+      fbTitleStyle: "margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:" + ink,
+      fbTitle: title,
+      fbSub: sub, hasSub: showSub,
+      fbParts: this.parts(q.explain),
+      contStyle: btn + 'border-bottom:5px solid ' + deep + ';background:' + ink + ';color:#FFFFFF'
+    });
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "basics": [
+    "versus-1",
+    "versus-2",
+    "versus-3",
+    "bug-2",
+    "bug-1"
+  ],
+  "box": [
+    "pairs-2",
+    "tune-2",
+    "tune-3",
+    "build-3",
+    "bug-3"
+  ],
+  "flex": [
+    "predict-1",
+    "predict-2",
+    "build-2",
+    "tune-1"
+  ],
+  "grid": [
+    "predict-3",
+    "predict-4",
+    "build-1"
+  ],
+  "props": [
+    "pairs-1",
+    "pairs-3",
+    "type-1",
+    "type-2",
+    "type-3"
+  ]
+}

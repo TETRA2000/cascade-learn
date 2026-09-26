@@ -1,0 +1,37 @@
+[
+  {
+    "key": "predict",
+    "name": "Predict the render",
+    "blurb": "Read CSS, pick the picture"
+  },
+  {
+    "key": "pairs",
+    "name": "Match pairs",
+    "blurb": "Property ↔ what it draws"
+  },
+  {
+    "key": "versus",
+    "name": "Which rule wins?",
+    "blurb": "Specificity and the cascade"
+  },
+  {
+    "key": "build",
+    "name": "Word bank",
+    "blurb": "Fill the blanks, see it live"
+  },
+  {
+    "key": "tune",
+    "name": "Tune to target",
+    "blurb": "Train your eye for spacing"
+  },
+  {
+    "key": "bug",
+    "name": "Spot the bug",
+    "blurb": "Find the silent failure"
+  },
+  {
+    "key": "type",
+    "name": "Type the value",
+    "blurb": "Recall it from memory"
+  }
+]
