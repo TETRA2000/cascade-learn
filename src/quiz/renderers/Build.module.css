@@ -1,0 +1,78 @@
+.code {
+  padding: 10px 16px;
+  background: var(--ink);
+  border-radius: var(--radius-tile);
+  font-family: var(--font-code);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--code-punct);
+}
+
+.line {
+  white-space: pre;
+}
+
+.slotLine {
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+  padding-left: 2ch;
+}
+
+.prop {
+  color: var(--code-property);
+}
+
+.empty,
+.filled {
+  min-width: 88px;
+  height: var(--touch);
+  margin: 0 4px;
+  border-radius: 8px;
+  font-family: var(--font-code);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.empty {
+  border: 2px dashed #7c7896;
+  background: transparent;
+}
+
+.filled {
+  padding: 0 10px;
+  border: 2px solid var(--code-value);
+  background: var(--code-value);
+  color: var(--ink);
+}
+
+.bank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.chip,
+.used {
+  min-height: var(--touch);
+  padding: 0 14px;
+  border-radius: var(--radius-chip);
+  font-family: var(--font-code);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.chip {
+  border: 2px solid var(--ink);
+  border-bottom-width: 4px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+/* A placed chip leaves a ghost so the bank doesn't reflow. */
+.used {
+  border: 2px solid var(--line);
+  background: var(--line);
+  color: transparent;
+}

@@ -1,4 +1,5 @@
 import type { Question } from '../../content';
+import { Build } from './Build';
 import { Pairs } from './Pairs';
 import { Predict } from './Predict';
 import { Versus } from './Versus';
@@ -9,6 +10,8 @@ export function QuestionBody({ question, answer, act }: RendererProps<Question>)
   switch (question.type) {
     case 'predict':
       return <Predict question={question} answer={answer} act={act} />;
+    case 'build':
+      return <Build question={question} answer={answer} act={act} />;
     case 'pairs':
       return <Pairs question={question} answer={answer} act={act} />;
     case 'versus':

@@ -1,0 +1,19 @@
+/* Side-by-side labeled previews: Goal / Yours, Expected / Actual. */
+.pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.caption {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
