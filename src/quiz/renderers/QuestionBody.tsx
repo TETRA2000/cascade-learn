@@ -2,6 +2,7 @@ import type { Question } from '../../content';
 import { Build } from './Build';
 import { Pairs } from './Pairs';
 import { Predict } from './Predict';
+import { Tune } from './Tune';
 import { Versus } from './Versus';
 import type { RendererProps } from './types';
 
@@ -14,6 +15,8 @@ export function QuestionBody({ question, answer, act }: RendererProps<Question>)
       return <Build question={question} answer={answer} act={act} />;
     case 'pairs':
       return <Pairs question={question} answer={answer} act={act} />;
+    case 'tune':
+      return <Tune question={question} answer={answer} act={act} />;
     case 'versus':
       return <Versus question={question} answer={answer} act={act} />;
     default:

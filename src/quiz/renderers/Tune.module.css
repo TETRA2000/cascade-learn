@@ -1,0 +1,93 @@
+.stage {
+  position: relative;
+  height: 170px;
+  background: var(--surface);
+  border: 2px solid var(--line);
+  border-radius: var(--radius-tile);
+  overflow: hidden;
+}
+
+/* Ghost and yours are stacked exactly on top of each other. */
+.row {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.legend {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.target,
+.yours {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.target {
+  border: 2px dashed var(--primary);
+}
+
+.yours {
+  background: var(--accent);
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.step {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  border-bottom-width: 5px;
+  border-radius: var(--radius-tile);
+  color: var(--ink);
+}
+
+.step:disabled {
+  opacity: 0.4;
+}
+
+.value {
+  flex-grow: 1;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  border-radius: var(--radius-tile);
+  font-family: var(--font-code);
+  font-size: 16px;
+  color: var(--code-punct);
+  white-space: pre;
+}
+
+.prop {
+  color: var(--code-property);
+}
+
+.val {
+  color: var(--code-value);
+}
