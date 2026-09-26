@@ -1,0 +1,56 @@
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  background: var(--ink);
+  border-radius: var(--radius-tile);
+}
+
+.line {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: var(--touch);
+  padding: 0 36px 0 10px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  text-align: left;
+  font-family: var(--font-code);
+  font-size: 13px;
+  color: var(--code-punct);
+}
+
+/* Dark-panel tones (the light ones live in tone.module.css). */
+.idle {
+  border-color: transparent;
+}
+
+.selected {
+  border-color: var(--code-property);
+  background: #34305a;
+}
+
+.correct {
+  border-color: #4ade80;
+  background: rgb(21 128 61 / 0.35);
+}
+
+.wrong {
+  border-color: #fb923c;
+  background: rgb(180 70 27 / 0.4);
+}
+
+.num {
+  width: 2ch;
+  flex-shrink: 0;
+  color: var(--ink-faint);
+  text-align: right;
+}
+
+.code {
+  white-space: pre;
+}
