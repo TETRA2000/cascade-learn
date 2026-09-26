@@ -132,9 +132,9 @@ Code arrays hold plain Rust lines. A line starting with `# ` (or equal to `#`) i
 | `rs-predict` | `code: string[]`, `opts: { text: string; kind: 'output' \| 'error' }[]` (3–4), `answer: number`, `error?: string` | Code panel, then option tiles. `output` options render as monospace blocks. The `error` option reads "Doesn't compile" | `sel === answer` | `Answer: B` |
 | `rs-pairs` | `items: { id; left: string; right: string }[]` (4), `order: string[]` | Left column: code tokens (highlighted). Right column: meanings. Same rules as CSS pairs: no hearts, 700 ms flash, auto-completes | all matched | mismatch count (as CSS) |
 | `rs-compiles` | `a: string[]`, `b: string[]`, `answer: 'a' \| 'b'`, `error: string` | Two stacked code panels as selectable tiles labelled "A" and "B" (`aria-pressed`) | `sel === answer` | `Answer: A` |
-| `rs-build` | `code: (string \| { slot: number })[]`, `bank: string[]`, `answer: string[]`, `output?: string[]` | Code with slots plus a word bank, as CSS build. After Check, the `output` panel appears | each slot's bank word equals `answer[i]` | `Answer:` + the filled slot lines |
+| `rs-build` | `code: (string \| (string \| { slot: number })[])[]` (a line is plain text, or text segments with inline slots), `bank: string[]`, `answer: string[]`, `output?: string[]` | Code with inline slots plus a word bank, as CSS build. After Check, the `output` panel appears | each slot's bank word equals `answer[i]` | `Answer: &String, &name` (answer words joined by `, `) |
 | `rs-error` | `code: string[]`, `answer: number` (1-based visible line), `error: string` | Numbered, tappable code lines (shared `LinePicker`) | `sel === answer` | title "Not that one — it's line N" |
-| `rs-fix` | `code: string[]`, `error: string`, `opts: { diff: string[] }[]` (3–4), `answer: number` | rustc error panel up front, then diff tiles. Diff lines start with `+ ` / `- `, shown as visible `+`/`−` glyphs with color on top | `sel === answer` | `Answer: C` |
+| `rs-fix` | `code: string[]`, `error: string`, `opts: { diff: string[] }[]` (3–4), `answer: number` | rustc error panel up front, then diff tiles. Diff lines start with `- ` or `+ `, shown as visible `−`/`+` glyphs with color on top. The `- ` lines are a contiguous run of visible lines of `code`, replaced by the `+ ` lines | `sel === answer` | `Answer: C` |
 | `rs-type` | `code: string[]` (exactly one `___`), `accept: string[]` | Code with the blank highlighted, text input below (`maxLength` 40, `autocapitalize="off"`, `spellcheck=false`) | input trimmed, internal whitespace collapsed to one space, exact case-sensitive match against `accept` | `Answer: <accept[0]>` |
 
 **AnswerState reuse.** `sel` (number or `'a'`/`'b'`), `slots` (initialized for `rs-build`), `val`, and `left`/`right`/`matched`/`miss`/`misses` for `rs-pairs`. No new fields.
@@ -173,6 +173,8 @@ Code arrays hold plain Rust lines. A line starting with `# ` (or equal to `#`) i
 ## 8. Verification
 
 ### `npm run check:rust` (`scripts/check-rust.ts`, run directly by Node 24's built-in type stripping)
+
+The pure checking logic lives in `scripts/rust-check-lib.ts` and is unit-tested by Vitest. `scripts/tsconfig.json` type-checks both files with `@types/node` (new dev dependency), and `npm run typecheck` runs it.
 - Reads `content/rust/*.json`, builds full programs (hidden lines included), writes each to a temp dir, and runs `rustc --edition 2024 --error-format=json` with the pinned toolchain. Anything that compiles is then run.
 - Checks:
   - `rs-predict`: if the answer option is `output`, the program compiles and stdout equals its text. If it is `error`, compilation fails.
@@ -183,7 +185,7 @@ Code arrays hold plain Rust lines. A line starting with `# ` (or equal to `#`) i
   - `rs-type`: the code compiles with each `accept` value filled in.
   - `code` / `rs-choice` demos: `output` → compiles with matching stdout; `error` → fails.
   - Authored `error` strings must contain the error code rustc reports (e.g. `E0382`).
-- Diff application for `rs-fix`: `- ` lines must match visible lines of `code` exactly and in order. They are replaced by the following `+ ` lines, and unprefixed lines are context.
+- Diff application for `rs-fix`: the `- ` lines must match a contiguous run of lines of `code` exactly. That run is replaced by the `+ ` lines. There are no context lines.
 - Output: one line per failing snippet with question id and reason. Exit code 1 on any failure.
 - `rust-toolchain.toml`: `channel = "1.93.0"`, `profile = "minimal"`.
 
