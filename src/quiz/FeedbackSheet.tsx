@@ -4,6 +4,7 @@ import { CheckCircleIcon, XCircleIcon } from '../components/icons';
 import { RichText } from '../components/RichText';
 import { feedbackText } from './feedback';
 import type { AnswerState } from './types';
+import { useArmed } from './useArmed';
 import styles from './FeedbackSheet.module.css';
 
 interface Props {
@@ -11,13 +12,16 @@ interface Props {
   answer: AnswerState;
   /** Queue position, for rotating praise. */
   index: number;
+  /** Continue ignores activation this long after appearing (double-tap guard). */
+  guardMs: number;
   onContinue: () => void;
 }
 
 /** Slides up after Check. Must be rendered inside an always-present aria-live region. */
-export function FeedbackSheet({ question, answer, index, onContinue }: Props) {
+export function FeedbackSheet({ question, answer, index, guardMs, onContinue }: Props) {
   const { title, detail } = feedbackText(question, answer, index);
   const continueRef = useRef<HTMLButtonElement>(null);
+  const armed = useArmed('sheet', guardMs);
 
   // Check just disappeared; keep keyboard focus in the flow.
   useEffect(() => {
@@ -34,7 +38,13 @@ export function FeedbackSheet({ question, answer, index, onContinue }: Props) {
       <p className={styles.explain}>
         <RichText text={question.explain} />
       </p>
-      <button ref={continueRef} type="button" className={styles.continue} onClick={onContinue}>
+      <button
+        ref={continueRef}
+        type="button"
+        className={styles.continue}
+        aria-disabled={armed ? undefined : true}
+        onClick={() => armed && onContinue()}
+      >
         Continue
       </button>
     </section>

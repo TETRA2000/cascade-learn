@@ -4,12 +4,14 @@ import { Button } from '../components/Button';
 import { HeartCount } from '../components/HeartCount';
 import { CloseIcon } from '../components/icons';
 import { ProgressBar } from '../components/ProgressBar';
+import { ACTIVATION_GUARD_MS } from '../state/rules';
 import { FeedbackSheet } from './FeedbackSheet';
 import { canCheck } from './grade';
 import { QuizDone, QuizOut } from './QuizEnd';
 import { QuestionBody } from './renderers/QuestionBody';
 import { currentQuestion, sessionReducer, startSession, type SessionAction } from './session';
 import type { Session } from './types';
+import { useArmed } from './useArmed';
 import styles from './Quiz.module.css';
 
 export interface QuizResult {
@@ -22,9 +24,11 @@ interface Props {
   onExit: () => void;
   /** Called once per finished run (queue exhausted) — never for an out-of-hearts run. */
   onComplete: (result: QuizResult) => void;
+  /** How long Check/Continue ignore activation after appearing (double-tap guard). */
+  guardMs?: number;
 }
 
-export function Quiz({ lessonKey, onExit, onComplete }: Props) {
+export function Quiz({ lessonKey, onExit, onComplete, guardMs = ACTIVATION_GUARD_MS }: Props) {
   const [session, dispatch] = useReducer(sessionReducer, lessonKey, (key) => startSession(key, lessonQuestionIds(key)));
   const restart = () => dispatch({ type: 'start', lessonKey, ids: lessonQuestionIds(lessonKey) });
 
@@ -40,14 +44,22 @@ export function Quiz({ lessonKey, onExit, onComplete }: Props) {
 
   if (session.phase === 'done') return <QuizDone session={session} onHome={onExit} onRetry={restart} />;
   if (session.phase === 'out') return <QuizOut onHome={onExit} onRetry={restart} />;
-  return <QuizQuestion session={session} dispatch={dispatch} onExit={onExit} />;
+  return <QuizQuestion session={session} dispatch={dispatch} onExit={onExit} guardMs={guardMs} />;
 }
 
-function QuizQuestion({ session, dispatch, onExit }: { session: Session; dispatch: Dispatch<SessionAction>; onExit: () => void }) {
+interface QuestionProps {
+  session: Session;
+  dispatch: Dispatch<SessionAction>;
+  onExit: () => void;
+  guardMs: number;
+}
+
+function QuizQuestion({ session, dispatch, onExit, guardMs }: QuestionProps) {
   const q = currentQuestion(session)!; // phase 'question' guarantees a current question
   const a = session.answer;
   const promptRef = useRef<HTMLHeadingElement>(null);
   const mainRef = useRef<HTMLElement>(null);
+  const checkArmed = useArmed(session.idx, guardMs);
 
   // New question: start at the top and announce its prompt.
   useEffect(() => {
@@ -82,7 +94,12 @@ function QuizQuestion({ session, dispatch, onExit }: { session: Session; dispatc
       <div className={styles.footer}>
         {!a.checked && q.type !== 'pairs' && (
           <div className={styles.bar}>
-            <Button className={styles.check} disabled={!canCheck(q, a)} onClick={() => dispatch({ type: 'check' })}>
+            <Button
+              className={styles.check}
+              disabled={!canCheck(q, a)}
+              aria-disabled={checkArmed ? undefined : true}
+              onClick={() => checkArmed && dispatch({ type: 'check' })}
+            >
               Check
             </Button>
           </div>
@@ -96,7 +113,9 @@ function QuizQuestion({ session, dispatch, onExit }: { session: Session; dispatc
           </div>
         )}
         <div aria-live="polite">
-          {a.checked && <FeedbackSheet question={q} answer={a} index={session.idx} onContinue={() => dispatch({ type: 'next' })} />}
+          {a.checked && (
+            <FeedbackSheet question={q} answer={a} index={session.idx} guardMs={guardMs} onContinue={() => dispatch({ type: 'next' })} />
+          )}
         </div>
       </div>
     </div>
