@@ -1,0 +1,36 @@
+.panel {
+  margin: 0;
+  padding: 12px 16px;
+  background: var(--ink);
+  color: var(--code-punct);
+  border-radius: var(--radius-tile);
+  font-family: var(--font-code);
+  font-size: 13px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.panel code {
+  font: inherit;
+}
+
+.line {
+  display: block;
+}
+
+.selector {
+  color: var(--code-selector);
+}
+.property {
+  color: var(--code-property);
+}
+.value {
+  color: var(--code-value);
+}
+.punct {
+  color: var(--code-punct);
+}
+.html {
+  color: var(--code-html);
+}

@@ -1,0 +1,8 @@
+.code {
+  font-family: var(--font-code);
+  font-size: 0.8125em;
+  background: rgb(29 27 38 / 0.08);
+  padding: 1px 5px;
+  border-radius: 5px;
+  overflow-wrap: anywhere;
+}

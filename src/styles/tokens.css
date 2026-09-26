@@ -1,0 +1,57 @@
+/* Design tokens — docs/design-tokens.md */
+:root {
+  /* Color */
+  --bg: #fbf8f2;
+  --surface: #ffffff;
+  --surface-muted: #f3f0e8;
+  --line: #e4dfd4;
+  --line-strong: #c9c3b6;
+  --ink: #1d1b26;
+  --ink-muted: #5b5868;
+  --ink-faint: #8c88a3;
+
+  --primary: #4338ca;
+  --primary-deep: #2e2690;
+  --primary-soft: #eef0ff;
+  --primary-tint: #c7cbff;
+  --primary-tint-text: #e0e3ff;
+  --focus: #818cf8;
+
+  --accent: #e4572e;
+
+  --correct: #15803d;
+  --correct-bg: #e3f4e8;
+  --correct-edge: #0f5e2c;
+  --wrong: #b4461b;
+  --wrong-bg: #fcebdf;
+  --wrong-edge: #8a3413;
+
+  --learn: #e3a008;
+  --learn-bg: #fff7db;
+  --learn-border: #f2d675;
+  --learn-text: #8a5a00;
+
+  /* Code syntax (on --ink) */
+  --code-selector: #f9a8d4;
+  --code-property: #a5b4fc;
+  --code-value: #fcd34d;
+  --code-punct: #d6d3e0;
+  --code-html: #9c98b3;
+
+  /* Type */
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-code: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Shape */
+  --radius-tile: 16px;
+  --radius-chip: 12px;
+  --radius-hero: 20px;
+  --radius-pill: 999px;
+
+  /* Spacing */
+  --screen-pad: 20px;
+  --touch: 44px;
+  --button-h: 52px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
