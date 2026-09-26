@@ -4,18 +4,22 @@ import { Quiz } from './quiz/Quiz';
 import { Home } from './screens/Home';
 import { Learn } from './screens/Learn';
 import { appReducer, initialState } from './state/app';
-import { localProgressStore, type ProgressStore } from './storage/progress';
+import { emptyCourseProgress, localProgressStore, type ProgressStore } from './storage/progress';
 import styles from './App.module.css';
 
 const defaultStore = localProgressStore();
 
 export function App({ store = defaultStore }: { store?: ProgressStore }) {
-  const [state, dispatch] = useReducer(appReducer, store, (s) => ({ ...initialState, ...s.load() }));
+  // CSS-only bridge between v2 storage and the single-course AppState.
+  const [state, dispatch] = useReducer(appReducer, store, (s) => {
+    const css = s.load().courses.css ?? emptyCourseProgress();
+    return { ...initialState, completedUnits: css.completedUnits, completedSets: css.completedSets, totalXp: css.xp };
+  });
   const { screen, completedUnits, completedSets, totalXp } = state;
   const course = courseById(state.course);
 
   useEffect(() => {
-    store.save({ completedUnits, completedSets, totalXp });
+    store.save({ activeCourse: 'css', courses: { css: { completedUnits, completedSets, xp: totalXp } } });
   }, [store, completedUnits, completedSets, totalXp]);
 
   return (
