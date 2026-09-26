@@ -4,9 +4,9 @@
 // applied as real CSS. In body/tip/explain text, `backtick` segments render
 // as inline code. In code arrays, a line starting with `§` is HTML.
 
-// ----- question-types.json -----
+import type { CourseIconName, CourseId, QuestionTypeKey } from './typeKeys';
 
-export type QuestionTypeKey = 'predict' | 'pairs' | 'versus' | 'build' | 'tune' | 'bug' | 'type';
+// ----- question-types.json -----
 
 export interface QuestionTypeInfo {
   key: QuestionTypeKey;
@@ -186,7 +186,7 @@ export interface TypeQuestion extends QuestionBase {
   base: string;
 }
 
-export type Question =
+export type CssQuestion =
   | PredictQuestion
   | PairsQuestion
   | VersusQuestion
@@ -194,6 +194,8 @@ export type Question =
   | TuneQuestion
   | BugQuestion
   | TypeQuestion;
+
+export type Question = CssQuestion;
 
 // ----- topics.json -----
 
@@ -204,3 +206,25 @@ export type Topics = Record<string, string[]>;
 
 /** What a quiz run practices: a mixed review, one unit's topic, or one question type. */
 export type LessonKey = 'mixed' | `topic:${string}` | QuestionTypeKey;
+
+// ----- courses.json -----
+
+export interface CourseInfo {
+  id: CourseId;
+  name: string;
+  /** Shown under the wordmark on Home. */
+  tagline: string;
+  /** Shown in the course picker. */
+  blurb: string;
+  icon: CourseIconName;
+}
+
+/** One course's four content files. */
+export interface ContentBundle {
+  units: readonly Unit[];
+  questions: readonly Question[];
+  questionTypes: readonly QuestionTypeInfo[];
+  topics: Topics;
+}
+
+export interface Course extends CourseInfo, ContentBundle {}

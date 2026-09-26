@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { units, type ChoiceDemo, type KnobDemo } from '../content';
+import { courseById, type ChoiceDemo, type KnobDemo } from '../content';
 import { buildDemo, initialSelection } from './demo';
 import { highlightLine } from './highlight';
 import { splitInlineCode } from './inlineCode';
 import { sanitizeCssKeyword } from './sanitize';
 
-const card = (unit: string, index: number) => units.find((u) => u.key === unit)!.cards[index]!;
+const card = (unit: string, index: number) => courseById('css').units.find((u) => u.key === unit)!.cards[index]!;
 
 describe('highlightLine', () => {
   it('colors a one-line rule', () => {

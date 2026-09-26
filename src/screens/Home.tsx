@@ -1,5 +1,5 @@
 import type { Dispatch, ReactNode } from 'react';
-import { questionsOfType, questionTypes, units } from '../content';
+import { questionsOfType, type Course } from '../content';
 import { Button } from '../components/Button';
 import { HeartCount } from '../components/HeartCount';
 import { BookIcon, CheckCircleIcon, ChevronRightIcon, TargetIcon } from '../components/icons';
@@ -8,11 +8,12 @@ import type { Action, AppState, Tab } from '../state/app';
 import styles from './Home.module.css';
 
 interface Props {
+  course: Course;
   state: AppState;
   dispatch: Dispatch<Action>;
 }
 
-export function Home({ state, dispatch }: Props) {
+export function Home({ course, state, dispatch }: Props) {
   return (
     <div className={styles.screen}>
       <div className={styles.scroll}>
@@ -26,7 +27,11 @@ export function Home({ state, dispatch }: Props) {
             <HeartCount count={HEARTS_PER_LESSON} />
           </div>
         </header>
-        {state.tab === 'learn' ? <LearnTab state={state} dispatch={dispatch} /> : <PracticeTab state={state} dispatch={dispatch} />}
+        {state.tab === 'learn' ? (
+          <LearnTab course={course} state={state} dispatch={dispatch} />
+        ) : (
+          <PracticeTab course={course} state={state} dispatch={dispatch} />
+        )}
       </div>
       <nav aria-label="Sections" className={styles.tabs}>
         <TabButton tab="learn" current={state.tab} dispatch={dispatch} icon={<BookIcon />} label="Learn" />
@@ -51,10 +56,10 @@ function TabButton(props: { tab: Tab; current: Tab; dispatch: Dispatch<Action>; 
   );
 }
 
-function LearnTab({ state, dispatch }: Props) {
+function LearnTab({ course, state, dispatch }: Props) {
   const done = state.completedUnits;
-  const nextUnit = units.find((u) => !done[u.key]);
-  const hero = nextUnit ?? units[0]!;
+  const nextUnit = course.units.find((u) => !done[u.key]);
+  const hero = nextUnit ?? course.units[0]!;
   const kicker = !nextUnit ? 'All lessons done — review any time' : Object.keys(done).length ? 'Up next' : 'Start here';
 
   return (
@@ -68,7 +73,7 @@ function LearnTab({ state, dispatch }: Props) {
       />
       <h2 className={styles.sectionTitle}>Lessons</h2>
       <ul className={styles.list}>
-        {units.map((u, i) => (
+        {course.units.map((u, i) => (
           <li key={u.key}>
             <Row
               n={i + 1}
@@ -86,21 +91,21 @@ function LearnTab({ state, dispatch }: Props) {
   );
 }
 
-function PracticeTab({ state, dispatch }: Props) {
+function PracticeTab({ course, state, dispatch }: Props) {
   const done = state.completedSets;
   return (
     <div className={styles.tabBody}>
       <Hero
         kicker="Today’s practice"
         title="Mixed review"
-        blurb={`${questionTypes.length} questions — one of every type, easiest to hardest.`}
+        blurb={`${course.questionTypes.length} questions — one of every type, easiest to hardest.`}
         action={done.mixed ? 'Go again' : 'Start'}
         onAction={() => dispatch({ type: 'startQuiz', lessonKey: 'mixed' })}
       />
       <h2 className={styles.sectionTitle}>Practice by type</h2>
       <ul className={styles.list}>
-        {questionTypes.map((t, i) => {
-          const count = questionsOfType(t.key).length;
+        {course.questionTypes.map((t, i) => {
+          const count = questionsOfType(course, t.key).length;
           return (
             <li key={t.key}>
               <Row

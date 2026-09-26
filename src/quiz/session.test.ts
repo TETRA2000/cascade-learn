@@ -3,7 +3,7 @@ import { accuracy, currentQuestion, sessionReducer, startSession, type SessionAc
 import type { Session } from './types';
 
 const run = (s: Session, ...actions: SessionAction[]) => actions.reduce(sessionReducer, s);
-const bugs = () => startSession('bug', ['bug-1', 'bug-2', 'bug-3']); // answers: lines 4, 3, 3
+const bugs = () => startSession('css', 'bug', ['bug-1', 'bug-2', 'bug-3']); // answers: lines 4, 3, 3
 const pickLine = (line: number): SessionAction[] => [{ type: 'select', sel: line }, { type: 'check' }];
 const next: SessionAction = { type: 'next' };
 
@@ -15,8 +15,8 @@ describe('startSession', () => {
   });
 
   it('drops unknown ids and finishes immediately when nothing is left', () => {
-    expect(startSession('bug', ['nope', 'bug-2']).queue).toEqual(['bug-2']);
-    expect(startSession('bug', []).phase).toBe('done');
+    expect(startSession('css', 'bug', ['nope', 'bug-2']).queue).toEqual(['bug-2']);
+    expect(startSession('css', 'bug', []).phase).toBe('done');
   });
 });
 
@@ -88,7 +88,7 @@ describe('next', () => {
 
 describe('answer actions', () => {
   it('fills build slots left to right from bank indexes and clears them', () => {
-    let s = run(startSession('build', ['build-2']), { type: 'placeWord', bankIndex: 3 }, { type: 'placeWord', bankIndex: 3 });
+    let s = run(startSession('css', 'build', ['build-2']), { type: 'placeWord', bankIndex: 3 }, { type: 'placeWord', bankIndex: 3 });
     expect(s.answer.slots).toEqual([3, null]); // the same chip can't be placed twice
     s = run(s, { type: 'placeWord', bankIndex: 0 }, { type: 'placeWord', bankIndex: 1 });
     expect(s.answer.slots).toEqual([3, 0]); // no empty slot left for chip 1
@@ -97,19 +97,19 @@ describe('answer actions', () => {
   });
 
   it('steps tune values within min and max', () => {
-    const t = startSession('tune', ['tune-1']); // start 8, step 4, range 0..48
+    const t = startSession('css', 'tune', ['tune-1']); // start 8, step 4, range 0..48
     expect(run(t, { type: 'step', dir: 1 }).answer.num).toBe(12);
     expect(run(t, { type: 'step', dir: -1 }, { type: 'step', dir: -1 }, { type: 'step', dir: -1 }).answer.num).toBe(0);
   });
 
   it('locks the answer once checked', () => {
-    const s = run(startSession('type', ['type-1']), { type: 'input', val: 'uppercase' }, { type: 'check' }, { type: 'input', val: 'x' });
+    const s = run(startSession('css', 'type', ['type-1']), { type: 'input', val: 'uppercase' }, { type: 'check' }, { type: 'input', val: 'x' });
     expect(s.answer.val).toBe('uppercase');
   });
 });
 
 describe('pairs', () => {
-  const pairs = () => startSession('pairs', ['pairs-1']);
+  const pairs = () => startSession('css', 'pairs', ['pairs-1']);
   const pick = (side: 'left' | 'right', id: string): SessionAction => ({ type: 'pickPair', side, id });
 
   it('matches a left and right pick in either order', () => {

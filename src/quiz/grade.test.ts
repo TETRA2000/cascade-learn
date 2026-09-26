@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { questionById, type BuildQuestion, type Question, type TuneQuestion, type TypeQuestion } from '../content';
+import { courseById, questionById, type BuildQuestion, type Question, type TuneQuestion, type TypeQuestion } from '../content';
 import { feedbackText } from './feedback';
 import { canCheck, freshAnswer, isCorrect } from './grade';
 import { buildPreview, tuneLayer, typePreviewCss } from './previews';
 import type { AnswerState } from './types';
 
-const q = <T extends Question = Question>(id: string) => questionById(id) as T;
+const q = <T extends Question = Question>(id: string) => questionById(courseById('css'), id) as T;
 const answer = (question: Question, patch: Partial<AnswerState> = {}): AnswerState => ({ ...freshAnswer(question), ...patch });
 
 describe('freshAnswer', () => {

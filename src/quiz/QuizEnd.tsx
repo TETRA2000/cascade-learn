@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { lessonName } from '../content';
+import { courseById, lessonName } from '../content';
 import { Button } from '../components/Button';
 import { BrokenHeartIcon, StarIcon } from '../components/icons';
 import { accuracy } from './session';
@@ -24,7 +24,7 @@ export function QuizDone({ session, onHome, onRetry }: { session: Session; onHom
         <h1 ref={heading} tabIndex={-1} className={`${styles.title} ${styles.done}`}>
           Lesson complete!
         </h1>
-        <p className={styles.sub}>{lessonName(session.lessonKey)}</p>
+        <p className={styles.sub}>{lessonName(courseById(session.courseId), session.lessonKey)}</p>
       </div>
       <dl className={styles.stats}>
         <div className={styles.stat}>

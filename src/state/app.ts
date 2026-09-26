@@ -1,5 +1,5 @@
 // App navigation + progress state. Pure reducer; App hydrates it from and saves it to a ProgressStore.
-import { unitByKey, type LessonKey } from '../content';
+import { courseById, unitByKey, type Course, type CourseId, type LessonKey } from '../content';
 import { initialSelection } from '../lib/demo';
 
 export type Tab = 'learn' | 'practice';
@@ -10,6 +10,8 @@ export type Screen =
   | { name: 'quiz'; lessonKey: LessonKey };
 
 export interface AppState {
+  /** The active course. */
+  course: CourseId;
   screen: Screen;
   tab: Tab;
   /** Units whose last card the learner has reached and finished. */
@@ -31,6 +33,7 @@ export type Action =
   | { type: 'goHome' };
 
 export const initialState: AppState = {
+  course: 'css',
   screen: { name: 'home' },
   tab: 'learn',
   completedUnits: {},
@@ -38,8 +41,8 @@ export const initialState: AppState = {
   totalXp: 0,
 };
 
-function cardScreen(unitKey: string, card: number): Screen | null {
-  const unit = unitByKey(unitKey);
+function cardScreen(course: Course, unitKey: string, card: number): Screen | null {
+  const unit = unitByKey(course, unitKey);
   const c = unit?.cards[card];
   if (!c) return null;
   return { name: 'learn', unitKey, card, selection: initialSelection(c.demo) };
@@ -52,13 +55,13 @@ export function appReducer(state: AppState, action: Action): AppState {
       return { ...state, tab: action.tab };
 
     case 'openUnit': {
-      const next = cardScreen(action.unitKey, 0);
+      const next = cardScreen(courseById(state.course), action.unitKey, 0);
       return next ? { ...state, screen: next } : state;
     }
 
     case 'gotoCard': {
       if (screen.name !== 'learn') return state;
-      const next = cardScreen(screen.unitKey, action.card);
+      const next = cardScreen(courseById(state.course), screen.unitKey, action.card);
       return next ? { ...state, screen: next } : state;
     }
 

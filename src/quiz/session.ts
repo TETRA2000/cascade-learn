@@ -1,8 +1,10 @@
 // One quiz run — a pure port of start/grade/check/next/resolvePair in the prototype.
-import { questionById, type LessonKey, type PairsQuestion, type Question } from '../content';
+import { courseById, questionById, type CourseId, type LessonKey, type PairsQuestion, type Question } from '../content';
 import { HEARTS_PER_LESSON, XP_FIRST_TRY, XP_RETRY } from '../state/rules';
 import { canCheck, freshAnswer, isCorrect } from './grade';
 import type { AnswerState, Session } from './types';
+
+const lookup = (courseId: CourseId, id: string) => questionById(courseById(courseId), id);
 
 export type SessionAction =
   | { type: 'start'; lessonKey: LessonKey; ids: readonly string[] }
@@ -16,9 +18,10 @@ export type SessionAction =
   | { type: 'check' }
   | { type: 'next' };
 
-export function startSession(lessonKey: LessonKey, ids: readonly string[], hearts = HEARTS_PER_LESSON): Session {
-  const queue = ids.filter((id) => questionById(id));
+export function startSession(courseId: CourseId, lessonKey: LessonKey, ids: readonly string[], hearts = HEARTS_PER_LESSON): Session {
+  const queue = ids.filter((id) => lookup(courseId, id));
   return {
+    courseId,
     lessonKey,
     queue,
     idx: 0,
@@ -28,14 +31,14 @@ export function startSession(lessonKey: LessonKey, ids: readonly string[], heart
     firstTry: 0,
     xp: 0,
     missed: {},
-    answer: freshAnswer(queue[0] === undefined ? undefined : questionById(queue[0])),
+    answer: freshAnswer(queue[0] === undefined ? undefined : lookup(courseId, queue[0])),
     phase: queue.length ? 'question' : 'done',
   };
 }
 
 export function currentQuestion(s: Session): Question | undefined {
   const id = s.queue[s.idx];
-  return id === undefined ? undefined : questionById(id);
+  return id === undefined ? undefined : lookup(s.courseId, id);
 }
 
 /** First-try percentage for the results screen. */
@@ -71,7 +74,7 @@ function resolvePair(s: Session, q: PairsQuestion, left: string, right: string):
 }
 
 export function sessionReducer(s: Session, action: SessionAction): Session {
-  if (action.type === 'start') return startSession(action.lessonKey, action.ids);
+  if (action.type === 'start') return startSession(s.courseId, action.lessonKey, action.ids);
 
   const q = currentQuestion(s);
   const a = s.answer;
@@ -125,7 +128,7 @@ export function sessionReducer(s: Session, action: SessionAction): Session {
       const idx = s.idx + 1;
       const id = s.queue[idx];
       if (id === undefined) return { ...s, phase: 'done' };
-      return { ...s, idx, answer: freshAnswer(questionById(id)) };
+      return { ...s, idx, answer: freshAnswer(lookup(s.courseId, id)) };
     }
   }
 }

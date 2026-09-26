@@ -1,4 +1,4 @@
-import type { LessonKey } from '../content';
+import type { CourseId, LessonKey } from '../content';
 
 /** The learner's in-progress answer to the current question. Fields unused by a type keep their defaults. */
 export interface AnswerState {
@@ -21,6 +21,8 @@ export interface AnswerState {
 }
 
 export interface Session {
+  /** The course whose questions this run uses. */
+  courseId: CourseId;
   lessonKey: LessonKey;
   /** Question ids; wrong answers are appended again. */
   queue: string[];

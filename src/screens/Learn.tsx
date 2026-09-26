@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, type Dispatch } from 'react';
-import { unitByKey } from '../content';
+import { unitByKey, type Course } from '../content';
 import { Button } from '../components/Button';
 import { CodePanel } from '../components/CodePanel';
 import { CssBox } from '../components/CssBox';
@@ -11,14 +11,15 @@ import type { Action } from '../state/app';
 import styles from './Learn.module.css';
 
 interface Props {
+  course: Course;
   unitKey: string;
   card: number;
   selection: number[];
   dispatch: Dispatch<Action>;
 }
 
-export function Learn({ unitKey, card: cardIndex, selection, dispatch }: Props) {
-  const unit = unitByKey(unitKey);
+export function Learn({ course, unitKey, card: cardIndex, selection, dispatch }: Props) {
+  const unit = unitByKey(course, unitKey);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const mainRef = useRef<HTMLElement>(null);
 

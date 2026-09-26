@@ -1,4 +1,5 @@
 import { useEffect, useReducer } from 'react';
+import { courseById } from './content';
 import { Quiz } from './quiz/Quiz';
 import { Home } from './screens/Home';
 import { Learn } from './screens/Learn';
@@ -11,6 +12,7 @@ const defaultStore = localProgressStore();
 export function App({ store = defaultStore }: { store?: ProgressStore }) {
   const [state, dispatch] = useReducer(appReducer, store, (s) => ({ ...initialState, ...s.load() }));
   const { screen, completedUnits, completedSets, totalXp } = state;
+  const course = courseById(state.course);
 
   useEffect(() => {
     store.save({ completedUnits, completedSets, totalXp });
@@ -18,13 +20,21 @@ export function App({ store = defaultStore }: { store?: ProgressStore }) {
 
   return (
     <div className={styles.frame}>
-      {screen.name === 'home' && <Home state={state} dispatch={dispatch} />}
+      {screen.name === 'home' && <Home course={course} state={state} dispatch={dispatch} />}
       {screen.name === 'learn' && (
-        <Learn key={screen.unitKey} unitKey={screen.unitKey} card={screen.card} selection={screen.selection} dispatch={dispatch} />
+        <Learn
+          key={screen.unitKey}
+          course={course}
+          unitKey={screen.unitKey}
+          card={screen.card}
+          selection={screen.selection}
+          dispatch={dispatch}
+        />
       )}
       {screen.name === 'quiz' && (
         <Quiz
           key={screen.lessonKey}
+          courseId={course.id}
           lessonKey={screen.lessonKey}
           onExit={() => dispatch({ type: 'goHome' })}
           onComplete={({ lessonKey, xp }) => dispatch({ type: 'completeQuiz', lessonKey, xp })}

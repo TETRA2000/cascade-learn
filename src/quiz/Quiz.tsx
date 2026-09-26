@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useRef, type Dispatch } from 'react';
-import { lessonQuestionIds, questionTypes, type LessonKey } from '../content';
+import { courseById, lessonQuestionIds, type CourseId, type LessonKey } from '../content';
 import { Button } from '../components/Button';
 import { HeartCount } from '../components/HeartCount';
 import { CloseIcon } from '../components/icons';
@@ -20,6 +20,7 @@ export interface QuizResult {
 }
 
 interface Props {
+  courseId: CourseId;
   lessonKey: LessonKey;
   onExit: () => void;
   /** Called once per finished run (queue exhausted) — never for an out-of-hearts run. */
@@ -28,9 +29,12 @@ interface Props {
   guardMs?: number;
 }
 
-export function Quiz({ lessonKey, onExit, onComplete, guardMs = ACTIVATION_GUARD_MS }: Props) {
-  const [session, dispatch] = useReducer(sessionReducer, lessonKey, (key) => startSession(key, lessonQuestionIds(key)));
-  const restart = () => dispatch({ type: 'start', lessonKey, ids: lessonQuestionIds(lessonKey) });
+export function Quiz({ courseId, lessonKey, onExit, onComplete, guardMs = ACTIVATION_GUARD_MS }: Props) {
+  const course = courseById(courseId);
+  const [session, dispatch] = useReducer(sessionReducer, lessonKey, (key) =>
+    startSession(courseId, key, lessonQuestionIds(course, key)),
+  );
+  const restart = () => dispatch({ type: 'start', lessonKey, ids: lessonQuestionIds(course, lessonKey) });
 
   // A finished session never changes again (the reducer ignores everything but
   // 'start'), so remembering which one we reported makes this exactly-once.
@@ -81,7 +85,7 @@ function QuizQuestion({ session, dispatch, onExit, guardMs }: QuestionProps) {
       </header>
 
       <div className={styles.titleBlock}>
-        <span className={styles.typeChip}>{questionTypes.find((t) => t.key === q.type)?.name}</span>
+        <span className={styles.typeChip}>{courseById(session.courseId).questionTypes.find((t) => t.key === q.type)?.name}</span>
         <h1 ref={promptRef} tabIndex={-1} className={styles.prompt}>
           {q.prompt}
         </h1>
