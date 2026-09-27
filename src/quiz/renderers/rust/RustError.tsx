@@ -1,5 +1,5 @@
 import type { RustErrorQuestion } from '../../../content';
-import { visibleLines } from '../../../lib/rustCode';
+import { visibleLines } from '../../../lib/code';
 import { LinePicker } from '../LinePicker';
 import type { RendererProps } from '../types';
 

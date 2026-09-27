@@ -1,7 +1,7 @@
 import { useId } from 'react';
 import type { RustCompilesQuestion } from '../../../content';
 import { CodePanel } from '../../../components/CodePanel';
-import { visibleLines } from '../../../lib/rustCode';
+import { visibleLines } from '../../../lib/code';
 import { tone, toneLabel } from '../../tone';
 import { ToneMark } from '../../ToneMark';
 import toneStyles from '../../tone.module.css';

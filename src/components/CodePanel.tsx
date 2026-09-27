@@ -1,6 +1,6 @@
 import { highlightLine } from '../lib/highlight';
 import { highlightRust } from '../lib/highlightRust';
-import { BLANK, visibleLines } from '../lib/rustCode';
+import { BLANK, visibleLines } from '../lib/code';
 import styles from './CodePanel.module.css';
 
 export type CodeLang = 'css' | 'rust';

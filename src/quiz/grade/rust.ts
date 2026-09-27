@@ -1,6 +1,6 @@
 // Rust answer rules.
 import type { RustQuestion } from '../../content';
-import { normalizeToken } from '../../lib/rustCode';
+import { normalizeToken } from '../../lib/code';
 import type { AnswerState } from '../types';
 
 /** Whether Check is enabled (the caller has already ruled out a checked answer). rs-pairs has no Check. */

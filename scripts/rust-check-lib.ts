@@ -1,7 +1,7 @@
 // Pure logic for `npm run check:rust`: which Rust snippets to compile, what
 // each must do, and how to read rustc's JSON diagnostics. check-rust.ts does the I/O.
 import type { Question, Unit } from '../src/content/types';
-import { applyDiff, fillBlank, fillSlots, visibleLineNumber } from '../src/lib/rustCode.ts';
+import { applyDiff, fillBlank, fillSlots, visibleLineNumber } from '../src/lib/code.ts';
 
 export type Expect =
   | { kind: 'compiles' }

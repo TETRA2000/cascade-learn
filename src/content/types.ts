@@ -224,7 +224,7 @@ export type CssQuestion =
   | TypeQuestion;
 
 // ----- Rust questions -----
-// Code arrays are plain Rust. Lines starting with `# ` are hidden setup (see lib/rustCode.ts).
+// Code arrays are plain Rust. Lines starting with `# ` are hidden setup (see lib/code.ts).
 // `error` strings are rustc's first error line, e.g. `error[E0382]: borrow of moved value: \`s\``.
 
 export interface RustPredictQuestion extends QuestionBase {

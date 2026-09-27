@@ -1,7 +1,7 @@
 import type { RustBuildQuestion } from '../../../content';
 import { CodeTokens } from '../../../components/CodePanel';
 import { OutputPanel } from '../../../components/OutputPanel';
-import { isHiddenLine } from '../../../lib/rustCode';
+import { isHiddenLine } from '../../../lib/code';
 import type { RendererProps } from '../types';
 import { SlotButton, WordBank } from '../WordBank';
 import styles from './RustBuild.module.css';

@@ -5,7 +5,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import type { Question, Unit } from '../src/content/types';
-import { programSource } from '../src/lib/rustCode.ts';
+import { programSource } from '../src/lib/code.ts';
 import { collectSnippets, firstError, judge, type CompileResult, type Snippet } from './rust-check-lib.ts';
 
 const dir = resolve(process.argv[2] ?? join(import.meta.dirname, '../content/rust'));

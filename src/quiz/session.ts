@@ -10,7 +10,7 @@ import {
   type Question,
   type RustPairsQuestion,
 } from '../content';
-import { TOKEN_MAX_LENGTH } from '../lib/rustCode';
+import { TOKEN_MAX_LENGTH } from '../lib/code';
 import { HEARTS_PER_LESSON, XP_FIRST_TRY, XP_RETRY } from '../state/rules';
 import { canCheck, freshAnswer, isCorrect } from './grade';
 import type { AnswerState, Session } from './types';

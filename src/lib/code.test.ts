@@ -3,12 +3,14 @@ import {
   applyDiff,
   fillBlank,
   fillSlots,
+  insertAfterVisibleLine,
   normalizeToken,
   parseDiff,
+  programLineOfVisible,
   programSource,
   visibleLineNumber,
   visibleLines,
-} from './rustCode';
+} from './code';
 
 const code = ['# fn main() {', 'let a = 1;', '#', 'let b = a;', '# }'];
 
@@ -72,5 +74,19 @@ describe('diffs', () => {
     expect(applyDiff(['a', 'b', 'c'], ['- a', '- c'])).toBeNull();
     expect(applyDiff(['a'], ['- z', '+ y'])).toBeNull();
     expect(applyDiff(['a'], ['+ z'])).toBeNull();
+  });
+});
+
+describe('visible ↔ program lines', () => {
+  const code = ['# fn main() {', 'let a = 1;', '#', 'let b = a;', '# }'];
+  it('maps a visible line to its program line', () => {
+    expect(programLineOfVisible(code, 1)).toBe(2);
+    expect(programLineOfVisible(code, 2)).toBe(4);
+    expect(programLineOfVisible(code, 3)).toBeNull();
+    expect(programLineOfVisible(code, 0)).toBeNull();
+  });
+  it('inserts a line right after a visible line', () => {
+    expect(insertAfterVisibleLine(code, 1, '# X')).toEqual(['# fn main() {', 'let a = 1;', '# X', '#', 'let b = a;', '# }']);
+    expect(insertAfterVisibleLine(code, 9, '# X')).toBeNull();
   });
 });

@@ -1,7 +1,7 @@
 // Checks for Rust-course demos and questions.
 import type { RustDemo, RustQuestion } from './types';
 import { inRange, isInt, isStr, isStrArr, type Err } from './validateUtil';
-import { BLANK, findDiffRange, isHiddenLine, normalizeToken, TOKEN_MAX_LENGTH, visibleLines } from '../lib/rustCode';
+import { BLANK, findDiffRange, isHiddenLine, normalizeToken, TOKEN_MAX_LENGTH, visibleLines } from '../lib/code';
 
 export const isRustError = (v: unknown): v is string => isStr(v) && /^error\[E\d{4}\]: \S/.test(v);
 export const BAD_ERROR = 'error must look like "error[E0000]: message"';

@@ -1,7 +1,7 @@
 import type { RustFixQuestion } from '../../../content';
 import { CodePanel } from '../../../components/CodePanel';
 import { OutputPanel } from '../../../components/OutputPanel';
-import { parseDiff } from '../../../lib/rustCode';
+import { parseDiff } from '../../../lib/code';
 import { tone, toneLabel } from '../../tone';
 import { ToneMark } from '../../ToneMark';
 import toneStyles from '../../tone.module.css';

@@ -1,7 +1,7 @@
 import { useId } from 'react';
 import type { RustTypeQuestion } from '../../../content';
 import { CodePanel } from '../../../components/CodePanel';
-import { TOKEN_MAX_LENGTH } from '../../../lib/rustCode';
+import { TOKEN_MAX_LENGTH } from '../../../lib/code';
 import type { RendererProps } from '../types';
 import styles from './RustType.module.css';
 

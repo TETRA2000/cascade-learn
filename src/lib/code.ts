@@ -1,5 +1,7 @@
-// Rust snippet helpers shared by the app and scripts/check-rust.ts.
-// Keep this file free of imports: Node runs it directly (type stripping) for the checker.
+// Code-snippet helpers shared by the app and the content checkers (scripts/check-rust.ts and,
+// later, its TypeScript counterpart). Most helpers here started Rust-only and are named for
+// the Rust question types that still use them; a later task may extend them for TS content.
+// Keep this file free of imports: Node runs it directly (type stripping) for the checkers.
 
 /** rustdoc's hidden-line convention: a `# ` prefix or a lone `#`. Compiled, never shown. */
 export function isHiddenLine(line: string): boolean {
@@ -21,6 +23,25 @@ export function visibleLineNumber(code: readonly string[], programLine: number):
   const line = code[programLine - 1];
   if (line === undefined || isHiddenLine(line)) return null;
   return visibleLines(code.slice(0, programLine)).length;
+}
+
+/** 1-based visible line → 1-based program line; null when `visible` is out of range. */
+export function programLineOfVisible(code: readonly string[], visible: number): number | null {
+  let seen = 0;
+  for (let i = 0; i < code.length; i++) {
+    const line = code[i];
+    if (line === undefined || isHiddenLine(line)) continue;
+    seen++;
+    if (seen === visible) return i + 1;
+  }
+  return null;
+}
+
+/** Insert `line` right after visible line `visible`; null when `visible` is out of range. */
+export function insertAfterVisibleLine(code: readonly string[], visible: number, line: string): string[] | null {
+  const programLine = programLineOfVisible(code, visible);
+  if (programLine === null) return null;
+  return [...code.slice(0, programLine), line, ...code.slice(programLine)];
 }
 
 /** The rs-type blank. */
