@@ -5,7 +5,7 @@ import { freshAnswer } from '../../grade';
 import { tsInfer } from '../../tsFixtures';
 import { CodeInfer } from './CodeInfer';
 
-// Component-level: TS isn't a bundled course yet. In tsInfer, `x` on line 3 is `string` (option A).
+// Component-level, on a fixture. In tsInfer, `x` on line 3 is `string` (option A).
 describe('Hover the type', () => {
   it('marks the hovered name with more than color and offers types as pressed tiles', async () => {
     const act = vi.fn();

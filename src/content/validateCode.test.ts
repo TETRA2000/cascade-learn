@@ -11,7 +11,7 @@ const check = (d: unknown, lang: CodeLang = 'rust') => {
   return errors;
 };
 
-describe('validateRustDemo', () => {
+describe('validateCodeDemo', () => {
   it('accepts code and code-choice demos', () => {
     expect(check({ kind: 'code', code: ['fn main() {}'] })).toEqual([]);
     expect(check({ kind: 'code', code: ['fn main() {}'], output: ['hi'] })).toEqual([]);
@@ -71,7 +71,7 @@ const checkQ = (q: unknown) => {
   return errors;
 };
 
-describe('validateRustQuestion', () => {
+describe('validateCodeQuestion (Rust)', () => {
   it('accepts every fixture', () => {
     for (const q of [rsPredict, rsPredictError, rsPairs, rsCompiles, rsBuild, rsError, rsFix, rsType]) expect(checkQ(q)).toEqual([]);
   });
@@ -114,7 +114,7 @@ describe('validateRustQuestion', () => {
   });
 });
 
-describe('validateTsQuestion', () => {
+describe('validateCodeQuestion (TypeScript)', () => {
   it('accepts every fixture', () => {
     for (const q of [tsPredict, tsPredictError, tsPredictThrows, tsInfer, tsCompiles]) expect(checkQ(q)).toEqual([]);
   });

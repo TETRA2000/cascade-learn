@@ -28,7 +28,7 @@ describe('Predict the output (Rust)', () => {
   });
 });
 
-// Component-level: TS isn't a bundled course yet.
+// Component-level, on a fixture whose answer is the throws option.
 describe('Predict the output (TypeScript)', () => {
   it('renders the error and throws options as text in a TypeScript code region', () => {
     render(<CodePredict question={tsPredictThrows} answer={freshAnswer(tsPredictThrows)} act={vi.fn()} />);

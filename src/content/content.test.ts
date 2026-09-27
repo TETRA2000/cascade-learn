@@ -156,7 +156,7 @@ describe('ts content', () => {
 
   it('is valid', () => expect(validateContent(ts)).toEqual([]));
 
-  it('has Values & equality with 6 cards and an 8-question quiz in type order', () => {
+  it('has its four units in order, and Values & equality has 6 cards and an 8-question quiz in type order', () => {
     expect(ts.units.map((u) => u.key)).toEqual(['values', 'objects', 'functions', 'narrowing']);
     expect(ts.units[0]!.cards).toHaveLength(6);
     const quiz = ts.topics.values!.map((id) => ts.questions.find((q) => q.id === id)!.type);

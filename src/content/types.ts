@@ -31,7 +31,7 @@ export interface Card {
 }
 
 export type CssDemo = KnobDemo | ChoiceDemo;
-/** A demo in a code course (Rust); the language comes from the course. */
+/** A demo in a code course (Rust or TypeScript); the language comes from the course. */
 export type CodeCourseDemo = CodeDemo | CodeChoiceDemo;
 export type Demo = CssDemo | CodeCourseDemo;
 
@@ -91,12 +91,12 @@ export interface ChoiceDemo {
   opts: ChoiceOption[];
 }
 
-/** A code example and what it does. At most one of `output` / `error`; neither means "compiles, prints nothing". */
+/** A code example and what it does. At most one of `output` / `error` (and `thrown` never with `error`); neither means "compiles, prints nothing". */
 export interface CodeDemo {
   kind: 'code';
   code: string[];
   output?: string[];
-  /** rustc's first error line, e.g. `error[E0382]: borrow of moved value: \`s\``. */
+  /** The compiler's first error line, e.g. rustc's `error[E0382]: borrow of moved value: \`s\`` or tsc's `error TS2322: …`. */
   error?: string;
   /** TS only: what Node reports when the program throws at runtime. Never with `error`. */
   thrown?: string;
@@ -105,7 +105,7 @@ export interface CodeDemo {
 export interface CodeChoiceOption {
   label: string;
   code: string[];
-  /** Exactly one of `output` / `error`. */
+  /** Rust: exactly one of `output` / `error`. TS: `error`, or `output` and/or `thrown`. */
   output?: string[];
   error?: string;
   /** TS only: what Node reports when the program throws at runtime. Never with `error`. */

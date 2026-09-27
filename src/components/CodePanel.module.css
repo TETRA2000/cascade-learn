@@ -19,7 +19,7 @@
   display: block;
 }
 
-/* Rust panels: hang wrapped continuation lines past the gutter (2.5ch + 1.5ch
+/* Code panels (Rust, TypeScript): hang wrapped continuation lines past the gutter (2.5ch + 1.5ch
    margin) instead of letting them wrap back to column 0, under the numbers. */
 .numbered .line {
   padding-left: 4ch;

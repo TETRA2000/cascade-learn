@@ -1,4 +1,4 @@
-// Pure logic shared by the content checkers (check-rust.ts, and later a TS counterpart):
+// Pure logic shared by the content checkers (check-rust.ts and check-ts.ts):
 // which snippets to compile, what each must do, and how to read a compiler's JSON diagnostics.
 // The checker scripts do the I/O.
 import type { Question, Unit } from '../src/content/types';
