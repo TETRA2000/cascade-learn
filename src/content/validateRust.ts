@@ -1,10 +1,12 @@
 // Checks for Rust-course demos and questions.
 import type { RustDemo, RustQuestion } from './types';
 import { inRange, isInt, isStr, isStrArr, type Err } from './validateUtil';
-import { applyDiff, BLANK, normalizeToken, TOKEN_MAX_LENGTH, visibleLines } from '../lib/rustCode';
+import { BLANK, findDiffRange, isHiddenLine, normalizeToken, TOKEN_MAX_LENGTH, visibleLines } from '../lib/rustCode';
 
 export const isRustError = (v: unknown): v is string => isStr(v) && /^error\[E\d{4}\]: \S/.test(v);
 export const BAD_ERROR = 'error must look like "error[E0000]: message"';
+/** The one string an rs-predict error option's text may read. */
+export const ERROR_OPTION_TEXT = 'Doesn’t compile';
 
 const hasCode = (c: unknown): c is string[] => isStrArr(c) && visibleLines(c).length > 0;
 
@@ -43,6 +45,7 @@ export function validateRustQuestion(q: RustQuestion, at: string, err: Err) {
       if (!validateOpts(q.opts, at, err)) return;
       q.opts.forEach((o, i) => {
         if (!isStr(o.text) || (o.kind !== 'output' && o.kind !== 'error')) err(at, `opt ${i} needs text and kind "output" or "error"`);
+        if (o.kind === 'error' && o.text !== ERROR_OPTION_TEXT) err(at, `the error option must read "${ERROR_OPTION_TEXT}"`);
       });
       if (!inRange(q.answer, q.opts.length)) return err(at, 'answer out of range');
       if ((q.opts[q.answer]!.kind === 'error') !== (q.error !== undefined)) {
@@ -104,17 +107,22 @@ export function validateRustQuestion(q: RustQuestion, at: string, err: Err) {
         if (!isStrArr(o.diff) || !o.diff.every((l) => l.startsWith('- ') || l.startsWith('+ '))) {
           return err(at, `${name} diff lines must start with "- " or "+ "`);
         }
-        if (!applyDiff(q.code, o.diff)) err(at, `${name} diff does not apply to code`);
+        const range = findDiffRange(q.code, o.diff);
+        if (!range) return err(at, `${name} diff does not apply to code`);
+        if (q.code.slice(range[0], range[1]).some(isHiddenLine)) err(at, `${name} diff must only remove visible lines`);
       });
       if (!inRange(q.answer, q.opts.length)) err(at, 'answer out of range');
       return;
-    case 'rs-type':
+    case 'rs-type': {
       if (!hasCode(q.code)) return err(at, 'needs visible code');
       if (q.code.join('\n').split(BLANK).length !== 2) err(at, `code needs exactly one ${BLANK} blank`);
+      const blankLine = q.code.find((l) => l.includes(BLANK));
+      if (blankLine !== undefined && isHiddenLine(blankLine)) err(at, 'the ___ blank must be on a visible line');
       if (!isStrArr(q.accept) || q.accept.length === 0) return err(at, 'needs accept[]');
       q.accept.forEach((a) => {
         if (normalizeToken(a) !== a || a.length > TOKEN_MAX_LENGTH) err(at, `accept "${a}" can never match normalized input`);
       });
       return;
+    }
   }
 }

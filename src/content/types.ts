@@ -230,7 +230,7 @@ export type CssQuestion =
 export interface RustPredictQuestion extends QuestionBase {
   type: 'rs-predict';
   code: string[];
-  /** `output` options render as program output; the `error` option reads "Doesn't compile". */
+  /** `output` options render as program output; the `error` option reads "Doesn’t compile". */
   opts: { text: string; kind: 'output' | 'error' }[];
   answer: number;
   /** Required exactly when the answer is the `error` option. */

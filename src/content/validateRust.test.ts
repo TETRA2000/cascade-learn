@@ -74,6 +74,25 @@ describe('validateRustQuestion', () => {
     ['a diff line without a prefix', { ...rsFix, opts: [...rsFix.opts, { diff: ['let t = s;'] }] }, 'q: option D diff lines must start with "- " or "+ "'],
     ['two blanks', { ...rsType, code: ['___ ___'] }, 'q: code needs exactly one ___ blank'],
     ['an accept that can never match', { ...rsType, accept: [' &mut'] }, 'q: accept " &mut" can never match normalized input'],
+    [
+      'a diff that removes a hidden line',
+      {
+        ...rsFix,
+        code: ['fn main() {', '# let extra = 1;', ...rsFix.code.slice(1)],
+        opts: [{ diff: ['- # let extra = 1;', '+ // nothing'] }, rsFix.opts[1]!, rsFix.opts[2]!],
+      },
+      'q: option A diff must only remove visible lines',
+    ],
+    [
+      'a ___ blank on a hidden line',
+      { ...rsType, code: ['# fn add_one(v: ___ Vec<i32>) {', '    v.push(1);', '}'] },
+      'q: the ___ blank must be on a visible line',
+    ],
+    [
+      'a predict error option that does not read "Doesn’t compile"',
+      { ...rsPredict, opts: [rsPredict.opts[0]!, rsPredict.opts[1]!, { ...rsPredict.opts[2]!, text: "Doesn't compile" }] },
+      'q: the error option must read "Doesn’t compile"',
+    ],
   ])('rejects %s', (_name, q, message) => {
     expect(checkQ(q)).toContain(message);
   });

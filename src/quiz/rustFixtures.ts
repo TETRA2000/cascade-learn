@@ -18,7 +18,7 @@ export const rsPredict: RustPredictQuestion = {
   opts: [
     { text: '5 6', kind: 'output' },
     { text: '6 6', kind: 'output' },
-    { text: "Doesn't compile", kind: 'error' },
+    { text: 'Doesn’t compile', kind: 'error' },
   ],
   answer: 0,
   explain: '`i32` is `Copy`.',

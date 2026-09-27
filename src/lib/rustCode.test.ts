@@ -39,6 +39,11 @@ describe('blanks and slots', () => {
     expect(fillBlank(['fn f(v: ___ Vec<i32>) {}', 'x'], '&mut')).toEqual(['fn f(v: &mut Vec<i32>) {}', 'x']);
   });
 
+  it('fills the blank literally, without expanding $& or $1 in the value', () => {
+    expect(fillBlank(['a ___ b'], 'x$&y')).toEqual(['a x$&y b']);
+    expect(fillBlank(['a ___ b'], 'x$1y')).toEqual(['a x$1y b']);
+  });
+
   it('normalizes typed tokens without changing case', () => {
     expect(normalizeToken('  & \t mut ')).toBe('& mut');
     expect(normalizeToken('&MUT')).toBe('&MUT');

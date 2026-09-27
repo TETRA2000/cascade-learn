@@ -27,7 +27,7 @@ export function visibleLineNumber(code: readonly string[], programLine: number):
 export const BLANK = '___';
 
 export function fillBlank(code: readonly string[], value: string): string[] {
-  return code.map((l) => l.replace(BLANK, value));
+  return code.map((l) => l.replace(BLANK, () => value));
 }
 
 /** rs-type input limit, enforced by the input and the session. */
@@ -57,14 +57,20 @@ export function parseDiff(diff: readonly string[]): { remove: string[]; add: str
   };
 }
 
-/** Replace the run of removed lines with the added ones. Null if nothing is removed or the run isn't in `code`. */
-export function applyDiff(code: readonly string[], diff: readonly string[]): string[] | null {
-  const { remove, add } = parseDiff(diff);
+/** The `[start, end)` run in `code` that a diff's removed lines match, or null if there's no match. */
+export function findDiffRange(code: readonly string[], diff: readonly string[]): [number, number] | null {
+  const { remove } = parseDiff(diff);
   if (!remove.length) return null;
   for (let i = 0; i + remove.length <= code.length; i++) {
-    if (remove.every((line, j) => code[i + j] === line)) {
-      return [...code.slice(0, i), ...add, ...code.slice(i + remove.length)];
-    }
+    if (remove.every((line, j) => code[i + j] === line)) return [i, i + remove.length];
   }
   return null;
+}
+
+/** Replace the run of removed lines with the added ones. Null if nothing is removed or the run isn't in `code`. */
+export function applyDiff(code: readonly string[], diff: readonly string[]): string[] | null {
+  const range = findDiffRange(code, diff);
+  if (!range) return null;
+  const [start, end] = range;
+  return [...code.slice(0, start), ...parseDiff(diff).add, ...code.slice(end)];
 }

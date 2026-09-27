@@ -11,7 +11,7 @@ describe('Predict the output (Rust)', () => {
     expect(code).toHaveTextContent('let mut b = a;');
     expect(code).not.toHaveTextContent('fn main');
     expect(screen.getAllByRole('button', { name: /^Option [A-D]:/ })).toHaveLength(4);
-    expect(screen.getByRole('button', { name: "Option D: Doesn't compile" })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Option D: Doesn’t compile' })).toBeInTheDocument();
   });
 
   it('marks a wrong pick with text and gives the answer', async () => {
