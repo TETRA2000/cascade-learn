@@ -284,5 +284,123 @@
         }
       }
     ]
+  },
+  {
+    "key": "functions",
+    "name": "Functions",
+    "blurb": "Write typed functions and predict closures",
+    "cards": [
+      {
+        "title": "Parameter and return types",
+        "body": "Every parameter needs a type, as in `function area(w: number, h: number)`. A return type goes after the `)`, like `: number`; leave it off and tsc infers it from the `return`.",
+        "tip": "Unlike plain JavaScript, tsc checks every call: `area(3)` and `area(\"3\", 4)` are both type errors.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "function area(w: number, h: number): number {",
+            "  return w * h;",
+            "}",
+            "function greet(name: string) {  // tsc infers string",
+            "  return `Hi ${name}`;",
+            "}",
+            "console.log(area(3, 4), greet(\"Ada\"));"
+          ],
+          "output": ["12 Hi Ada"]
+        }
+      },
+      {
+        "title": "Arrow functions",
+        "body": "`(n: number) => n * 2` is a function written as a value: store it in a `const` and call it like any other function. Without braces, the expression after `=>` is returned; with braces, you need `return`.",
+        "tip": "With braces and no `return`, an arrow returns `undefined`, and tsc types its result as `void`.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "const double = (n: number) => n * 2;",
+            "const add = (a: number, b: number): number => {",
+            "  return a + b;",
+            "};",
+            "console.log(double(4), add(2, 3));",
+            "console.log([1, 2, 3].map((n) => n * 10));"
+          ],
+          "output": ["8 5", "[ 10, 20, 30 ]"]
+        }
+      },
+      {
+        "title": "Optional and default parameters",
+        "body": "Passing too few arguments is a type error. `tip?: number` makes a parameter optional, so inside the function it's `number | undefined`; `tip = 0` makes it optional with a default, so it's always a `number`.",
+        "tip": "A left-out argument is `undefined`, and `10 + undefined` is `NaN`.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "function total(price: number, …)",
+          "opts": [
+            {
+              "label": "tip: number",
+              "code": ["function total(price: number, tip: number) {", "  return price + tip;", "}", "console.log(total(10), total(10, 2));"],
+              "error": "error TS2554: Expected 2 arguments, but got 1.",
+              "note": "Both parameters are required, so tsc rejects `total(10)`. Plain JavaScript would run it with `tip` set to `undefined`."
+            },
+            {
+              "label": "tip?: number",
+              "code": ["function total(price: number, tip?: number) {", "  return price + tip;", "}", "console.log(total(10), total(10, 2));"],
+              "error": "error TS18048: 'tip' is possibly 'undefined'.",
+              "note": "The call is fine now, but `tip` is `number | undefined`, and tsc won't add `undefined` to a number."
+            },
+            {
+              "label": "tip = 0",
+              "code": ["function total(price: number, tip = 0) {", "  return price + tip;", "}", "console.log(total(10), total(10, 2));"],
+              "output": ["10 12"],
+              "note": "A left-out `tip` becomes `0`, so it's always a `number`. tsc infers that type from the default."
+            }
+          ]
+        }
+      },
+      {
+        "title": "Functions are values",
+        "body": "You can store a function in a variable and pass it to another function, which calls it later: that's a callback. A function type such as `(n: number) => boolean` names the parameter types and the return type.",
+        "tip": "When tsc knows the expected function type, it infers the callback's parameter types, so `(n) => n > 10` needs no annotation.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "type Check = (n: number) => boolean;",
+            "const isEven: Check = (n) => n % 2 === 0;",
+            "function countIf(nums: number[], check: Check): number {",
+            "  return nums.filter(check).length;",
+            "}",
+            "console.log(countIf([1, 2, 3, 4], isEven));",
+            "console.log(countIf([5, 20, 15, 30], (n) => n > 10));"
+          ],
+          "output": ["2", "3"]
+        }
+      },
+      {
+        "title": "Closures capture variables",
+        "body": "A function can use variables from the code around it, even after that code has finished running: it's called a closure. It captures the variable itself, not a copy of its value, so it sees whatever the variable holds when it's called.",
+        "tip": "Avoid `var`: it ignores `{ }` blocks, so every pass of a loop shares one variable.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "Declare i with …",
+          "opts": [
+            {
+              "label": "for (let i …)",
+              "code": ["type Getter = () => number;", "const getters: Getter[] = [];", "for (let i = 0; i < 3; i++) {", "  getters.push(() => i);", "}", "console.log(getters.map((g) => g()));"],
+              "output": ["[ 0, 1, 2 ]"],
+              "note": "`let` in a `for` header makes a fresh `i` for each pass, so each function captures its own."
+            },
+            {
+              "label": "for (var i …)",
+              "code": ["type Getter = () => number;", "const getters: Getter[] = [];", "for (var i = 0; i < 3; i++) {", "  getters.push(() => i);", "}", "console.log(getters.map((g) => g()));"],
+              "output": ["[ 3, 3, 3 ]"],
+              "note": "`var` makes one `i` for the whole loop. The functions run after the loop, when that `i` is `3`."
+            },
+            {
+              "label": "let i before the loop",
+              "code": ["type Getter = () => number;", "const getters: Getter[] = [];", "let i = 0;", "for (; i < 3; i++) {", "  getters.push(() => i);", "}", "console.log(getters.map((g) => g()));"],
+              "output": ["[ 3, 3, 3 ]"],
+              "note": "One `let i` shared by every pass behaves just like `var`: each function reads `i` when it's called, not when it was made."
+            }
+          ]
+        }
+      }
+    ]
   }
 ]
