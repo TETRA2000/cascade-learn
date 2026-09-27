@@ -1,0 +1,144 @@
+[
+  {
+    "key": "values",
+    "name": "Values & equality",
+    "blurb": "Predict what basic values do",
+    "cards": [
+      {
+        "title": "let, const and inference",
+        "body": "`const` makes a binding you can't reassign; `let` makes one you can. You may annotate a type, as in `let limit: number = 3`, but usually tsc infers it from the starting value.",
+        "tip": "Default to `const`; reach for `let` only when the value must change.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "const lang = \"TypeScript\";",
+            "let count = 1;          // tsc infers number",
+            "let limit: number = 3;  // or annotate it",
+            "count = count + 1;",
+            "console.log(lang, count, limit);"
+          ],
+          "output": ["TypeScript 2 3"]
+        }
+      },
+      {
+        "title": "One number type",
+        "body": "There is no separate int and float: every `number` is a 64-bit float, so `7 / 2` is `3.5` and `0.1 + 0.2` is not quite `0.3`. A failed conversion gives `NaN`, which isn't equal to anything, not even itself.",
+        "tip": "Test for it with `Number.isNaN(x)`, never `x === NaN`.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "console.log(7 / 2);",
+            "console.log(0.1 + 0.2);",
+            "console.log(0.1 + 0.2 === 0.3);",
+            "const n = Number(\"abc\");",
+            "console.log(n, n === n, Number.isNaN(n));"
+          ],
+          "output": ["3.5", "0.30000000000000004", "false", "NaN false true"]
+        }
+      },
+      {
+        "title": "Strings and template literals",
+        "body": "Strings take `'single'` or `\"double\"` quotes, and backtick strings fill in `${…}` with any expression. `+` with a string on either side joins text instead of adding.",
+        "tip": "`\"1\" + 2` is `\"12\"`, and tsc allows it: the result is a `string`.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "const name = \"Ada\";",
+            "const n = 3;",
+            "console.log(`Hi ${name}, you have ${n + 1} messages`);",
+            "console.log(\"1\" + 2);",
+            "console.log(name.length, name.toUpperCase());"
+          ],
+          "output": ["Hi Ada, you have 4 messages", "12", "3 ADA"]
+        }
+      },
+      {
+        "title": "=== vs ==",
+        "body": "`===` compares without converting types. `==` converts first, so in plain JavaScript `\"7\" == 7` is `true`. tsc rejects comparing a `string` with a `number` either way.",
+        "tip": "Always use `===` and `!==`. Convert on purpose with `Number(…)` or `String(…)`.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "Compare id",
+          "opts": [
+            {
+              "label": "id == 7",
+              "code": ["const id: string = \"7\";", "console.log(id == 7);"],
+              "error": "error TS2367: This comparison appears to be unintentional because the types 'string' and 'number' have no overlap.",
+              "note": "Plain JavaScript would print `true` here. tsc stops you comparing unrelated types."
+            },
+            {
+              "label": "id === \"7\"",
+              "code": ["const id: string = \"7\";", "console.log(id === \"7\");"],
+              "output": ["true"],
+              "note": "Same type on both sides, so `===` is a plain comparison."
+            },
+            {
+              "label": "Number(id) === 7",
+              "code": ["const id: string = \"7\";", "console.log(Number(id) === 7);"],
+              "output": ["true"],
+              "note": "Convert explicitly, then compare two `number`s."
+            }
+          ]
+        }
+      },
+      {
+        "title": "null vs undefined",
+        "body": "JavaScript has two empty values: `undefined` means never set, and `null` means deliberately empty. With strict checks on, a `string` can hold neither; say so in the type, as in `string | null`.",
+        "tip": "`|` makes a union: `string | null` is a string or `null`.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "let name: …",
+          "opts": [
+            {
+              "label": "string",
+              "code": ["let name: string = \"Ada\";", "name = null;", "console.log(name);"],
+              "error": "error TS2322: Type 'null' is not assignable to type 'string'.",
+              "note": "Under strict checks, `null` is not a `string`."
+            },
+            {
+              "label": "string | null",
+              "code": ["let name: string | null = \"Ada\";", "name = null;", "console.log(name);"],
+              "output": ["null"],
+              "note": "The type allows `null`, so the assignment is fine."
+            },
+            {
+              "label": "string | undefined",
+              "code": ["let name: string | undefined = \"Ada\";", "name = undefined;", "console.log(name);"],
+              "output": ["undefined"],
+              "note": "`undefined` is a different value from `null`, with its own type."
+            }
+          ]
+        }
+      },
+      {
+        "title": "Truthy and falsy",
+        "body": "`if` accepts any value, not just a `boolean`. `false`, `0`, `\"\"`, `NaN`, `null` and `undefined` count as false; everything else counts as true, even `\"0\"`.",
+        "tip": "To ask \"is there a value?\", compare with `null` instead: `score !== null`.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "score = …",
+          "opts": [
+            {
+              "label": "7",
+              "code": ["const score: number | null = 7;", "if (score) {", "  console.log(`Score: ${score}`);", "} else {", "  console.log(\"No score yet\");", "}"],
+              "output": ["Score: 7"],
+              "note": "Any number other than `0` and `NaN` is truthy."
+            },
+            {
+              "label": "0",
+              "code": ["const score: number | null = 0;", "if (score) {", "  console.log(`Score: ${score}`);", "} else {", "  console.log(\"No score yet\");", "}"],
+              "output": ["No score yet"],
+              "note": "`0` is falsy, so a real score of zero looks missing."
+            },
+            {
+              "label": "null",
+              "code": ["const score: number | null = null;", "if (score) {", "  console.log(`Score: ${score}`);", "} else {", "  console.log(\"No score yet\");", "}"],
+              "output": ["No score yet"],
+              "note": "`null` is falsy, as intended."
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

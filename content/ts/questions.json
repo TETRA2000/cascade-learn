@@ -1,0 +1,101 @@
+[
+  {
+    "id": "ts-predict-1",
+    "type": "ts-predict",
+    "prompt": "What does this program print?",
+    "code": ["const a = \"5\";", "const b = 2;", "console.log(a + b);"],
+    "opts": [
+      { "text": "52", "kind": "output" },
+      { "text": "7", "kind": "output" },
+      { "text": "Type error", "kind": "error" },
+      { "text": "Throws at runtime", "kind": "throws" }
+    ],
+    "answer": 0,
+    "explain": "With a string on either side, `+` joins text, so `\"5\" + 2` is `\"52\"`. tsc allows it and types the result as `string`."
+  },
+  {
+    "id": "ts-pairs-1",
+    "type": "ts-pairs",
+    "prompt": "Match each piece of code to what it means",
+    "items": [
+      { "id": "strict", "left": "===", "right": "Equal, with no type conversion" },
+      { "id": "loose", "left": "==", "right": "Equal after converting types" },
+      { "id": "null", "left": "null", "right": "Deliberately empty" },
+      { "id": "undef", "left": "undefined", "right": "Never set" }
+    ],
+    "order": ["null", "undef", "loose", "strict"],
+    "explain": "`===` never converts, which is why it's the one to use. `null` is an empty value you chose; `undefined` is what you get when nothing was set."
+  },
+  {
+    "id": "ts-infer-1",
+    "type": "ts-infer",
+    "prompt": "What type does the editor show for `count` on line 1?",
+    "code": ["let count = 10;", "count = count + 1;", "console.log(count);"],
+    "line": 1,
+    "name": "count",
+    "opts": ["number", "10", "any"],
+    "answer": 0,
+    "explain": "tsc infers the type from the starting value, and because a `let` can be reassigned, it widens `10` to `number`."
+  },
+  {
+    "id": "ts-compiles-1",
+    "type": "ts-compiles",
+    "prompt": "Which one type-checks?",
+    "a": ["const input: string = \"42\";", "if (Number(input) === 42) {", "  console.log(\"match\");", "}"],
+    "b": ["const input: string = \"42\";", "if (input == 42) {", "  console.log(\"match\");", "}"],
+    "answer": "a",
+    "error": "error TS2367: This comparison appears to be unintentional because the types 'string' and 'number' have no overlap.",
+    "explain": "B compares a `string` with a `number`, which tsc rejects even with `==`. A converts first, then compares two numbers."
+  },
+  {
+    "id": "ts-build-1",
+    "type": "ts-build",
+    "prompt": "Fill the blanks so `total` can change and the check prints `true`",
+    "code": [
+      [{ "slot": 0 }, " total = 0;"],
+      "total = total + 5;",
+      ["console.log(total ", { "slot": 1 }, " 5);"]
+    ],
+    "bank": ["const", "let", "===", "!==", "="],
+    "answer": ["let", "==="],
+    "output": ["true"],
+    "explain": "`total` is reassigned on line 2, so it needs `let`, and `===` checks that it now equals `5`."
+  },
+  {
+    "id": "ts-error-1",
+    "type": "ts-error",
+    "prompt": "tsc rejects one line. Which one?",
+    "code": [
+      "let title: string = \"Dr\";",
+      "let middle: string | null = null;",
+      "const last = \"Lovelace\";",
+      "title = null;",
+      "console.log(title, middle, last);"
+    ],
+    "answer": 4,
+    "error": "error TS2322: Type 'null' is not assignable to type 'string'.",
+    "explain": "`middle` is declared `string | null`, so it may hold `null`. `title` is a plain `string`, so assigning `null` to it on line 4 is an error."
+  },
+  {
+    "id": "ts-fix-1",
+    "type": "ts-fix",
+    "prompt": "Pick the change that makes this type-check",
+    "code": ["const count = 0;", "count = count + 1;", "console.log(count);"],
+    "error": "error TS2588: Cannot assign to 'count' because it is a constant.",
+    "opts": [
+      { "diff": ["- const count = 0;", "+ const count: number = 0;"] },
+      { "diff": ["- const count = 0;", "+ let count = 0;"] },
+      { "diff": ["- count = count + 1;", "+ count += 1;"] }
+    ],
+    "answer": 1,
+    "explain": "A `const` can never be reassigned, however you write the assignment. Declaring it with `let` allows the change."
+  },
+  {
+    "id": "ts-type-1",
+    "type": "ts-type",
+    "prompt": "Type the missing token so `winner` may start out as `null`",
+    "code": ["let winner: string | ___ = null;", "winner = \"Ada\";", "console.log(winner);"],
+    "accept": ["null"],
+    "explain": "Under strict checks, `null` fits only where the type names it: `string | null`."
+  }
+]

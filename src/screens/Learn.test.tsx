@@ -44,12 +44,49 @@ const course: Course = {
   ],
 };
 
-function Harness({ card = 0 }: { card?: number }) {
+const tsCourse: Course = {
+  id: 'ts',
+  name: 'TypeScript',
+  tagline: '',
+  blurb: '',
+  icon: 'ts',
+  questions: [],
+  questionTypes: [],
+  topics: {},
+  units: [
+    {
+      key: 'vals',
+      name: 'Values',
+      blurb: '',
+      cards: [
+        {
+          title: 'Reads',
+          body: 'Pick one.',
+          demo: {
+            kind: 'code-choice',
+            label: 'words[…]',
+            opts: [
+              { label: '0', code: ['# const words: string[] = ["hi"];', 'console.log(words[0].toUpperCase());'], output: ['HI'] },
+              {
+                label: '5',
+                code: ['# const words: string[] = ["hi"];', 'console.log("start");', 'console.log(words[5].toUpperCase());'],
+                output: ['start'],
+                thrown: "TypeError: Cannot read properties of undefined (reading 'toUpperCase')",
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+};
+
+function Harness({ card = 0, of = course }: { card?: number; of?: Course }) {
   const [selection, setSelection] = useState([0]);
   const dispatch = (a: Action) => {
     if (a.type === 'pickOption') setSelection([a.option]);
   };
-  return <Learn course={course} unitKey="own" card={card} selection={selection} dispatch={dispatch} />;
+  return <Learn course={of} unitKey={of.units[0]!.key} card={card} selection={selection} dispatch={dispatch} />;
 }
 
 describe('Learn with Rust demos', () => {
@@ -75,5 +112,26 @@ describe('Learn with Rust demos', () => {
     render(<Harness card={1} />);
     expect(screen.getByLabelText('Rust code')).toHaveTextContent('fn main() {}');
     expect(screen.queryByRole('region', { name: 'Output' })).not.toBeInTheDocument();
+  });
+});
+
+describe('Learn with TypeScript demos', () => {
+  it('labels the code as TypeScript and swaps Output for Output + Runtime error on tap', async () => {
+    const user = userEvent.setup();
+    render(<Harness of={tsCourse} />);
+    const code = screen.getByLabelText('TypeScript code');
+    expect(code).toHaveTextContent('console.log(words[0].toUpperCase());');
+    expect(code).not.toHaveTextContent('const words');
+    expect(screen.getByRole('region', { name: 'Output' })).toHaveTextContent('HI');
+    expect(screen.queryByRole('region', { name: 'Runtime error' })).not.toBeInTheDocument();
+
+    const group = screen.getByRole('group', { name: 'words[…]' });
+    await user.click(within(group).getByRole('button', { name: '5' }));
+    expect(within(group).getByRole('button', { name: '5' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('region', { name: 'Output' })).toHaveTextContent('start');
+    const thrown = screen.getByRole('region', { name: 'Runtime error' });
+    expect(thrown).toHaveTextContent('Throws at runtime');
+    expect(thrown).toHaveTextContent("TypeError: Cannot read properties of undefined (reading 'toUpperCase')");
+    expect(screen.queryByRole('region', { name: 'Compiler error' })).not.toBeInTheDocument();
   });
 });

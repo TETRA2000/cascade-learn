@@ -1,7 +1,7 @@
 // Course ids and question-type keys as values, so validation and progress
 // parsing can check untrusted data against them.
 
-export const COURSE_IDS = ['css', 'rust'] as const;
+export const COURSE_IDS = ['css', 'rust', 'ts'] as const;
 export type CourseId = (typeof COURSE_IDS)[number];
 
 export function isCourseId(v: unknown): v is CourseId {
@@ -9,7 +9,7 @@ export function isCourseId(v: unknown): v is CourseId {
 }
 
 /** SVGs exported by components/icons.tsx that a course may use. */
-export const COURSE_ICON_NAMES = ['css', 'rust'] as const;
+export const COURSE_ICON_NAMES = ['css', 'rust', 'ts'] as const;
 export type CourseIconName = (typeof COURSE_ICON_NAMES)[number];
 
 /** CSS question types in difficulty order; css/question-types.json must match. */
@@ -30,4 +30,5 @@ export type QuestionTypeKey = CssTypeKey | RustTypeKey | TsTypeKey;
 export const TYPE_KEYS: Record<CourseId, readonly QuestionTypeKey[]> = {
   css: CSS_TYPE_KEYS,
   rust: RUST_TYPE_KEYS,
+  ts: TS_TYPE_KEYS,
 };

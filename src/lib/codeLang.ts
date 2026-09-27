@@ -53,5 +53,7 @@ export function courseLang(id: CourseId): CodeLang | null {
       return null;
     case 'rust':
       return 'rust';
+    case 'ts':
+      return 'ts';
   }
 }

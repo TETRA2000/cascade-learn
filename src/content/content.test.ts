@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { bundledCourseIds, courseById, courseInfos, courses, lessonName, lessonQuestionIds, type CourseId, type CourseInfo } from './index';
+import { bundledCourseIds, courseById, courseInfos, courses, lessonName, lessonQuestionIds, TS_TYPE_KEYS, type CourseId, type CourseInfo } from './index';
 import { validateContent, validateCourses } from './validate';
 
 const css = courseById('css');
 
 describe('courses', () => {
   it('lists exactly the bundled courses', () => {
+    expect(bundledCourseIds).toEqual(['css', 'rust', 'ts']);
     expect(validateCourses(courseInfos, bundledCourseIds)).toEqual([]);
     expect(courses.map((c) => c.id)).toEqual(courseInfos.map((c) => c.id));
   });
@@ -13,13 +14,14 @@ describe('courses', () => {
   it('reports malformed, duplicate, unbundled and unlisted courses', () => {
     const info = courseInfos[0]!;
     const bad = [{ ...info, icon: 'nope' }, info, { ...info, id: 'go', name: 7 }] as unknown as CourseInfo[];
-    expect(validateCourses(bad, ['css', 'rust'])).toEqual([
+    expect(validateCourses(bad, ['css', 'rust', 'ts'])).toEqual([
       'courses/css: unknown icon "nope"',
       'courses/css: duplicate course id',
       'courses/go: id, name, tagline and blurb must be strings',
       'courses/go: unknown course id',
       'courses/go: no content bundled for this course',
       'courses: bundled course "rust" is not listed',
+      'courses: bundled course "ts" is not listed',
     ]);
   });
 
@@ -146,5 +148,24 @@ describe('rust content', () => {
     };
     (broken.units[0]!.cards as unknown[]).push(card);
     expect(validateContent(broken)).toContain('lessons/ownership/card 6/option a: note has an unmatched backtick');
+  });
+});
+
+describe('ts content', () => {
+  const ts = courseById('ts');
+
+  it('is valid', () => expect(validateContent(ts)).toEqual([]));
+
+  it('has Values & equality with 6 cards and an 8-question quiz in type order', () => {
+    expect(ts.units.map((u) => u.key)).toEqual(['values']);
+    expect(ts.units[0]!.cards).toHaveLength(6);
+    const quiz = ts.topics.values!.map((id) => ts.questions.find((q) => q.id === id)!.type);
+    expect(quiz).toEqual([...TS_TYPE_KEYS]);
+  });
+
+  it('builds runs from TypeScript questions only', () => {
+    expect(lessonQuestionIds(ts, 'mixed', () => 0)).toEqual(TS_TYPE_KEYS.map((k) => `${k}-1`));
+    expect(lessonName(ts, 'topic:values')).toBe('Values & equality — practice');
+    expect(lessonName(ts, 'ts-infer')).toBe('Hover the type');
   });
 });

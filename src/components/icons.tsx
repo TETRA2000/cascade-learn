@@ -180,5 +180,7 @@ export function CourseIcon({ name, ...rest }: IconProps & { name: CourseIconName
       return <CssIcon {...rest} />;
     case 'rust':
       return <RustIcon {...rest} />;
+    case 'ts':
+      return <TsIcon {...rest} />;
   }
 }
