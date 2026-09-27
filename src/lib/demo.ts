@@ -97,18 +97,20 @@ export function buildDemo(demo: CssDemo, selection: readonly number[]): DemoView
   };
 }
 
-export interface RustDemoView {
+export interface CodeDemoView {
   code: string[];
   output?: string[];
   error?: string;
+  /** TS only: what Node reports when the program throws at runtime. */
+  thrown?: string;
   /** Empty for a code demo; one control for code-choice. */
   controls: DemoControl[];
   caption: string | null;
 }
 
-export function buildRustDemo(demo: CodeCourseDemo, selection: readonly number[]): RustDemoView {
+export function buildCodeDemo(demo: CodeCourseDemo, selection: readonly number[]): CodeDemoView {
   if (demo.kind === 'code') {
-    return { code: demo.code, output: demo.output, error: demo.error, controls: [], caption: null };
+    return { code: demo.code, output: demo.output, error: demo.error, thrown: demo.thrown, controls: [], caption: null };
   }
   const active = selection[0] ?? 0;
   const opt = demo.opts[active] ?? demo.opts[0]!;
@@ -116,6 +118,7 @@ export function buildRustDemo(demo: CodeCourseDemo, selection: readonly number[]
     code: opt.code,
     output: opt.output,
     error: opt.error,
+    thrown: opt.thrown,
     controls: [{ label: demo.label, options: demo.opts.map((o, i) => ({ label: o.label, active: i === active })) }],
     caption: opt.note ?? null,
   };

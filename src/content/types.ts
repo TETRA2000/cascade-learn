@@ -98,6 +98,8 @@ export interface CodeDemo {
   output?: string[];
   /** rustc's first error line, e.g. `error[E0382]: borrow of moved value: \`s\``. */
   error?: string;
+  /** TS only: what Node reports when the program throws at runtime. Never with `error`. */
+  thrown?: string;
 }
 
 export interface CodeChoiceOption {
@@ -106,6 +108,8 @@ export interface CodeChoiceOption {
   /** Exactly one of `output` / `error`. */
   output?: string[];
   error?: string;
+  /** TS only: what Node reports when the program throws at runtime. Never with `error`. */
+  thrown?: string;
   note?: string;
 }
 

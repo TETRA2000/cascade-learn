@@ -10,24 +10,34 @@ export const badError = (lang: CodeLang): string => `error must look like "${LAN
 
 const hasCode = (c: unknown): c is string[] => isStrArr(c) && visibleLines(c).length > 0;
 
-function validateResult(r: { output?: unknown; error?: unknown }, lang: CodeLang, at: string, err: Err) {
+function validateResult(r: { output?: unknown; error?: unknown; thrown?: unknown }, lang: CodeLang, at: string, err: Err) {
   if (r.output !== undefined && !isStrArr(r.output)) err(at, 'output must be a list of strings');
   if (r.error !== undefined && !isCodeError(r.error, lang)) err(at, badError(lang));
+  if (r.thrown !== undefined) {
+    if (lang !== 'ts') err(at, 'thrown is only for TypeScript');
+    else if (!isStr(r.thrown) || r.thrown === '') err(at, 'thrown must be a non-empty string');
+  }
 }
 
 export function validateCodeDemo(d: CodeCourseDemo, lang: CodeLang, at: string, err: Err) {
   if (d.kind === 'code') {
     if (!hasCode(d.code)) err(at, 'code demo needs visible code');
     if (d.output !== undefined && d.error !== undefined) return err(at, 'code demo has both output and error');
+    if (d.thrown !== undefined && d.error !== undefined) return err(at, 'code demo has both thrown and error');
     return validateResult(d, lang, at, err);
   }
-  if (!isStr(d.label)) err(at, 'rs-choice demo needs a label');
-  if (!Array.isArray(d.opts) || d.opts.length < 2) return err(at, 'rs-choice demo needs 2+ options');
-  if (d.start !== undefined && !inRange(d.start, d.opts.length)) err(at, 'rs-choice start out of range');
+  if (!isStr(d.label)) err(at, 'code-choice demo needs a label');
+  if (!Array.isArray(d.opts) || d.opts.length < 2) return err(at, 'code-choice demo needs 2+ options');
+  if (d.start !== undefined && !inRange(d.start, d.opts.length)) err(at, 'code-choice start out of range');
   d.opts.forEach((o, i) => {
     const oat = `${at}/option ${o.label ?? i}`;
     if (!isStr(o.label) || !hasCode(o.code)) err(oat, 'needs label and visible code');
-    if ((o.output === undefined) === (o.error === undefined)) return err(oat, 'needs exactly one of output and error');
+    if (lang === 'ts') {
+      const hasResult = o.output !== undefined || o.thrown !== undefined;
+      if ((o.error !== undefined) === hasResult) return err(oat, 'needs error, or output and/or thrown');
+    } else if ((o.output === undefined) === (o.error === undefined)) {
+      return err(oat, 'needs exactly one of output and error');
+    }
     validateResult(o, lang, oat, err);
   });
 }

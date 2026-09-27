@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { courseById, type ChoiceDemo, type KnobDemo, type CodeChoiceDemo } from '../content';
-import { buildDemo, buildRustDemo, initialSelection } from './demo';
+import { buildCodeDemo, buildDemo, initialSelection } from './demo';
 import { highlightLine } from './highlight';
 import { splitInlineCode } from './inlineCode';
 import { sanitizeCssKeyword } from './sanitize';
@@ -140,7 +140,7 @@ describe('buildDemo — choice', () => {
   });
 });
 
-describe('buildRustDemo', () => {
+describe('buildCodeDemo', () => {
   const choice: CodeChoiceDemo = {
     kind: 'code-choice',
     label: 'let t = …',
@@ -157,23 +157,32 @@ describe('buildRustDemo', () => {
   });
 
   it('shows the picked option’s code, result and note', () => {
-    expect(buildRustDemo(choice, [0])).toEqual({
+    expect(buildCodeDemo(choice, [0])).toEqual({
       code: ['let t = s;'],
       error: 'error[E0382]: borrow of moved value: `s`',
       output: undefined,
+      thrown: undefined,
       controls: [{ label: 'let t = …', options: [{ label: 's', active: true }, { label: 's.clone()', active: false }] }],
       caption: 'Moved.',
     });
-    expect(buildRustDemo(choice, [1])).toMatchObject({ output: ['hi hi'], error: undefined, caption: null });
+    expect(buildCodeDemo(choice, [1])).toMatchObject({ output: ['hi hi'], error: undefined, caption: null });
   });
 
   it('passes a code demo through', () => {
-    expect(buildRustDemo({ kind: 'code', code: ['fn main() {}'], output: [''] }, [])).toEqual({
+    expect(buildCodeDemo({ kind: 'code', code: ['fn main() {}'], output: [''] }, [])).toEqual({
       code: ['fn main() {}'],
       output: [''],
       error: undefined,
+      thrown: undefined,
       controls: [],
       caption: null,
+    });
+  });
+
+  it('carries thrown through buildCodeDemo', () => {
+    expect(buildCodeDemo({ kind: 'code', code: ['x;'], output: ['a'], thrown: 'TypeError: t' }, [])).toMatchObject({
+      output: ['a'],
+      thrown: 'TypeError: t',
     });
   });
 });

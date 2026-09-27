@@ -1,21 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import { rsBuild, rsCompiles, rsError, rsFix, rsPairs, rsPredict, rsPredictError, rsType } from '../quiz/rustFixtures';
 import type { CodeCourseDemo, CodeQuestion } from './types';
+import type { CodeLang } from '../lib/codeLang';
 import { validateCodeDemo, validateCodeQuestion } from './validateCode';
 
-const check = (d: unknown) => {
+const check = (d: unknown, lang: CodeLang = 'rust') => {
   const errors: string[] = [];
-  validateCodeDemo(d as CodeCourseDemo, 'rust', 'd', (where, msg) => errors.push(`${where}: ${msg}`));
+  validateCodeDemo(d as CodeCourseDemo, lang, 'd', (where, msg) => errors.push(`${where}: ${msg}`));
   return errors;
 };
 
 describe('validateRustDemo', () => {
-  it('accepts code and rs-choice demos', () => {
+  it('accepts code and code-choice demos', () => {
     expect(check({ kind: 'code', code: ['fn main() {}'] })).toEqual([]);
     expect(check({ kind: 'code', code: ['fn main() {}'], output: ['hi'] })).toEqual([]);
     expect(
       check({
-        kind: 'rs-choice',
+        kind: 'code-choice',
         label: 'x',
         opts: [
           { label: 'a', code: ['a'], output: ['1'] },
@@ -31,13 +32,13 @@ describe('validateRustDemo', () => {
     expect(check({ kind: 'code', code: ['x'], error: 'moved' })).toEqual(['d: error must look like "error[E0000]: message"']);
   });
 
-  it('rejects bad rs-choice demos', () => {
-    expect(check({ kind: 'rs-choice', label: 'x', opts: [{ label: 'a', code: ['a'], output: ['1'] }] })).toEqual([
-      'd: rs-choice demo needs 2+ options',
+  it('rejects bad code-choice demos', () => {
+    expect(check({ kind: 'code-choice', label: 'x', opts: [{ label: 'a', code: ['a'], output: ['1'] }] })).toEqual([
+      'd: code-choice demo needs 2+ options',
     ]);
     expect(
       check({
-        kind: 'rs-choice',
+        kind: 'code-choice',
         label: 'x',
         start: 5,
         opts: [
@@ -45,7 +46,21 @@ describe('validateRustDemo', () => {
           { label: 'b', code: ['b'], output: ['1'] },
         ],
       }),
-    ).toEqual(['d: rs-choice start out of range', 'd/option a: needs exactly one of output and error']);
+    ).toEqual(['d: code-choice start out of range', 'd/option a: needs exactly one of output and error']);
+  });
+
+  it('accepts thrown (with or without output) on TS demos and rejects it on Rust demos', () => {
+    expect(check({ kind: 'code', code: ['x;'], output: ['a'], thrown: 'TypeError: t' }, 'ts')).toEqual([]);
+    expect(check({ kind: 'code', code: ['x;'], thrown: 'TypeError: t' }, 'rust')).toEqual(['d: thrown is only for TypeScript']);
+    expect(check({ kind: 'code', code: ['x;'], error: 'error TS2322: x', thrown: 'TypeError: t' }, 'ts')).toEqual([
+      'd: code demo has both thrown and error',
+    ]);
+    expect(check({ kind: 'code', code: ['x;'], thrown: '' }, 'ts')).toEqual(['d: thrown must be a non-empty string']);
+  });
+
+  it('needs error, or output and/or thrown, on each TS code-choice option', () => {
+    const demo = { kind: 'code-choice', label: 'L', opts: [{ label: 'a', code: ['x;'] }, { label: 'b', code: ['y;'], thrown: 'TypeError: t' }] };
+    expect(check(demo, 'ts')).toEqual(['d/option a: needs error, or output and/or thrown']);
   });
 });
 

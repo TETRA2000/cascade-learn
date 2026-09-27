@@ -161,6 +161,18 @@ export function RustIcon({ size = 24, ...rest }: IconProps) {
   );
 }
 
+/** A rounded square with "TS", after TypeScript's logo mark. */
+export function TsIcon({ size = 24, ...rest }: IconProps) {
+  return (
+    <Svg size={size} {...rest}>
+      <rect x="3" y="3" width="18" height="18" rx="4" fill="currentColor" />
+      <text x="12" y="16.5" textAnchor="middle" fontSize="10" fontWeight="700" fill="var(--surface)">
+        TS
+      </text>
+    </Svg>
+  );
+}
+
 /** The icon a course names in courses.json. */
 export function CourseIcon({ name, ...rest }: IconProps & { name: CourseIconName }): ReactElement {
   switch (name) {

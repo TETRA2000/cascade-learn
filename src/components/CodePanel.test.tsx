@@ -27,4 +27,11 @@ describe('CodePanel', () => {
     render(<CodePanel lines={['.a { color: red; }']} label="CSS" />);
     expect(screen.getByLabelText('CSS')).not.toHaveClass('numbered');
   });
+
+  it('numbers TS lines and hides # lines', () => {
+    render(<CodePanel lines={['# const a = 1;', 'console.log(a);']} lang="ts" label="TypeScript code" />);
+    const panel = screen.getByLabelText('TypeScript code');
+    expect(panel).toHaveTextContent(/^1console\.log\(a\);$/);
+    expect(panel).toHaveClass('numbered');
+  });
 });

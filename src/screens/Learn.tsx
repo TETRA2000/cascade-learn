@@ -7,7 +7,8 @@ import { BulbIcon, CloseIcon } from '../components/icons';
 import { OutputPanel } from '../components/OutputPanel';
 import { ProgressBar } from '../components/ProgressBar';
 import { RichText } from '../components/RichText';
-import { buildDemo, buildRustDemo, type DemoControl, type DemoView, type RustDemoView } from '../lib/demo';
+import { buildCodeDemo, buildDemo, type CodeDemoView, type DemoControl, type DemoView } from '../lib/demo';
+import { LANG, courseLang, type CodeLang } from '../lib/codeLang';
 import type { Action } from '../state/app';
 import styles from './Learn.module.css';
 
@@ -65,7 +66,7 @@ export function Learn({ course, unitKey, card: cardIndex, selection, dispatch }:
 
         {card.demo &&
           (isCodeDemo(card.demo) ? (
-            <RustPlayground view={buildRustDemo(card.demo, selection)} onPick={pick} />
+            <CodePlayground lang={courseLang(course.id)!} view={buildCodeDemo(card.demo, selection)} onPick={pick} />
           ) : (
             <Playground view={buildDemo(card.demo, selection)} onPick={pick} />
           ))}
@@ -140,12 +141,22 @@ function Playground({ view, onPick }: { view: DemoView; onPick: (control: number
   );
 }
 
-function RustPlayground({ view, onPick }: { view: RustDemoView; onPick: (control: number, option: number) => void }) {
+function CodePlayground({
+  lang,
+  view,
+  onPick,
+}: {
+  lang: CodeLang;
+  view: CodeDemoView;
+  onPick: (control: number, option: number) => void;
+}) {
   return (
     <section className={styles.playground} aria-label="Playground">
-      <CodePanel lines={view.code} lang="rust" label="Rust code" />
+      <CodePanel lines={view.code} lang={lang} label={LANG[lang].codeLabel} />
       <div aria-live="polite">
-        {(view.output !== undefined || view.error !== undefined) && <OutputPanel output={view.output} error={view.error} />}
+        {(view.output !== undefined || view.error !== undefined || view.thrown !== undefined) && (
+          <OutputPanel lang={lang} output={view.output} error={view.error} thrown={view.thrown} />
+        )}
       </div>
       {view.caption !== null && (
         <p className={styles.caption} aria-live="polite">
