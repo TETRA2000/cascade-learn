@@ -19,7 +19,7 @@
   display: block;
 }
 
-/* Rust panels: hang wrapped continuation lines past the gutter (2.5ch + 1.5ch
+/* Code panels (Rust, TypeScript): hang wrapped continuation lines past the gutter (2.5ch + 1.5ch
    margin) instead of letting them wrap back to column 0, under the numbers. */
 .numbered .line {
   padding-left: 4ch;
@@ -85,4 +85,30 @@
   background: #34305a;
   color: var(--code-value);
   font-weight: 700;
+}
+
+/* ts-infer's hovered name: a dotted underline plus the "hover" tag, never color alone. */
+.hovered {
+  background: none;
+  color: inherit;
+  text-decoration: underline dotted 2px var(--code-value);
+  text-underline-offset: 4px;
+}
+
+/* --code-value on #34305a is 8.8:1. */
+.hoverTag {
+  display: inline-block;
+  margin: 0 2px 0 4px;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: #34305a;
+  color: var(--code-value);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  text-indent: 0;
+  vertical-align: 1px;
+  user-select: none;
 }

@@ -31,8 +31,9 @@ export interface Card {
 }
 
 export type CssDemo = KnobDemo | ChoiceDemo;
-export type RustDemo = CodeDemo | RustChoiceDemo;
-export type Demo = CssDemo | RustDemo;
+/** A demo in a code course (Rust or TypeScript); the language comes from the course. */
+export type CodeCourseDemo = CodeDemo | CodeChoiceDemo;
+export type Demo = CssDemo | CodeCourseDemo;
 
 /** A styled child of a demo stage. */
 export interface DemoKid {
@@ -90,30 +91,34 @@ export interface ChoiceDemo {
   opts: ChoiceOption[];
 }
 
-/** A Rust example and what it does. At most one of `output` / `error`; neither means "compiles, prints nothing". */
+/** A code example and what it does. At most one of `output` / `error` (and `thrown` never with `error`); neither means "compiles, prints nothing". */
 export interface CodeDemo {
   kind: 'code';
   code: string[];
   output?: string[];
-  /** rustc's first error line, e.g. `error[E0382]: borrow of moved value: \`s\``. */
+  /** The compiler's first error line, e.g. rustc's `error[E0382]: borrow of moved value: \`s\`` or tsc's `error TS2322: …`. */
   error?: string;
+  /** TS only: what Node reports when the program throws at runtime. Never with `error`. */
+  thrown?: string;
 }
 
-export interface RustChoiceOption {
+export interface CodeChoiceOption {
   label: string;
   code: string[];
-  /** Exactly one of `output` / `error`. */
+  /** Rust: exactly one of `output` / `error`. TS: `error`, or `output` and/or `thrown`. */
   output?: string[];
   error?: string;
+  /** TS only: what Node reports when the program throws at runtime. Never with `error`. */
+  thrown?: string;
   note?: string;
 }
 
-/** Tap between variants of a Rust snippet and see how the result changes. */
-export interface RustChoiceDemo {
-  kind: 'rs-choice';
+/** Tap between variants of a code snippet and see how the result changes. */
+export interface CodeChoiceDemo {
+  kind: 'code-choice';
   label: string;
   start?: number;
-  opts: RustChoiceOption[];
+  opts: CodeChoiceOption[];
 }
 
 // ----- questions.json -----
@@ -223,44 +228,54 @@ export type CssQuestion =
   | BugQuestion
   | TypeQuestion;
 
-// ----- Rust questions -----
-// Code arrays are plain Rust. Lines starting with `# ` are hidden setup (see lib/rustCode.ts).
-// `error` strings are rustc's first error line, e.g. `error[E0382]: borrow of moved value: \`s\``.
+// ----- Code questions -----
+// Shared shapes for the code courses, generic over their course-prefixed key.
+// Code arrays are plain code. Lines starting with `# ` are hidden setup (see lib/code.ts).
+// `error` strings are the compiler's first error line, e.g. rustc's `error[E0382]: borrow of moved value: \`s\``.
 
-export interface RustPredictQuestion extends QuestionBase {
-  type: 'rs-predict';
+/** A shared question type's key in each code course, e.g. `CodeKey<'predict'>` = `'rs-predict' | 'ts-predict'`. */
+export type CodeKey<K extends string> = `rs-${K}` | `ts-${K}`;
+
+/** Predict option kinds per key: only TS programs can throw at runtime. */
+export type PredictKind<K> = K extends 'ts-predict' ? 'output' | 'error' | 'throws' : 'output' | 'error';
+
+export interface CodePredictQuestion<K extends CodeKey<'predict'> = CodeKey<'predict'>> extends QuestionBase {
+  type: K;
   code: string[];
-  /** `output` options render as program output; the `error` option reads "Doesn’t compile". */
-  opts: { text: string; kind: 'output' | 'error' }[];
+  /** `output` options render as program output; the `error` option reads the language's error title ("Doesn’t compile",
+   * "Type error"), and TS's `throws` option reads "Throws at runtime". At most one `error` and one `throws` option. */
+  opts: { text: string; kind: PredictKind<K> }[];
   answer: number;
   /** Required exactly when the answer is the `error` option. */
   error?: string;
+  /** TS only: Node's `String(error)`, required exactly when the answer is the `throws` option. */
+  thrown?: string;
 }
 
-export interface RustPairsQuestion extends QuestionBase {
-  type: 'rs-pairs';
+export interface CodePairsQuestion<K extends CodeKey<'pairs'> = CodeKey<'pairs'>> extends QuestionBase {
+  type: K;
   items: { id: string; left: string; right: string }[];
   /** Right-column order, by item id. */
   order: string[];
 }
 
-export interface RustCompilesQuestion extends QuestionBase {
-  type: 'rs-compiles';
+export interface CodeCompilesQuestion<K extends CodeKey<'compiles'> = CodeKey<'compiles'>> extends QuestionBase {
+  type: K;
   a: string[];
   b: string[];
   /** The snippet that compiles. */
   answer: 'a' | 'b';
-  /** What rustc says about the other one. */
+  /** What the compiler says about the other one. */
   error: string;
 }
 
-export type RustBuildSegment = string | { slot: number };
+export type CodeBuildSegment = string | { slot: number };
 /** A plain line, or text segments with inline slots. */
-export type RustBuildLine = string | RustBuildSegment[];
+export type CodeBuildLine = string | CodeBuildSegment[];
 
-export interface RustBuildQuestion extends QuestionBase {
-  type: 'rs-build';
-  code: RustBuildLine[];
+export interface CodeBuildQuestion<K extends CodeKey<'build'> = CodeKey<'build'>> extends QuestionBase {
+  type: K;
+  code: CodeBuildLine[];
   /** May contain duplicates — chips are tracked by index. */
   bank: string[];
   /** The word for each slot, by slot number. */
@@ -269,16 +284,16 @@ export interface RustBuildQuestion extends QuestionBase {
   output?: string[];
 }
 
-export interface RustErrorQuestion extends QuestionBase {
-  type: 'rs-error';
+export interface CodeErrorQuestion<K extends CodeKey<'error'> = CodeKey<'error'>> extends QuestionBase {
+  type: K;
   code: string[];
-  /** 1-based visible line that rustc rejects. */
+  /** 1-based visible line that the compiler rejects. */
   answer: number;
   error: string;
 }
 
-export interface RustFixQuestion extends QuestionBase {
-  type: 'rs-fix';
+export interface CodeFixQuestion<K extends CodeKey<'fix'> = CodeKey<'fix'>> extends QuestionBase {
+  type: K;
   code: string[];
   error: string;
   /** Each diff: `- old line` lines (a contiguous run of `code`) then `+ new line` lines. */
@@ -286,13 +301,23 @@ export interface RustFixQuestion extends QuestionBase {
   answer: number;
 }
 
-export interface RustTypeQuestion extends QuestionBase {
-  type: 'rs-type';
+export interface CodeTypeQuestion<K extends CodeKey<'type'> = CodeKey<'type'>> extends QuestionBase {
+  type: K;
   /** Exactly one `___` blank. */
   code: string[];
   /** Normalized answers (trimmed, single spaces); matching is case-sensitive. */
   accept: string[];
 }
+
+// ----- Rust questions -----
+
+export type RustPredictQuestion = CodePredictQuestion<'rs-predict'>;
+export type RustPairsQuestion = CodePairsQuestion<'rs-pairs'>;
+export type RustCompilesQuestion = CodeCompilesQuestion<'rs-compiles'>;
+export type RustBuildQuestion = CodeBuildQuestion<'rs-build'>;
+export type RustErrorQuestion = CodeErrorQuestion<'rs-error'>;
+export type RustFixQuestion = CodeFixQuestion<'rs-fix'>;
+export type RustTypeQuestion = CodeTypeQuestion<'rs-type'>;
 
 export type RustQuestion =
   | RustPredictQuestion
@@ -303,7 +328,51 @@ export type RustQuestion =
   | RustFixQuestion
   | RustTypeQuestion;
 
-export type Question = CssQuestion | RustQuestion;
+// ----- TypeScript questions -----
+
+export type TsPredictQuestion = CodePredictQuestion<'ts-predict'>;
+export type TsPairsQuestion = CodePairsQuestion<'ts-pairs'>;
+export type TsCompilesQuestion = CodeCompilesQuestion<'ts-compiles'>;
+export type TsBuildQuestion = CodeBuildQuestion<'ts-build'>;
+export type TsErrorQuestion = CodeErrorQuestion<'ts-error'>;
+export type TsFixQuestion = CodeFixQuestion<'ts-fix'>;
+export type TsTypeQuestion = CodeTypeQuestion<'ts-type'>;
+
+/** "Hover the type": the type the editor shows for `name` on `line`, narrowing included. */
+export interface TsInferQuestion extends QuestionBase {
+  type: 'ts-infer';
+  code: string[];
+  /**
+   * 1-based visible line. It must not reassign `name` (declaring it is fine, but not with both
+   * a type annotation and an initializer, which narrows by assignment), and it must not narrow
+   * `name` (`if`/`else`/`while`/`switch`/`case` lines, `typeof`/`instanceof`/`in` tests, calls
+   * that may be assertion functions). check:ts asserts the type just after this line, so it has
+   * to match the hover. The prompt names `name` in backticks and says `line N`.
+   */
+  line: number;
+  /** An identifier that appears on `line` as a whole word. */
+  name: string;
+  /** Type texts, e.g. `string | number`; each tile reads `name: <type>`. */
+  opts: string[];
+  answer: number;
+}
+
+export type TsQuestion =
+  | TsPredictQuestion
+  | TsPairsQuestion
+  | TsInferQuestion
+  | TsCompilesQuestion
+  | TsBuildQuestion
+  | TsErrorQuestion
+  | TsFixQuestion
+  | TsTypeQuestion;
+
+/** Every code-course question. */
+export type CodeQuestion = RustQuestion | TsQuestion;
+/** The code questions of one shared type, e.g. `CodeQ<'predict'>`. */
+export type CodeQ<K extends string> = Extract<CodeQuestion, { type: CodeKey<K> }>;
+
+export type Question = CssQuestion | CodeQuestion;
 
 // ----- topics.json -----
 

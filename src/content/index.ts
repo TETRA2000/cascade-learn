@@ -9,6 +9,10 @@ import rustLessons from '../../content/rust/lessons.json';
 import rustQuestions from '../../content/rust/questions.json';
 import rustQuestionTypes from '../../content/rust/question-types.json';
 import rustTopics from '../../content/rust/topics.json';
+import tsLessons from '../../content/ts/lessons.json';
+import tsQuestions from '../../content/ts/questions.json';
+import tsQuestionTypes from '../../content/ts/question-types.json';
+import tsTopics from '../../content/ts/topics.json';
 import type { CourseId, QuestionTypeKey } from './typeKeys';
 import type { ContentBundle, Course, CourseInfo, LessonKey, Question, QuestionTypeInfo, Topics, Unit } from './types';
 
@@ -30,6 +34,12 @@ const BUNDLES: Partial<Record<CourseId, ContentBundle>> = {
     questions: rustQuestions as unknown as readonly Question[],
     questionTypes: rustQuestionTypes as unknown as readonly QuestionTypeInfo[],
     topics: rustTopics as Topics,
+  },
+  ts: {
+    units: tsLessons as unknown as readonly Unit[],
+    questions: tsQuestions as unknown as readonly Question[],
+    questionTypes: tsQuestionTypes as unknown as readonly QuestionTypeInfo[],
+    topics: tsTopics as Topics,
   },
 };
 

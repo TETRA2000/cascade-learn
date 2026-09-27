@@ -1,23 +1,25 @@
-import type { RustBuildQuestion } from '../../../content';
+import { langOf, type CodeQ } from '../../../content';
 import { CodeTokens } from '../../../components/CodePanel';
 import { OutputPanel } from '../../../components/OutputPanel';
-import { isHiddenLine } from '../../../lib/rustCode';
+import { LANG } from '../../../lib/codeLang';
+import { isHiddenLine } from '../../../lib/code';
 import type { RendererProps } from '../types';
 import { SlotButton, WordBank } from '../WordBank';
-import styles from './RustBuild.module.css';
+import styles from './CodeBuild.module.css';
 
 /** Fill inline blanks from a word bank. After Check, show what the finished program prints. */
-export function RustBuild({ question: q, answer, act }: RendererProps<RustBuildQuestion>) {
+export function CodeBuild({ question: q, answer, act }: RendererProps<CodeQ<'build'>>) {
+  const lang = langOf(q);
   const words = answer.slots.map((ci) => (ci === null ? null : (q.bank[ci] ?? null)));
   return (
     <>
-      <div className={styles.code} role="group" aria-label="Rust code">
+      <div className={styles.code} role="group" aria-label={LANG[lang].codeLabel}>
         {q.code.map((line, i) => {
           if (typeof line === 'string') {
             if (isHiddenLine(line)) return null;
             return (
               <div key={i} className={styles.line}>
-                <CodeTokens line={line} lang="rust" />
+                <CodeTokens line={line} lang={lang} />
               </div>
             );
           }
@@ -25,7 +27,7 @@ export function RustBuild({ question: q, answer, act }: RendererProps<RustBuildQ
             <div key={i} className={styles.line}>
               {line.map((seg, j) =>
                 typeof seg === 'string' ? (
-                  <CodeTokens key={j} line={seg} lang="rust" />
+                  <CodeTokens key={j} line={seg} lang={lang} />
                 ) : (
                   <SlotButton
                     key={j}
@@ -41,7 +43,7 @@ export function RustBuild({ question: q, answer, act }: RendererProps<RustBuildQ
         })}
       </div>
       <WordBank bank={q.bank} slots={answer.slots} checked={answer.checked} act={act} />
-      {answer.checked && answer.ok && q.output && <OutputPanel output={q.output} />}
+      {answer.checked && answer.ok && q.output && <OutputPanel lang={lang} output={q.output} />}
     </>
   );
 }

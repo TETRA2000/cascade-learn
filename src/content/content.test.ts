@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { bundledCourseIds, courseById, courseInfos, courses, lessonName, lessonQuestionIds, type CourseId, type CourseInfo } from './index';
+import { bundledCourseIds, courseById, courseInfos, courses, lessonName, lessonQuestionIds, TS_TYPE_KEYS, type CourseId, type CourseInfo } from './index';
 import { validateContent, validateCourses } from './validate';
 
 const css = courseById('css');
 
 describe('courses', () => {
   it('lists exactly the bundled courses', () => {
+    expect(bundledCourseIds).toEqual(['css', 'rust', 'ts']);
     expect(validateCourses(courseInfos, bundledCourseIds)).toEqual([]);
     expect(courses.map((c) => c.id)).toEqual(courseInfos.map((c) => c.id));
   });
@@ -13,13 +14,14 @@ describe('courses', () => {
   it('reports malformed, duplicate, unbundled and unlisted courses', () => {
     const info = courseInfos[0]!;
     const bad = [{ ...info, icon: 'nope' }, info, { ...info, id: 'go', name: 7 }] as unknown as CourseInfo[];
-    expect(validateCourses(bad, ['css', 'rust'])).toEqual([
+    expect(validateCourses(bad, ['css', 'rust', 'ts'])).toEqual([
       'courses/css: unknown icon "nope"',
       'courses/css: duplicate course id',
       'courses/go: id, name, tagline and blurb must be strings',
       'courses/go: unknown course id',
       'courses/go: no content bundled for this course',
       'courses: bundled course "rust" is not listed',
+      'courses: bundled course "ts" is not listed',
     ]);
   });
 
@@ -130,13 +132,13 @@ describe('rust content', () => {
     expect(lessonName(rust, 'rs-fix')).toBe('Fix it');
   });
 
-  it('reports an unmatched backtick in an rs-choice demo note', () => {
+  it('reports an unmatched backtick in a code-choice demo note', () => {
     const broken = structuredClone(rust);
     const card = {
       title: 'T',
       body: 'B',
       demo: {
-        kind: 'rs-choice',
+        kind: 'code-choice',
         label: 'L',
         opts: [
           { label: 'a', code: ['fn main() {}'], output: ['x'], note: 'bad `note' },
@@ -146,5 +148,57 @@ describe('rust content', () => {
     };
     (broken.units[0]!.cards as unknown[]).push(card);
     expect(validateContent(broken)).toContain('lessons/ownership/card 6/option a: note has an unmatched backtick');
+  });
+});
+
+describe('ts content', () => {
+  const ts = courseById('ts');
+
+  it('is valid', () => expect(validateContent(ts)).toEqual([]));
+
+  it('has its four units in order, and Values & equality has 6 cards and an 8-question quiz in type order', () => {
+    expect(ts.units.map((u) => u.key)).toEqual(['values', 'objects', 'functions', 'narrowing']);
+    expect(ts.units[0]!.cards).toHaveLength(6);
+    const quiz = ts.topics.values!.map((id) => ts.questions.find((q) => q.id === id)!.type);
+    expect(quiz).toEqual([...TS_TYPE_KEYS]);
+  });
+
+  it('has Objects & arrays with 6 cards and an 8-question quiz in type order', () => {
+    const unit = ts.units.find((u) => u.key === 'objects')!;
+    expect(unit.name).toBe('Objects & arrays');
+    expect(unit.cards).toHaveLength(6);
+    const quiz = ts.topics.objects!.map((id) => ts.questions.find((q) => q.id === id)!.type);
+    expect(quiz).toEqual([...TS_TYPE_KEYS]);
+    expect(ts.topics.objects).toEqual(TS_TYPE_KEYS.map((k) => `${k}-2`));
+  });
+
+  it('has Functions with 5 cards and an 8-question quiz in type order', () => {
+    const unit = ts.units.find((u) => u.key === 'functions')!;
+    expect(unit.name).toBe('Functions');
+    expect(unit.cards).toHaveLength(5);
+    const quiz = ts.topics.functions!.map((id) => ts.questions.find((q) => q.id === id)!.type);
+    expect(quiz).toEqual([...TS_TYPE_KEYS]);
+    expect(ts.topics.functions).toEqual(TS_TYPE_KEYS.map((k) => `${k}-3`));
+  });
+
+  it('has Unions & narrowing with 6 cards and an 8-question quiz in type order', () => {
+    const unit = ts.units.find((u) => u.key === 'narrowing')!;
+    expect(unit.name).toBe('Unions & narrowing');
+    expect(unit.blurb).toBe('Model "one of these" and let the compiler prove which');
+    expect(unit.cards).toHaveLength(6);
+    const quiz = ts.topics.narrowing!.map((id) => ts.questions.find((q) => q.id === id)!.type);
+    expect(quiz).toEqual([...TS_TYPE_KEYS]);
+    expect(ts.topics.narrowing).toEqual(TS_TYPE_KEYS.map((k) => `${k}-4`));
+  });
+
+  it('has 23 cards and 32 questions in total', () => {
+    expect(ts.units.reduce((n, u) => n + u.cards.length, 0)).toBe(23);
+    expect(ts.questions).toHaveLength(32);
+  });
+
+  it('builds runs from TypeScript questions only', () => {
+    expect(lessonQuestionIds(ts, 'mixed', () => 0)).toEqual(TS_TYPE_KEYS.map((k) => `${k}-1`));
+    expect(lessonName(ts, 'topic:values')).toBe('Values & equality — practice');
+    expect(lessonName(ts, 'ts-infer')).toBe('Hover the type');
   });
 });

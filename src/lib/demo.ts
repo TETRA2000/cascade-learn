@@ -1,7 +1,7 @@
 // The Learn playground engine — a port of demoVm() in
 // reference/design-canvas/Prototype.dc.html. Pure: content + selection in,
 // CSS strings and code lines out.
-import type { CssDemo, Demo, LegendItem, RustDemo } from '../content/types';
+import type { CodeCourseDemo, CssDemo, Demo, LegendItem } from '../content/types';
 
 export interface DemoChild {
   /** Wrapper CSS (`display:contents` unless the content sets `w`). */
@@ -30,7 +30,7 @@ export interface DemoView {
 /** Selected option index per control: a choice's `start`, or each knob's `start` (default 0). */
 export function initialSelection(demo: Demo | undefined): number[] {
   if (!demo || demo.kind === 'code') return [];
-  if (demo.kind === 'choice' || demo.kind === 'rs-choice') return [demo.start ?? 0];
+  if (demo.kind === 'choice' || demo.kind === 'code-choice') return [demo.start ?? 0];
   return demo.knobs.map((k) => k.start ?? 0);
 }
 
@@ -97,18 +97,20 @@ export function buildDemo(demo: CssDemo, selection: readonly number[]): DemoView
   };
 }
 
-export interface RustDemoView {
+export interface CodeDemoView {
   code: string[];
   output?: string[];
   error?: string;
-  /** Empty for a code demo; one control for rs-choice. */
+  /** TS only: what Node reports when the program throws at runtime. */
+  thrown?: string;
+  /** Empty for a code demo; one control for code-choice. */
   controls: DemoControl[];
   caption: string | null;
 }
 
-export function buildRustDemo(demo: RustDemo, selection: readonly number[]): RustDemoView {
+export function buildCodeDemo(demo: CodeCourseDemo, selection: readonly number[]): CodeDemoView {
   if (demo.kind === 'code') {
-    return { code: demo.code, output: demo.output, error: demo.error, controls: [], caption: null };
+    return { code: demo.code, output: demo.output, error: demo.error, thrown: demo.thrown, controls: [], caption: null };
   }
   const active = selection[0] ?? 0;
   const opt = demo.opts[active] ?? demo.opts[0]!;
@@ -116,6 +118,7 @@ export function buildRustDemo(demo: RustDemo, selection: readonly number[]): Rus
     code: opt.code,
     output: opt.output,
     error: opt.error,
+    thrown: opt.thrown,
     controls: [{ label: demo.label, options: demo.opts.map((o, i) => ({ label: o.label, active: i === active })) }],
     caption: opt.note ?? null,
   };

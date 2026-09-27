@@ -1,4 +1,4 @@
-/* Stacked answer tiles for the Rust single-pick types. Tone colors come from tone.module.css. */
+/* Stacked answer tiles for the code courses’ single-pick types. Tone colors come from tone.module.css. */
 .list {
   display: flex;
   flex-direction: column;

@@ -12,5 +12,12 @@
     "tagline": "Rust, one tap at a time",
     "blurb": "Ownership, borrowing, enums and errors, for developers who already code.",
     "icon": "rust"
+  },
+  {
+    "id": "ts",
+    "name": "TypeScript",
+    "tagline": "TypeScript, one tap at a time",
+    "blurb": "Types, objects, functions and narrowing, for developers new to JavaScript.",
+    "icon": "ts"
   }
 ]

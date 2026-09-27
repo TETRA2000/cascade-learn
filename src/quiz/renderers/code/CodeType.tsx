@@ -1,16 +1,18 @@
 import { useId } from 'react';
-import type { RustTypeQuestion } from '../../../content';
+import { langOf, type CodeQ } from '../../../content';
 import { CodePanel } from '../../../components/CodePanel';
-import { TOKEN_MAX_LENGTH } from '../../../lib/rustCode';
+import { LANG } from '../../../lib/codeLang';
+import { TOKEN_MAX_LENGTH } from '../../../lib/code';
 import type { RendererProps } from '../types';
-import styles from './RustType.module.css';
+import styles from './CodeType.module.css';
 
 /** Free recall: type the missing token. The code shows it in place as you type (as text, never markup). */
-export function RustType({ question: q, answer, act }: RendererProps<RustTypeQuestion>) {
+export function CodeType({ question: q, answer, act }: RendererProps<CodeQ<'type'>>) {
+  const lang = langOf(q);
   const inputId = useId();
   return (
     <>
-      <CodePanel lines={q.code} lang="rust" label="Rust code" blank={answer.val} />
+      <CodePanel lines={q.code} lang={lang} label={LANG[lang].codeLabel} blank={answer.val} />
       <div className={styles.field}>
         <label htmlFor={inputId} className={styles.label}>
           Missing token

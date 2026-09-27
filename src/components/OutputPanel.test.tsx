@@ -4,15 +4,29 @@ import { OutputPanel } from './OutputPanel';
 
 describe('OutputPanel', () => {
   it('shows program output', () => {
-    render(<OutputPanel output={['hi', 'there']} />);
+    render(<OutputPanel lang="rust" output={['hi', 'there']} />);
     expect(screen.getByRole('region', { name: 'Output' }).querySelector('pre')?.textContent).toBe('hi\nthere');
   });
 
   it('shows a compile error with an icon and words, not just color', () => {
-    render(<OutputPanel error="error[E0382]: borrow of moved value: `s`" />);
+    render(<OutputPanel lang="rust" error="error[E0382]: borrow of moved value: `s`" />);
     const region = screen.getByRole('region', { name: 'Compiler error' });
     expect(region).toHaveTextContent('Doesn’t compile');
     expect(region).toHaveTextContent('error[E0382]: borrow of moved value: `s`');
     expect(region.querySelector('svg')).not.toBeNull();
+  });
+
+  it('titles a TS compile error "Type error"', () => {
+    render(<OutputPanel lang="ts" error="error TS2322: Type 'string' is not assignable to type 'number'." />);
+    expect(screen.getByRole('region', { name: 'Compiler error' })).toHaveTextContent('Type error');
+  });
+
+  it('shows output, then the runtime throw, with an icon and words', () => {
+    render(<OutputPanel lang="ts" output={['start']} thrown="TypeError: x is not a function" />);
+    const regions = screen.getAllByRole('region');
+    expect(regions.map((r) => r.getAttribute('aria-label'))).toEqual(['Output', 'Runtime error']);
+    expect(regions[1]).toHaveTextContent('Throws at runtime');
+    expect(regions[1]).toHaveTextContent('TypeError: x is not a function');
+    expect(regions[1]!.querySelector('svg')).not.toBeNull();
   });
 });

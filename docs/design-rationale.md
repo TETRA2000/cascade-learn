@@ -51,3 +51,13 @@ The Rust course reuses the game loop and swaps the CSS "see it render" previews 
 | Type the token | Free recall of the small tokens that carry meaning (`&mut`, `?`, `'a`). |
 
 "Tune to target" has no Rust counterpart: it trains a visual eye for spacing.
+
+## TypeScript course
+
+The audience is programmers who know other languages but not JavaScript or TypeScript, so the course teaches JS runtime semantics *through* TS rather than assuming it. It reuses the Rust course's shared shapes (Predict the output, Match pairs, Type-checks?, Word bank, Spot the type error, Fix it, Type the token) and adds one type of its own:
+
+| Type | Why |
+|---|---|
+| Hover the type | TypeScript's types are erased before anything runs — there's no `console.log` for "what type is this", so a real TS programmer's actual feedback loop is the editor's hover tooltip, not the terminal. This question puts that hover front and center: the marked identifier gets a dotted underline plus a small "hover" tag, and each option tile reads `name: <type>`, so noticing a narrowed type (inside `if (typeof x === "string") {`, `x` is `string`) becomes something the learner recognizes on sight, the same way they will in their editor, rather than something they have to work out from first principles every time. |
+
+Predict the output also gains a `throws` outcome, alongside its `output` and `Type error` options. This is deliberate, not an edge case: a learner arriving from a statically-typed language expects "it type-checks" to mean "it's safe", but `--strict` still leaves real gaps a newcomer needs to see early — the clearest is reading past the end of an array (`words[5].toUpperCase()`), which type-checks (`noUncheckedIndexedAccess` stays off, matching most real projects) yet fails at runtime once `words[5]` turns out to be `undefined`. Making "type-checks and still throws" a first-class, nameable outcome — labelled "Throws at runtime" next to "Type error", with Node's own message shown under "Node says" — teaches the JS/TS split between compile-time and runtime failure that this audience doesn't yet have a feel for, instead of leaving it as a surprise they hit later in real code.

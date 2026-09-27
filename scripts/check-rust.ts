@@ -5,8 +5,8 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import type { Question, Unit } from '../src/content/types';
-import { programSource } from '../src/lib/rustCode.ts';
-import { collectSnippets, firstError, judge, type CompileResult, type Snippet } from './rust-check-lib.ts';
+import { programSource } from '../src/lib/code.ts';
+import { collectSnippets, firstError, judge, type CompileResult, type Snippet } from './code-check-lib.ts';
 
 const dir = resolve(process.argv[2] ?? join(import.meta.dirname, '../content/rust'));
 const read = <T>(file: string): T => JSON.parse(readFileSync(join(dir, file), 'utf8')) as T;
@@ -41,7 +41,7 @@ const failures = [...problems];
 const work = mkdtempSync(join(tmpdir(), 'check-rust-'));
 try {
   snippets.forEach((s, i) => {
-    const why = judge(s, compile(s, work, i));
+    const why = judge(s, compile(s, work, i), 'rustc');
     if (why) failures.push(`${s.where}: ${why}`);
   });
 } finally {

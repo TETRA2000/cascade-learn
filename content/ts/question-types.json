@@ -1,0 +1,10 @@
+[
+  { "key": "ts-predict", "name": "Predict the output", "blurb": "Read TypeScript, pick what happens" },
+  { "key": "ts-pairs", "name": "Match pairs", "blurb": "Code ↔ what it means" },
+  { "key": "ts-infer", "name": "Hover the type", "blurb": "Pick the type the editor shows" },
+  { "key": "ts-compiles", "name": "Type-checks?", "blurb": "Pick the snippet tsc accepts" },
+  { "key": "ts-build", "name": "Word bank", "blurb": "Fill the blanks, see the output" },
+  { "key": "ts-error", "name": "Spot the type error", "blurb": "Find the line tsc rejects" },
+  { "key": "ts-fix", "name": "Fix it", "blurb": "Pick the change that type-checks" },
+  { "key": "ts-type", "name": "Type the token", "blurb": "Recall it from memory" }
+]

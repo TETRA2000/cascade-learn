@@ -1,0 +1,415 @@
+[
+  {
+    "id": "ts-predict-1",
+    "type": "ts-predict",
+    "prompt": "What does this program print?",
+    "code": ["const a = \"5\";", "const b = 2;", "console.log(a + b);"],
+    "opts": [
+      { "text": "52", "kind": "output" },
+      { "text": "7", "kind": "output" },
+      { "text": "Type error", "kind": "error" },
+      { "text": "Throws at runtime", "kind": "throws" }
+    ],
+    "answer": 0,
+    "explain": "With a string on either side, `+` joins text, so `\"5\" + 2` is `\"52\"`. tsc allows it and types the result as `string`."
+  },
+  {
+    "id": "ts-pairs-1",
+    "type": "ts-pairs",
+    "prompt": "Match each piece of code to what it means",
+    "items": [
+      { "id": "strict", "left": "===", "right": "Equal, with no type conversion" },
+      { "id": "loose", "left": "==", "right": "Equal after converting types" },
+      { "id": "null", "left": "null", "right": "Deliberately empty" },
+      { "id": "undef", "left": "undefined", "right": "Never set" }
+    ],
+    "order": ["null", "undef", "loose", "strict"],
+    "explain": "`===` never converts, which is why it's the one to use. `null` is an empty value you chose; `undefined` is what you get when nothing was set."
+  },
+  {
+    "id": "ts-infer-1",
+    "type": "ts-infer",
+    "prompt": "What type does the editor show for `count` on line 1?",
+    "code": ["let count = 10;", "count = count + 1;", "console.log(count);"],
+    "line": 1,
+    "name": "count",
+    "opts": ["number", "10", "any"],
+    "answer": 0,
+    "explain": "tsc infers the type from the starting value, and because a `let` can be reassigned, it widens `10` to `number`."
+  },
+  {
+    "id": "ts-compiles-1",
+    "type": "ts-compiles",
+    "prompt": "Which one type-checks?",
+    "a": ["const input: string = \"42\";", "if (Number(input) === 42) {", "  console.log(\"match\");", "}"],
+    "b": ["const input: string = \"42\";", "if (input == 42) {", "  console.log(\"match\");", "}"],
+    "answer": "a",
+    "error": "error TS2367: This comparison appears to be unintentional because the types 'string' and 'number' have no overlap.",
+    "explain": "B compares a `string` with a `number`, which tsc rejects even with `==`. A converts first, then compares two numbers."
+  },
+  {
+    "id": "ts-build-1",
+    "type": "ts-build",
+    "prompt": "Fill the blanks so `total` can change and the check prints `true`",
+    "code": [
+      [{ "slot": 0 }, " total = 0;"],
+      "total = total + 5;",
+      ["console.log(total ", { "slot": 1 }, " 5);"]
+    ],
+    "bank": ["const", "let", "===", "!==", "="],
+    "answer": ["let", "==="],
+    "output": ["true"],
+    "explain": "`total` is reassigned on line 2, so it needs `let`, and `===` checks that it now equals `5`."
+  },
+  {
+    "id": "ts-error-1",
+    "type": "ts-error",
+    "prompt": "tsc rejects one line. Which one?",
+    "code": [
+      "let title: string = \"Dr\";",
+      "let middle: string | null = null;",
+      "const last = \"Lovelace\";",
+      "title = null;",
+      "console.log(title, middle, last);"
+    ],
+    "answer": 4,
+    "error": "error TS2322: Type 'null' is not assignable to type 'string'.",
+    "explain": "`middle` is declared `string | null`, so it may hold `null`. `title` is a plain `string`, so assigning `null` to it on line 4 is an error."
+  },
+  {
+    "id": "ts-fix-1",
+    "type": "ts-fix",
+    "prompt": "Pick the change that makes this type-check",
+    "code": ["const count = 0;", "count = count + 1;", "console.log(count);"],
+    "error": "error TS2588: Cannot assign to 'count' because it is a constant.",
+    "opts": [
+      { "diff": ["- const count = 0;", "+ const count: number = 0;"] },
+      { "diff": ["- const count = 0;", "+ let count = 0;"] },
+      { "diff": ["- count = count + 1;", "+ count += 1;"] }
+    ],
+    "answer": 1,
+    "explain": "A `const` can never be reassigned, however you write the assignment. Declaring it with `let` allows the change."
+  },
+  {
+    "id": "ts-type-1",
+    "type": "ts-type",
+    "prompt": "Type the missing token so `winner` can only ever be a `string` or `null`",
+    "code": ["let winner: string | ___ = null;", "winner = \"Ada\";", "console.log(winner);"],
+    "accept": ["null"],
+    "explain": "`string | null` allows exactly a string or `null`. Under strict checks, `null` fits only where the type names it."
+  },
+  {
+    "id": "ts-predict-2",
+    "type": "ts-predict",
+    "prompt": "What does this program print?",
+    "code": ["const team = { names: [\"Ada\", \"Grace\"] };", "const copy = { ...team };", "copy.names.pop();", "console.log(team.names[1].toUpperCase());"],
+    "opts": [
+      { "text": "GRACE", "kind": "output" },
+      { "text": "undefined", "kind": "output" },
+      { "text": "Type error", "kind": "error" },
+      { "text": "Throws at runtime", "kind": "throws" }
+    ],
+    "answer": 3,
+    "thrown": "TypeError: Cannot read properties of undefined (reading 'toUpperCase')",
+    "explain": "A spread copies one level, so `copy.names` is the same array as `team.names`, and `pop()` removes `\"Grace\"` from both. `team.names[1]` is then `undefined`, which tsc can't see, so `.toUpperCase()` throws."
+  },
+  {
+    "id": "ts-pairs-2",
+    "type": "ts-pairs",
+    "prompt": "Match each piece of code to what it means",
+    "items": [
+      { "id": "alias", "left": "const b = a;", "right": "A second name for the same object" },
+      { "id": "spread", "left": "const b = { ...a };", "right": "A new object, copied one level deep" },
+      { "id": "same", "left": "a === b", "right": "True only if both are the same object" },
+      { "id": "ro", "left": "readonly x: number", "right": "tsc rejects assigning to this property" }
+    ],
+    "order": ["same", "ro", "alias", "spread"],
+    "explain": "Assigning an object shares it; a spread copies its top level. `===` compares object identity, and `readonly` makes tsc refuse assignments to that property."
+  },
+  {
+    "id": "ts-infer-2",
+    "type": "ts-infer",
+    "prompt": "What type does the editor show for `book` on line 1?",
+    "code": ["const book = { title: \"Dune\", pages: 412 };", "book.pages = 500;", "console.log(book);"],
+    "line": 1,
+    "name": "book",
+    "opts": ["{ title: \"Dune\"; pages: 412; }", "{ title: string; pages: number; }", "{ readonly title: string; readonly pages: number; }", "object"],
+    "answer": 1,
+    "explain": "tsc infers an object type from the literal, widening each property to `string` or `number` because properties can be reassigned. `const` only fixes which object `book` names, so nothing is `readonly`."
+  },
+  {
+    "id": "ts-compiles-2",
+    "type": "ts-compiles",
+    "prompt": "Which one type-checks?",
+    "a": ["type Point = { x: number; y: number };", "const p: Point = { x: 1, y: 2, z: 3 };", "console.log(p);"],
+    "b": ["type Point = { x: number; y: number };", "const p3 = { x: 1, y: 2, z: 3 };", "const p: Point = p3;", "console.log(p);"],
+    "answer": "b",
+    "error": "error TS2353: Object literal may only specify known properties, and 'z' does not exist in type 'Point'.",
+    "explain": "`p3` has an `x` and a `y`, so its shape fits `Point` and the extra `z` is allowed. A is an object literal written straight into a `Point`, so tsc flags `z` as a likely typo."
+  },
+  {
+    "id": "ts-build-2",
+    "type": "ts-build",
+    "prompt": "Fill the blanks so `prices` is an array of numbers and this prints the ones under 10",
+    "code": [
+      ["const prices: ", { "slot": 0 }, " = [4, 12, 7];"],
+      ["const cheap = prices.", { "slot": 1 }, "((p) => p < 10);"],
+      "console.log(cheap);"
+    ],
+    "bank": ["number", "number[]", "string[]", "map", "filter"],
+    "answer": ["number[]", "filter"],
+    "output": ["[ 4, 7 ]"],
+    "explain": "`number[]` is an array of numbers. `filter` keeps the elements that pass the test; `map` would give `[ true, false, true ]`."
+  },
+  {
+    "id": "ts-error-2",
+    "type": "ts-error",
+    "prompt": "tsc rejects one line. Which one?",
+    "code": [
+      "type Config = { readonly host: string; port: number };",
+      "const config: Config = { host: \"localhost\", port: 8080 };",
+      "config.port = 3000;",
+      "config.host = \"example.com\";",
+      "console.log(config);"
+    ],
+    "answer": 4,
+    "error": "error TS2540: Cannot assign to 'host' because it is a read-only property.",
+    "explain": "`const` doesn't freeze the object, so changing `port` on line 3 is fine. `host` is marked `readonly`, so tsc rejects line 4."
+  },
+  {
+    "id": "ts-fix-2",
+    "type": "ts-fix",
+    "prompt": "Pick the change that makes this type-check",
+    "code": ["type User = { name: string; email: string };", "const ada: User = { name: \"Ada\" };", "console.log(ada.name);"],
+    "error": "error TS2741: Property 'email' is missing in type '{ name: string; }' but required in type 'User'.",
+    "opts": [
+      { "diff": ["- type User = { name: string; email: string };", "+ type User = { name: string; email: string | null };"] },
+      { "diff": ["- const ada: User = { name: \"Ada\" };", "+ const ada: User = { name: \"Ada\", email: null };"] },
+      { "diff": ["- const ada: User = { name: \"Ada\" };", "+ const ada: User = { name: \"Ada\", email: \"ada@example.com\" };"] }
+    ],
+    "answer": 2,
+    "explain": "Every `User` needs an `email` that is a `string`. Allowing `null` in the type still leaves the property missing, and `null` is not a `string`."
+  },
+  {
+    "id": "ts-type-2",
+    "type": "ts-type",
+    "prompt": "Type the missing token so `b` is a separate copy of `a` and this prints `1 99`",
+    "code": ["const a = { x: 1, y: 2 };", "const b = { ___a };", "b.x = 99;", "console.log(a.x, b.x);"],
+    "accept": ["..."],
+    "explain": "`{ ...a }` builds a new object with `a`'s properties, so changing `b.x` leaves `a.x` alone. `const b = a` would make both names share one object."
+  },
+  {
+    "id": "ts-predict-3",
+    "type": "ts-predict",
+    "prompt": "What does this program print?",
+    "code": ["let rate = 2;", "const scale = (n: number) => n * rate;", "const before = scale(5);", "rate = 10;", "console.log(before, scale(5));"],
+    "opts": [
+      { "text": "10 10", "kind": "output" },
+      { "text": "10 50", "kind": "output" },
+      { "text": "50 50", "kind": "output" },
+      { "text": "Type error", "kind": "error" }
+    ],
+    "answer": 1,
+    "explain": "`scale` captures the variable `rate`, not its value, so each call reads `rate` as it is then. `before` was computed while `rate` was `2`, and it's a plain number that doesn't change."
+  },
+  {
+    "id": "ts-pairs-3",
+    "type": "ts-pairs",
+    "prompt": "Match each piece of code to what it means",
+    "items": [
+      { "id": "arrow", "left": "(n: number) => n * 2", "right": "A function that returns its argument doubled" },
+      { "id": "ftype", "left": "type F = (n: number) => number", "right": "A name for a function type" },
+      { "id": "optional", "left": "function f(x?: number)", "right": "x may be undefined inside f" },
+      { "id": "default", "left": "function f(x = 0)", "right": "x is 0 when the argument is left out" }
+    ],
+    "order": ["default", "arrow", "optional", "ftype"],
+    "explain": "After `type F =`, the arrow describes a kind of function; on its own, `(n: number) => n * 2` is a function you can call. `x?` leaves `x` as `undefined` when the argument is left out, while `x = 0` fills in `0`."
+  },
+  {
+    "id": "ts-infer-3",
+    "type": "ts-infer",
+    "prompt": "What type does the editor show for `shout` on line 1?",
+    "code": ["const shout = (word: string) => word.toUpperCase() + \"!\";", "console.log(shout(\"hi\"));"],
+    "line": 1,
+    "name": "shout",
+    "opts": ["string", "(word: string) => string", "(word: string) => void", "(word: string) => any"],
+    "answer": 1,
+    "explain": "`shout` holds a function, not its result, so its type is a function type. tsc infers the return type `string` from the expression after `=>`, even with no `return` or annotation."
+  },
+  {
+    "id": "ts-compiles-3",
+    "type": "ts-compiles",
+    "prompt": "Which one type-checks?",
+    "a": ["function greet(name: string, greeting = \"Hello\") {", "  return `${greeting}, ${name}!`;", "}", "console.log(greet(\"Ada\"));"],
+    "b": ["function greet(name: string, greeting: string) {", "  return `${greeting}, ${name}!`;", "}", "console.log(greet(\"Ada\"));"],
+    "answer": "a",
+    "error": "error TS2554: Expected 2 arguments, but got 1.",
+    "explain": "In B, `greeting` is required, so calling `greet` with one argument is a type error. In A it has a default, so it's optional and becomes `\"Hello\"`."
+  },
+  {
+    "id": "ts-build-3",
+    "type": "ts-build",
+    "prompt": "Fill the blanks so this type-checks and prints `[ '5 kg', '12 kg' ]`",
+    "code": [
+      ["type Format = (n: number) ", { "slot": 0 }, " ", { "slot": 1 }, ";"],
+      "const withUnit: Format = (n) => `${n} kg`;",
+      "console.log([5, 12].map(withUnit));"
+    ],
+    "bank": ["=>", ":", "string", "number", "boolean"],
+    "answer": ["=>", "string"],
+    "output": ["[ '5 kg', '12 kg' ]"],
+    "explain": "A function type puts its return type after `=>`, not after `:`. `withUnit` returns a template string, so the return type is `string`."
+  },
+  {
+    "id": "ts-error-3",
+    "type": "ts-error",
+    "prompt": "tsc rejects one line. Which one?",
+    "code": [
+      "const triple = (n: number) => { n * 3; };",
+      "const double = (n: number) => n * 2;",
+      "const b: number = triple(4);",
+      "const a: number = double(4);",
+      "console.log(a, b);"
+    ],
+    "answer": 3,
+    "error": "error TS2322: Type 'void' is not assignable to type 'number'.",
+    "explain": "Line 1 is legal: with braces and no `return`, `triple` returns nothing, so tsc infers `void`. The mistake surfaces on line 3, where that result can't go into a `number`."
+  },
+  {
+    "id": "ts-fix-3",
+    "type": "ts-fix",
+    "prompt": "Pick the change that makes this type-check",
+    "code": ["function price(base: number, discount?: number) {", "  return base - discount;", "}", "console.log(price(10), price(10, 3));"],
+    "error": "error TS18048: 'discount' is possibly 'undefined'.",
+    "opts": [
+      { "diff": ["- function price(base: number, discount?: number) {", "+ function price(base: number, discount = 0) {"] },
+      { "diff": ["- function price(base: number, discount?: number) {", "+ function price(base: number, discount?: number = 0) {"] },
+      { "diff": ["- console.log(price(10), price(10, 3));", "+ console.log(price(10, 0), price(10, 3));"] }
+    ],
+    "answer": 0,
+    "explain": "A default makes `discount` optional for callers but always a `number` inside. A parameter can't be both `?` and defaulted, and changing a call doesn't change the type inside the function."
+  },
+  {
+    "id": "ts-type-3",
+    "type": "ts-type",
+    "prompt": "Type the missing keyword so this prints `[ 0, 1, 2 ]`",
+    "code": ["type Getter = () => number;", "const getters: Getter[] = [];", "for (___ i = 0; i < 3; i++) {", "  getters.push(() => i);", "}", "console.log(getters.map((g) => g()));"],
+    "accept": ["let"],
+    "explain": "`let` in a `for` header makes a fresh `i` for each pass, so each function captures its own. With `var`, all three share one `i` and print `[ 3, 3, 3 ]`."
+  },
+  {
+    "id": "ts-predict-4",
+    "type": "ts-predict",
+    "prompt": "What does this program print?",
+    "code": ["type Profile = { name: string | null; score: number | null };", "const p: Profile = { name: \"\", score: 0 };", "console.log(`[${p.name ?? \"guest\"}] ${p.score || 99}`);"],
+    "opts": [
+      { "text": "[] 0", "kind": "output" },
+      { "text": "[] 99", "kind": "output" },
+      { "text": "[guest] 0", "kind": "output" },
+      { "text": "[guest] 99", "kind": "output" }
+    ],
+    "answer": 1,
+    "explain": "`??` falls back only for `null` or `undefined`, so the empty name stays `\"\"`. `||` falls back for any falsy value, so the score of `0` becomes `99`."
+  },
+  {
+    "id": "ts-pairs-4",
+    "type": "ts-pairs",
+    "prompt": "Match each piece of code to what it means",
+    "items": [
+      { "id": "union", "left": "string | number", "right": "Either a string or a number" },
+      { "id": "literal", "left": "\"up\" | \"down\"", "right": "Only these two exact strings" },
+      { "id": "nullish", "left": "a ?? b", "right": "b only when a is null or undefined" },
+      { "id": "never", "left": "never", "right": "A type with no values" }
+    ],
+    "order": ["nullish", "never", "literal", "union"],
+    "explain": "`|` joins types into a union, and a union of literal types lists exact values. `??` falls back only for `null` and `undefined`, and `never` is what's left once every possibility is ruled out."
+  },
+  {
+    "id": "ts-infer-4",
+    "type": "ts-infer",
+    "prompt": "What type does the editor show for `x` on line 3?",
+    "code": ["function show(x: string | number) {", "  if (typeof x === \"string\") {", "    console.log(x.toUpperCase());", "  } else {", "    console.log(x * 2);", "  }", "}", "show(\"hi\");", "show(21);"],
+    "line": 3,
+    "name": "x",
+    "opts": ["string | number", "string", "number", "\"string\""],
+    "answer": 1,
+    "explain": "Inside the `if`, tsc has narrowed `x` from `string | number` to `string`, which is why `toUpperCase` is allowed. `\"string\"` is what `typeof` returns at runtime, not `x`'s type."
+  },
+  {
+    "id": "ts-compiles-4",
+    "type": "ts-compiles",
+    "prompt": "Which one type-checks?",
+    "a": ["type Size = \"small\" | \"large\";", "function order(size: Size) {", "  console.log(`One ${size} coffee`);", "}", "const drink = { size: \"large\" };", "order(drink.size);"],
+    "b": ["type Size = \"small\" | \"large\";", "function order(size: Size) {", "  console.log(`One ${size} coffee`);", "}", "const size = \"large\";", "order(size);"],
+    "answer": "b",
+    "error": "error TS2345: Argument of type 'string' is not assignable to parameter of type 'Size'.",
+    "explain": "A `const` string keeps its literal type `\"large\"`, which is a `Size`. An object property can be reassigned, so in A `drink.size` widens to `string`, even though `drink` is a `const`."
+  },
+  {
+    "id": "ts-build-4",
+    "type": "ts-build",
+    "prompt": "Fill the blanks so this type-checks and prints `radius 2 side 5`",
+    "code": [
+      "type Shape = { kind: \"circle\"; radius: number } | { kind: \"square\"; side: number };",
+      "function label(s: Shape) {",
+      ["  switch (s.", { "slot": 0 }, ") {"],
+      "    case \"circle\":",
+      ["      return `radius ${s.", { "slot": 1 }, "}`;"],
+      "    case \"square\":",
+      "      return `side ${s.side}`;",
+      "  }",
+      "}",
+      "console.log(label({ kind: \"circle\", radius: 2 }), label({ kind: \"square\", side: 5 }));"
+    ],
+    "bank": ["kind", "type", "radius", "side", "circle"],
+    "answer": ["kind", "radius"],
+    "output": ["radius 2 side 5"],
+    "explain": "Switching on the `kind` tag narrows `s`, so inside `case \"circle\":` it's a circle and has a `radius`. `s.side` there would be a type error, because only a square has a `side`."
+  },
+  {
+    "id": "ts-error-4",
+    "type": "ts-error",
+    "prompt": "tsc rejects one line. Which one?",
+    "code": [
+      "type Light = \"red\" | \"amber\" | \"green\";",
+      "function next(light: Light): Light {",
+      "  switch (light) {",
+      "    case \"red\":",
+      "      return \"green\";",
+      "    case \"green\":",
+      "      return \"amber\";",
+      "    default: {",
+      "      const unreachable: never = light;",
+      "      return unreachable;",
+      "    }",
+      "  }",
+      "}",
+      "console.log(next(\"red\"));"
+    ],
+    "answer": 9,
+    "error": "error TS2322: Type '\"amber\"' is not assignable to type 'never'.",
+    "explain": "There's no `case \"amber\":`, so `light` can still be `\"amber\"` in `default:`. tsc reports it where that value meets the `never` variable, on line 9."
+  },
+  {
+    "id": "ts-fix-4",
+    "type": "ts-fix",
+    "prompt": "Pick the change that makes this type-check",
+    "code": ["function shout(word: string | null) {", "  return word.toUpperCase();", "}", "console.log(shout(\"hi\"), shout(null));"],
+    "error": "error TS18047: 'word' is possibly 'null'.",
+    "opts": [
+      { "diff": ["- function shout(word: string | null) {", "+ function shout(word: string) {"] },
+      { "diff": ["- console.log(shout(\"hi\"), shout(null));", "+ console.log(shout(\"hi\"));"] },
+      { "diff": ["-   return word.toUpperCase();", "+   return word?.toUpperCase();"] }
+    ],
+    "answer": 2,
+    "explain": "`word?.toUpperCase()` gives `undefined` instead of throwing when `word` is `null`. Dropping `null` from the type breaks the `shout(null)` call, and removing that call doesn't change `word`'s type inside the function."
+  },
+  {
+    "id": "ts-type-4",
+    "type": "ts-type",
+    "prompt": "Type the missing keyword so tsc narrows `pet` and this type-checks",
+    "code": ["type Fish = { swim: string };", "type Bird = { fly: string };", "function move(pet: Fish | Bird) {", "  if (\"swim\" ___ pet) {", "    return pet.swim;", "  }", "  return pet.fly;", "}", "console.log(move({ swim: \"paddles\" }), move({ fly: \"flaps\" }));"],
+    "accept": ["in"],
+    "explain": "`\"swim\" in pet` checks whether `pet` has a `swim` property, so tsc narrows it to `Fish` inside the `if` and to `Bird` after it."
+  }
+]

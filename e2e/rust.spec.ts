@@ -5,7 +5,7 @@ test('learn Ownership in Rust, practice it, and keep XP across courses', async (
   await page.getByRole('button', { name: /^Rust,/ }).click();
   await expect(page.getByText('Rust, one tap at a time')).toBeVisible();
 
-  // Learn: a code demo, then an rs-choice demo that swaps the compiler's verdict.
+  // Learn: a code demo, then a code-choice demo that swaps the compiler's verdict.
   await page.getByRole('button', { name: 'Ownership & moves, 5 cards' }).click();
   const h1 = page.getByRole('heading', { level: 1 });
   await expect(h1).toHaveText('Every value has one owner');

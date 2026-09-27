@@ -111,7 +111,7 @@ function QuizQuestion({ session, dispatch, onExit, guardMs }: QuestionProps) {
         )}
         {!a.checked && isPairs(q) && (
           <div className={`${styles.bar} ${styles.hint}`}>
-            <p>{q.type === 'rs-pairs' ? 'Tap a code item, then its meaning.' : 'Tap a property, then its result.'}</p>
+            <p>{q.type === 'pairs' ? 'Tap a property, then its result.' : 'Tap a code item, then its meaning.'}</p>
             <span>
               {Object.keys(a.matched).length} / {q.items.length}
             </span>

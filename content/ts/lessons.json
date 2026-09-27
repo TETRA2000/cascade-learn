@@ -1,0 +1,570 @@
+[
+  {
+    "key": "values",
+    "name": "Values & equality",
+    "blurb": "Predict what basic values do",
+    "cards": [
+      {
+        "title": "let, const and inference",
+        "body": "`const` makes a binding you can't reassign; `let` makes one you can. You may annotate a type, as in `let limit: number = 3`, but usually tsc infers it from the starting value.",
+        "tip": "Default to `const`; reach for `let` only when the value must change.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "const lang = \"TypeScript\";",
+            "let count = 1;          // tsc infers number",
+            "let limit: number = 3;  // or annotate it",
+            "count = count + 1;",
+            "console.log(lang, count, limit);"
+          ],
+          "output": ["TypeScript 2 3"]
+        }
+      },
+      {
+        "title": "One number type",
+        "body": "There is no separate int and float: every `number` is a 64-bit float, so `7 / 2` is `3.5` and `0.1 + 0.2` is not quite `0.3`. A failed conversion gives `NaN`, which isn't equal to anything, not even itself.",
+        "tip": "Test for it with `Number.isNaN(x)`, never `x === NaN`.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "console.log(7 / 2);",
+            "console.log(0.1 + 0.2);",
+            "console.log(0.1 + 0.2 === 0.3);",
+            "const n = Number(\"abc\");",
+            "console.log(n, n === n, Number.isNaN(n));"
+          ],
+          "output": ["3.5", "0.30000000000000004", "false", "NaN false true"]
+        }
+      },
+      {
+        "title": "Strings and template literals",
+        "body": "Strings take `'single'` or `\"double\"` quotes, and backtick strings fill in `${…}` with any expression. `+` with a string on either side joins text instead of adding.",
+        "tip": "`\"1\" + 2` is `\"12\"`, and tsc allows it: the result is a `string`.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "const name = \"Ada\";",
+            "const n = 3;",
+            "console.log(`Hi ${name}, you have ${n + 1} messages`);",
+            "console.log(\"1\" + 2);",
+            "console.log(name.length, name.toUpperCase());"
+          ],
+          "output": ["Hi Ada, you have 4 messages", "12", "3 ADA"]
+        }
+      },
+      {
+        "title": "=== vs ==",
+        "body": "`===` compares without converting types. `==` converts first, so in plain JavaScript `\"7\" == 7` is `true`. tsc rejects comparing a `string` with a `number` either way.",
+        "tip": "Always use `===` and `!==`. Convert on purpose with `Number(…)` or `String(…)`.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "Compare id",
+          "opts": [
+            {
+              "label": "id == 7",
+              "code": ["const id: string = \"7\";", "console.log(id == 7);"],
+              "error": "error TS2367: This comparison appears to be unintentional because the types 'string' and 'number' have no overlap.",
+              "note": "Plain JavaScript would print `true` here. tsc stops you comparing unrelated types."
+            },
+            {
+              "label": "id === \"7\"",
+              "code": ["const id: string = \"7\";", "console.log(id === \"7\");"],
+              "output": ["true"],
+              "note": "Same type on both sides, so `===` is a plain comparison."
+            },
+            {
+              "label": "Number(id) === 7",
+              "code": ["const id: string = \"7\";", "console.log(Number(id) === 7);"],
+              "output": ["true"],
+              "note": "Convert explicitly, then compare two `number`s."
+            }
+          ]
+        }
+      },
+      {
+        "title": "null vs undefined",
+        "body": "JavaScript has two empty values: `undefined` means never set, and `null` means deliberately empty. With strict checks on, a `string` can hold neither; say so in the type, as in `string | null`.",
+        "tip": "`|` makes a union: `string | null` is a string or `null`.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "let name: …",
+          "opts": [
+            {
+              "label": "string",
+              "code": ["let name: string = \"Ada\";", "name = null;", "console.log(name);"],
+              "error": "error TS2322: Type 'null' is not assignable to type 'string'.",
+              "note": "Under strict checks, `null` is not a `string`."
+            },
+            {
+              "label": "string | null",
+              "code": ["let name: string | null = \"Ada\";", "name = null;", "console.log(name);"],
+              "output": ["null"],
+              "note": "The type allows `null`, so the assignment is fine."
+            },
+            {
+              "label": "string | undefined",
+              "code": ["let name: string | undefined = \"Ada\";", "name = undefined;", "console.log(name);"],
+              "output": ["undefined"],
+              "note": "`undefined` is a different value from `null`, with its own type."
+            }
+          ]
+        }
+      },
+      {
+        "title": "Truthy and falsy",
+        "body": "`if` accepts any value, not just a `boolean`. `false`, `0`, `\"\"`, `NaN`, `null` and `undefined` count as false; everything else counts as true, even `\"0\"`.",
+        "tip": "To ask \"is there a value?\", compare with `null` instead: `score !== null`.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "score = …",
+          "opts": [
+            {
+              "label": "7",
+              "code": ["const score: number | null = 7;", "if (score) {", "  console.log(`Score: ${score}`);", "} else {", "  console.log(\"No score yet\");", "}"],
+              "output": ["Score: 7"],
+              "note": "Any number other than `0` and `NaN` is truthy."
+            },
+            {
+              "label": "0",
+              "code": ["const score: number | null = 0;", "if (score) {", "  console.log(`Score: ${score}`);", "} else {", "  console.log(\"No score yet\");", "}"],
+              "output": ["No score yet"],
+              "note": "`0` is falsy, so a real score of zero looks missing."
+            },
+            {
+              "label": "null",
+              "code": ["const score: number | null = null;", "if (score) {", "  console.log(`Score: ${score}`);", "} else {", "  console.log(\"No score yet\");", "}"],
+              "output": ["No score yet"],
+              "note": "`null` is falsy, as intended."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "key": "objects",
+    "name": "Objects & arrays",
+    "blurb": "Model data with object types, and predict aliasing",
+    "cards": [
+      {
+        "title": "Objects and object types",
+        "body": "An object literal groups named values: `{ name: \"Ada\", age: 36 }`. `type User = { … }` names a shape, and tsc checks that every `User` has each property with the right type.",
+        "tip": "A missing property is a type error: `{ name: \"Ada\" }` is not a `User`.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "type User = { name: string; age: number };",
+            "const ada: User = { name: \"Ada\", age: 36 };",
+            "console.log(ada.name, ada.age);",
+            "console.log(ada);"
+          ],
+          "output": ["Ada 36", "{ name: 'Ada', age: 36 }"]
+        }
+      },
+      {
+        "title": "Shapes, not names",
+        "body": "tsc compares shapes, not type names: any object with a `name: string` fits `type Named = { name: string }`, even with extra properties. The exception is an object literal written straight into a typed slot, where an extra property is probably a typo.",
+        "tip": "This is called structural typing: a type is a list of what a value must have.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "const n: Named = …",
+          "opts": [
+            {
+              "label": "user",
+              "code": ["type Named = { name: string };", "const user = { name: \"Ada\", age: 36 };", "const n: Named = user;", "console.log(n.name);"],
+              "output": ["Ada"],
+              "note": "`user` has a `name: string`, so it fits `Named`. The extra `age` is fine."
+            },
+            {
+              "label": "{ name: \"Ada\", age: 36 }",
+              "code": ["type Named = { name: string };", "const n: Named = { name: \"Ada\", age: 36 };", "console.log(n.name);"],
+              "error": "error TS2353: Object literal may only specify known properties, and 'age' does not exist in type 'Named'.",
+              "note": "A fresh literal typed as `Named` gets an excess-property check: nothing could ever read `age` through `n`."
+            },
+            {
+              "label": "pet",
+              "code": ["type Named = { name: string };", "const pet = { species: \"cat\" };", "const n: Named = pet;", "console.log(n.name);"],
+              "error": "error TS2741: Property 'name' is missing in type '{ species: string; }' but required in type 'Named'.",
+              "note": "`pet` has no `name`, so its shape doesn't fit."
+            }
+          ]
+        }
+      },
+      {
+        "title": "Objects are references",
+        "body": "Assigning an object copies a reference, not the object: after `const b = a`, both names point at one object, so changing `b.x` changes `a.x`. `===` on objects asks \"same object?\", not \"same contents?\".",
+        "tip": "Two separate objects with equal contents are never `===`.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "const a = { x: 1 };",
+            "const b = a;",
+            "b.x = 2;",
+            "console.log(a.x);",
+            "const c = { x: 2 };",
+            "console.log(a === b, a === c);"
+          ],
+          "output": ["2", "true false"]
+        }
+      },
+      {
+        "title": "const doesn't freeze",
+        "body": "`const` stops you rebinding a name, but you can still change the object it points to. To have tsc reject a property change, mark the property `readonly`, or add `as const` to make the whole literal read-only.",
+        "tip": "`readonly` and `as const` are checked by tsc only; they don't exist in the JavaScript that runs.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "Declare point with …",
+          "opts": [
+            {
+              "label": "just const",
+              "code": ["const point = { x: 1, y: 2 };", "point.x = 5;", "console.log(point);"],
+              "output": ["{ x: 5, y: 2 }"],
+              "note": "`point` still names the same object; only its contents changed."
+            },
+            {
+              "label": "readonly x",
+              "code": ["const point: { readonly x: number; y: number } = { x: 1, y: 2 };", "point.x = 5;", "console.log(point);"],
+              "error": "error TS2540: Cannot assign to 'x' because it is a read-only property.",
+              "note": "Only `x` is read-only here; `point.y = 5` would be fine."
+            },
+            {
+              "label": "as const",
+              "code": ["const point = { x: 1, y: 2 } as const;", "point.x = 5;", "console.log(point);"],
+              "error": "error TS2540: Cannot assign to 'x' because it is a read-only property.",
+              "note": "`as const` makes every property of the literal `readonly`."
+            }
+          ]
+        }
+      },
+      {
+        "title": "Arrays",
+        "body": "`number[]` is an array of numbers. `map` makes a new array by transforming each element, and `filter` keeps the elements that pass a test; both take a function such as `(n) => n * 2`. Reading past the end gives `undefined`, yet tsc still types `words[5]` as `string`.",
+        "tip": "tsc can't see out-of-range reads, so that mistake only shows up when the code runs. Check the index against `words.length`.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "const nums: number[] = [1, 2, 3, 4];",
+            "const doubled = nums.map((n) => n * 2);",
+            "const evens = nums.filter((n) => n % 2 === 0);",
+            "console.log(doubled, evens);",
+            "const words = [\"hi\", \"there\"];",
+            "console.log(words[5].toUpperCase());"
+          ],
+          "output": ["[ 2, 4, 6, 8 ] [ 2, 4 ]"],
+          "thrown": "TypeError: Cannot read properties of undefined (reading 'toUpperCase')"
+        }
+      },
+      {
+        "title": "Spread copies one level",
+        "body": "`{ ...orig }` makes a new object with the same properties, and `const { name, tags } = orig` pulls properties out into variables. A spread copies only the top level: a nested array or object is still shared.",
+        "tip": "Copy a nested array too with `[...orig.tags]`.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "const copy = …",
+          "opts": [
+            {
+              "label": "orig",
+              "code": ["const orig = { name: \"Ada\", tags: [\"math\"] };", "const copy = orig;", "copy.name = \"Grace\";", "copy.tags.push(\"code\");", "const { name, tags } = orig;", "console.log(name, tags);"],
+              "output": ["Grace [ 'math', 'code' ]"],
+              "note": "No copy at all: `copy` and `orig` are one object."
+            },
+            {
+              "label": "{ ...orig }",
+              "code": ["const orig = { name: \"Ada\", tags: [\"math\"] };", "const copy = { ...orig };", "copy.name = \"Grace\";", "copy.tags.push(\"code\");", "const { name, tags } = orig;", "console.log(name, tags);"],
+              "output": ["Ada [ 'math', 'code' ]"],
+              "note": "`name` was copied, but `tags` is still the same array in both objects."
+            },
+            {
+              "label": "{ ...orig, tags: [...orig.tags] }",
+              "code": ["const orig = { name: \"Ada\", tags: [\"math\"] };", "const copy = { ...orig, tags: [...orig.tags] };", "copy.name = \"Grace\";", "copy.tags.push(\"code\");", "const { name, tags } = orig;", "console.log(name, tags);"],
+              "output": ["Ada [ 'math' ]"],
+              "note": "The nested array is copied too, so `orig` is untouched."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "key": "functions",
+    "name": "Functions",
+    "blurb": "Write typed functions and predict closures",
+    "cards": [
+      {
+        "title": "Parameter and return types",
+        "body": "Parameters of a standalone function need a type unless they have a default, as in `function area(w: number, h: number)`. A return type goes after the `)`, like `: number`; leave it off and tsc infers it from the `return`.",
+        "tip": "Unlike plain JavaScript, tsc checks every call: `area(3)` and `area(\"3\", 4)` are both type errors.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "function area(w: number, h: number): number {",
+            "  return w * h;",
+            "}",
+            "function greet(name: string) {  // tsc infers string",
+            "  return `Hi ${name}`;",
+            "}",
+            "console.log(area(3, 4), greet(\"Ada\"));"
+          ],
+          "output": ["12 Hi Ada"]
+        }
+      },
+      {
+        "title": "Arrow functions",
+        "body": "`(n: number) => n * 2` is a function written as a value: store it in a `const` and call it like any other function. Without braces, the expression after `=>` is returned; with braces, you need `return`.",
+        "tip": "With braces and no `return`, an arrow returns `undefined`, and tsc types its result as `void`.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "const double = (n: number) => n * 2;",
+            "const add = (a: number, b: number): number => {",
+            "  return a + b;",
+            "};",
+            "console.log(double(4), add(2, 3));",
+            "console.log([1, 2, 3].map((n) => n * 10));"
+          ],
+          "output": ["8 5", "[ 10, 20, 30 ]"]
+        }
+      },
+      {
+        "title": "Optional and default parameters",
+        "body": "Passing too few arguments is a type error. `tip?: number` makes a parameter optional, so inside the function it's `number | undefined`; `tip = 0` makes it optional with a default, so it's always a `number`.",
+        "tip": "A left-out argument is `undefined`, and `10 + undefined` is `NaN`.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "function total(price: number, …)",
+          "opts": [
+            {
+              "label": "tip: number",
+              "code": ["function total(price: number, tip: number) {", "  return price + tip;", "}", "console.log(total(10), total(10, 2));"],
+              "error": "error TS2554: Expected 2 arguments, but got 1.",
+              "note": "Both parameters are required, so tsc rejects `total(10)`. Plain JavaScript would run it with `tip` set to `undefined`."
+            },
+            {
+              "label": "tip?: number",
+              "code": ["function total(price: number, tip?: number) {", "  return price + tip;", "}", "console.log(total(10), total(10, 2));"],
+              "error": "error TS18048: 'tip' is possibly 'undefined'.",
+              "note": "The call is fine now, but `tip` is `number | undefined`, and tsc won't add `undefined` to a number."
+            },
+            {
+              "label": "tip = 0",
+              "code": ["function total(price: number, tip = 0) {", "  return price + tip;", "}", "console.log(total(10), total(10, 2));"],
+              "output": ["10 12"],
+              "note": "A left-out `tip` becomes `0`, so it's always a `number`. tsc infers that type from the default."
+            }
+          ]
+        }
+      },
+      {
+        "title": "Functions are values",
+        "body": "You can store a function in a variable and pass it to another function, which calls it later: that's a callback. A function type such as `(n: number) => boolean` names the parameter types and the return type.",
+        "tip": "When tsc knows the expected function type, it infers the callback's parameter types, so `(n) => n > 10` needs no annotation.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "type Check = (n: number) => boolean;",
+            "const isEven: Check = (n) => n % 2 === 0;",
+            "function countIf(nums: number[], check: Check): number {",
+            "  return nums.filter(check).length;",
+            "}",
+            "console.log(countIf([1, 2, 3, 4], isEven));",
+            "console.log(countIf([5, 20, 15, 30], (n) => n > 10));"
+          ],
+          "output": ["2", "3"]
+        }
+      },
+      {
+        "title": "Closures capture variables",
+        "body": "A function can use variables from the code around it, even after that code has finished running: it's called a closure. It captures the variable itself, not a copy of its value, so it sees whatever the variable holds when it's called.",
+        "tip": "Avoid `var`: it ignores `{ }` blocks, so every pass of a loop shares one variable.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "Declare i with …",
+          "opts": [
+            {
+              "label": "for (let i …)",
+              "code": ["type Getter = () => number;", "const getters: Getter[] = [];", "for (let i = 0; i < 3; i++) {", "  getters.push(() => i);", "}", "console.log(getters.map((g) => g()));"],
+              "output": ["[ 0, 1, 2 ]"],
+              "note": "`let` in a `for` header makes a fresh `i` for each pass, so each function captures its own."
+            },
+            {
+              "label": "for (var i …)",
+              "code": ["type Getter = () => number;", "const getters: Getter[] = [];", "for (var i = 0; i < 3; i++) {", "  getters.push(() => i);", "}", "console.log(getters.map((g) => g()));"],
+              "output": ["[ 3, 3, 3 ]"],
+              "note": "`var` makes one `i` for the whole loop. The functions run after the loop, when that `i` is `3`."
+            },
+            {
+              "label": "let i before the loop",
+              "code": ["type Getter = () => number;", "const getters: Getter[] = [];", "let i = 0;", "for (; i < 3; i++) {", "  getters.push(() => i);", "}", "console.log(getters.map((g) => g()));"],
+              "output": ["[ 3, 3, 3 ]"],
+              "note": "One `let i` shared by every pass behaves just like `var`: each function reads `i` when it's called, not when it was made."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "key": "narrowing",
+    "name": "Unions & narrowing",
+    "blurb": "Model \"one of these\" and let the compiler prove which",
+    "cards": [
+      {
+        "title": "Union types",
+        "body": "`string | number` is a union type: the value is a string or a number. tsc accepts either, but only lets you do what works for both, like putting it in a template string. At runtime, `typeof id` tells you which one you have.",
+        "tip": "An array of either is `(string | number)[]`. Without the parentheses, `string | number[]` means a string or an array of numbers.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "function describe(id: string | number) {",
+            "  return `id ${id} is a ${typeof id}`;",
+            "}",
+            "console.log(describe(42));",
+            "console.log(describe(\"A-7\"));",
+            "const ids: (string | number)[] = [1, \"B-2\"];",
+            "console.log(ids);"
+          ],
+          "output": ["id 42 is a number", "id A-7 is a string", "[ 1, 'B-2' ]"]
+        }
+      },
+      {
+        "title": "Narrowing with typeof and in",
+        "body": "Inside `if (typeof x === \"string\")`, tsc knows `x` is a `string`; this is called narrowing. For a union of object types, `\"bark\" in pet` checks for a property and narrows `pet` to the members that have it.",
+        "tip": "After an `if` that returns, tsc knows the rest of the function only sees what's left: here, a `number`.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "Narrow with …",
+          "opts": [
+            {
+              "label": "no check",
+              "code": ["function boost(x: string | number) {", "  return x.toUpperCase();", "}", "console.log(boost(\"hi\"));"],
+              "error": "error TS2339: Property 'toUpperCase' does not exist on type 'string | number'.",
+              "note": "A `number` has no `toUpperCase`, so tsc won't call it on something that might be one."
+            },
+            {
+              "label": "typeof",
+              "code": ["function boost(x: string | number) {", "  if (typeof x === \"string\") {", "    return x.toUpperCase();", "  }", "  return x * 10;", "}", "console.log(boost(\"hi\"), boost(4));"],
+              "output": ["HI 40"],
+              "note": "`x` is a `string` inside the `if`. The `if` returns, so after it `x` can only be a `number`."
+            },
+            {
+              "label": "in",
+              "code": ["type Dog = { name: string; bark: string };", "type Fish = { name: string; swim: string };", "function describe(pet: Dog | Fish) {", "  if (\"bark\" in pet) {", "    return `${pet.name} says ${pet.bark}`;", "  }", "  return `${pet.name} can ${pet.swim}`;", "}", "console.log(describe({ name: \"Rex\", bark: \"woof\" }));"],
+              "output": ["Rex says woof"],
+              "note": "`typeof` gives `\"object\"` for both shapes, so check for a property with `in` instead."
+            }
+          ]
+        }
+      },
+      {
+        "title": "Literal types",
+        "body": "A literal type is one exact value, like `\"up\"` or `42`. `const dir = \"up\"` has type `\"up\"` because it can never change, but `let dir = \"up\"` widens to `string`. A union of literals such as `\"up\" | \"down\"` lists every allowed value.",
+        "tip": "Object properties widen like `let` does: `{ size: \"large\" }` has `size: string`.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "Declare dir with …",
+          "opts": [
+            {
+              "label": "const dir = \"up\"",
+              "code": ["type Dir = \"up\" | \"down\";", "function move(d: Dir) {", "  console.log(`Moving ${d}`);", "}", "const dir = \"up\";", "move(dir);"],
+              "output": ["Moving up"],
+              "note": "`dir` has type `\"up\"`, which is one of the values `Dir` allows."
+            },
+            {
+              "label": "let dir = \"up\"",
+              "code": ["type Dir = \"up\" | \"down\";", "function move(d: Dir) {", "  console.log(`Moving ${d}`);", "}", "let dir = \"up\";", "move(dir);"],
+              "error": "error TS2345: Argument of type 'string' is not assignable to parameter of type 'Dir'.",
+              "note": "A `let` could later hold any string, so tsc widens it to `string`, and not every string is a `Dir`."
+            },
+            {
+              "label": "let dir: Dir = \"up\"",
+              "code": ["type Dir = \"up\" | \"down\";", "function move(d: Dir) {", "  console.log(`Moving ${d}`);", "}", "let dir: Dir = \"up\";", "move(dir);"],
+              "output": ["Moving up"],
+              "note": "Annotate a `let` to keep it changeable but limited to `\"up\"` or `\"down\"`."
+            }
+          ]
+        }
+      },
+      {
+        "title": "Discriminated unions",
+        "body": "Give every member of a union the same property with a different literal type, such as `kind: \"circle\"`. Checking `kind` in a `switch` narrows the whole object, so each `case` can use that shape's own properties.",
+        "tip": "This pattern is called a discriminated union, and `kind` is its tag. The leading `|` just lets each member start its own line.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "type Shape =",
+            "  | { kind: \"circle\"; radius: number }",
+            "  | { kind: \"square\"; side: number };",
+            "function area(s: Shape): number {",
+            "  switch (s.kind) {",
+            "    case \"circle\":",
+            "      return 3.14 * s.radius * s.radius;",
+            "    case \"square\":",
+            "      return s.side * s.side;",
+            "  }",
+            "}",
+            "console.log(area({ kind: \"circle\", radius: 1 }), area({ kind: \"square\", side: 3 }));"
+          ],
+          "output": ["3.14 9"]
+        }
+      },
+      {
+        "title": "?. and ?? vs ||",
+        "body": "`a?.b` reads `b` only when `a` isn't `null` or `undefined`; otherwise it gives `undefined` instead of throwing. `x ?? 50` falls back to `50` only when `x` is `null` or `undefined`, but `x || 50` falls back for any falsy value, including `0` and `\"\"`.",
+        "tip": "Use `??` for defaults whenever `0` or `\"\"` is a real value.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "Read the volume with …",
+          "opts": [
+            {
+              "label": "settings.volume || 50",
+              "code": ["type User = { settings?: { volume?: number } };", "const user: User = { settings: { volume: 0 } };", "console.log(user.settings.volume || 50);"],
+              "error": "error TS18048: 'user.settings' is possibly 'undefined'.",
+              "note": "`settings` is optional, so tsc makes you handle the case where it's missing."
+            },
+            {
+              "label": "settings?.volume || 50",
+              "code": ["type User = { settings?: { volume?: number } };", "const user: User = { settings: { volume: 0 } };", "console.log(user.settings?.volume || 50);"],
+              "output": ["50"],
+              "note": "`?.` handles a possibly missing `settings`, but `0` is falsy, so `||` replaces a real volume of zero."
+            },
+            {
+              "label": "settings?.volume ?? 50",
+              "code": ["type User = { settings?: { volume?: number } };", "const user: User = { settings: { volume: 0 } };", "console.log(user.settings?.volume ?? 50);"],
+              "output": ["0"],
+              "note": "`0` is neither `null` nor `undefined`, so `??` keeps it."
+            }
+          ]
+        }
+      },
+      {
+        "title": "Exhaustiveness with never",
+        "body": "`never` is the type with no values. When a `switch` handles every member of a union, the value in `default:` has type `never`, so it can go into a `never` variable. Add a member and forget its `case`, and that line becomes a type error.",
+        "tip": "The check costs nothing at runtime: when every case is handled, `default:` never runs.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "type Shape = …",
+          "opts": [
+            {
+              "label": "circle | square",
+              "code": ["type Shape =", "  | { kind: \"circle\"; radius: number }", "  | { kind: \"square\"; side: number };", "function area(s: Shape): number {", "  switch (s.kind) {", "    case \"circle\":", "      return 3.14 * s.radius * s.radius;", "    case \"square\":", "      return s.side * s.side;", "    default: {", "      const unreachable: never = s;", "      return unreachable;", "    }", "  }", "}", "console.log(area({ kind: \"square\", side: 3 }));"],
+              "output": ["9"],
+              "note": "Both members have a `case`, so nothing is left for `default:` and `s` is `never` there."
+            },
+            {
+              "label": "… | triangle, no case",
+              "code": ["type Shape =", "  | { kind: \"circle\"; radius: number }", "  | { kind: \"square\"; side: number }", "  | { kind: \"triangle\"; base: number; height: number };", "function area(s: Shape): number {", "  switch (s.kind) {", "    case \"circle\":", "      return 3.14 * s.radius * s.radius;", "    case \"square\":", "      return s.side * s.side;", "    default: {", "      const unreachable: never = s;", "      return unreachable;", "    }", "  }", "}", "console.log(area({ kind: \"square\", side: 3 }));"],
+              "error": "error TS2322: Type '{ kind: \"triangle\"; base: number; height: number; }' is not assignable to type 'never'.",
+              "note": "A triangle reaches `default:`, so `s` isn't `never` there, and tsc flags the forgotten case."
+            },
+            {
+              "label": "… | triangle, with a case",
+              "code": ["type Shape =", "  | { kind: \"circle\"; radius: number }", "  | { kind: \"square\"; side: number }", "  | { kind: \"triangle\"; base: number; height: number };", "function area(s: Shape): number {", "  switch (s.kind) {", "    case \"circle\":", "      return 3.14 * s.radius * s.radius;", "    case \"square\":", "      return s.side * s.side;", "    case \"triangle\":", "      return (s.base * s.height) / 2;", "    default: {", "      const unreachable: never = s;", "      return unreachable;", "    }", "  }", "}", "console.log(area({ kind: \"triangle\", base: 4, height: 3 }));"],
+              "output": ["6"],
+              "note": "Handling the new member makes `s` `never` in `default:` again."
+            }
+          ]
+        }
+      }
+    ]
+  }
+]
