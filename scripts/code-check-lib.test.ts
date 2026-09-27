@@ -173,23 +173,49 @@ describe('collectSnippets', () => {
 });
 
 describe('collectSnippets (TypeScript)', () => {
-  it('collects ts-infer as one snippet per option with the assertion after the line', () => {
+  it('collects ts-infer as one snippet per option with the assertion after the line, plus a validity snippet for the option’s type text', () => {
     const { snippets } = collectSnippets([], [tsInfer]);
-    expect(snippets.map((s) => s.expect)).toEqual([
-      { kind: 'compiles' },
-      { kind: 'error', code: 'TS2322', programLine: 4 },
-      { kind: 'error', code: 'TS2322', programLine: 4 },
-      { kind: 'error', code: 'TS2322', programLine: 4 },
+    expect(snippets.map((s) => [s.where, s.expect])).toEqual([
+      ['ts-infer-1/option A', { kind: 'compiles' }],
+      ['ts-infer-1/type "string"', { kind: 'compiles' }],
+      ['ts-infer-1/option B', { kind: 'error', code: 'TS2322', programLine: 4 }],
+      ['ts-infer-1/type "string | number"', { kind: 'compiles' }],
+      ['ts-infer-1/option C', { kind: 'error', code: 'TS2322', programLine: 4 }],
+      ['ts-infer-1/type "number"', { kind: 'compiles' }],
+      ['ts-infer-1/option D', { kind: 'error', code: 'TS2322', programLine: 4 }],
+      ['ts-infer-1/type "never"', { kind: 'compiles' }],
     ]);
-    expect(snippets[1]!.code[3]).toBe('# const __ok1: __Eq<typeof x, string | number> = true;');
+    expect(snippets[0]!.code[3]).toBe(inferAssertion(0, 'x', 'string'));
+    expect(snippets[2]!.code[3]).toBe('# const __ok1: __Eq<typeof x, string | number> = true;');
+    // The validity snippet is the plain question code with the option's type appended as its own
+    // (unrelated to __Eq) hidden declaration, so an unresolvable type fails on its own merits.
+    expect(snippets[1]!.code).toEqual([...tsInfer.code, '# type __Opt0 = string;']);
+    expect(snippets[3]!.code.at(-1)).toBe('# type __Opt1 = string | number;');
   });
 
   it('places the assertion by visible line, after hidden lines', () => {
     const q = { ...tsInfer, code: ['# function f(x: string | number) {', 'if (typeof x === "number") {', '  x;', '}', '# }'], line: 2 };
     const { snippets } = collectSnippets([], [q]);
     expect(snippets[0]!.code[3]).toBe(inferAssertion(0, 'x', 'string'));
-    expect(snippets[1]!.expect).toEqual({ kind: 'error', code: 'TS2322', programLine: 4 });
-    expect(snippets.map((s) => s.where)).toEqual(['ts-infer-1/option A', 'ts-infer-1/option B', 'ts-infer-1/option C', 'ts-infer-1/option D']);
+    expect(snippets[2]!.expect).toEqual({ kind: 'error', code: 'TS2322', programLine: 4 });
+    expect(snippets.map((s) => s.where)).toEqual([
+      'ts-infer-1/option A',
+      'ts-infer-1/type "string"',
+      'ts-infer-1/option B',
+      'ts-infer-1/type "string | number"',
+      'ts-infer-1/option C',
+      'ts-infer-1/type "number"',
+      'ts-infer-1/option D',
+      'ts-infer-1/type "never"',
+    ]);
+  });
+
+  it('catches an unresolvable option type via its validity snippet, even though the assertion snippet alone would not', () => {
+    const q = { ...tsInfer, opts: ['string', 'strng', 'number', 'never'] };
+    const { snippets } = collectSnippets([], [q]);
+    const validity = snippets.find((s) => s.where === 'ts-infer-1/type "strng"')!;
+    expect(validity.expect).toEqual({ kind: 'compiles' });
+    expect(validity.code.at(-1)).toBe('# type __Opt1 = strng;');
   });
 
   it('collects ts-predict throws and error answers', () => {

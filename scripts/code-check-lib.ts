@@ -85,6 +85,12 @@ export function collectSnippets(units: readonly Unit[], questions: readonly Ques
           const code = insertAfterVisibleLine(q.code, q.line, inferAssertion(i, q.name, type))!;
           const expect: Expect = i === q.answer ? { kind: 'compiles' } : { kind: 'error', code: 'TS2322', programLine: programLine + 1 };
           add(`${q.id}/option ${String.fromCharCode(65 + i)}`, code, expect);
+          // A typo'd or otherwise unresolvable option type (e.g. `strng`) still makes the __Eq
+          // assertion above fail with TS2322 (a real mismatch, not a name-resolution error), since
+          // tsc reports that diagnostic at the declared name's column, before the "cannot find
+          // name" one further right on the same line — indistinguishable from a genuine wrong
+          // answer. Check the option's type text resolves at all, on its own.
+          add(`${q.id}/type ${JSON.stringify(type)}`, [...q.code, `# type __Opt${i} = ${type};`], { kind: 'compiles' });
         });
         break;
       }
