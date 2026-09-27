@@ -1,17 +1,19 @@
-import type { RustPredictQuestion } from '../../../content';
+import { langOf, type CodeQ } from '../../../content';
 import { CodePanel } from '../../../components/CodePanel';
+import { LANG } from '../../../lib/codeLang';
 import { tone, toneLabel } from '../../tone';
 import { ToneMark } from '../../ToneMark';
 import toneStyles from '../../tone.module.css';
 import type { RendererProps } from '../types';
 import choice from './choice.module.css';
-import styles from './RustPredict.module.css';
+import styles from './CodePredict.module.css';
 
-/** Read Rust, pick what it prints — or that it doesn't compile. */
-export function RustPredict({ question: q, answer, act }: RendererProps<RustPredictQuestion>) {
+/** Read the code, pick what it prints — or that it doesn't compile. */
+export function CodePredict({ question: q, answer, act }: RendererProps<CodeQ<'predict'>>) {
+  const lang = langOf(q);
   return (
     <>
-      <CodePanel lines={q.code} lang="rust" label="Rust code" />
+      <CodePanel lines={q.code} lang={lang} label={LANG[lang].codeLabel} />
       <div className={choice.list} role="group" aria-label="Options">
         {q.opts.map((o, i) => {
           const letter = String.fromCharCode(65 + i);

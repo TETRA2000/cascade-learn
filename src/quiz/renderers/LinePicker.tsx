@@ -1,4 +1,4 @@
-import { CodeTokens, type CodeLang } from '../../components/CodePanel';
+import { CodeTokens, type PanelLang } from '../../components/CodePanel';
 import type { SessionAction } from '../session';
 import { tone, toneLabel } from '../tone';
 import { ToneMark } from '../ToneMark';
@@ -8,7 +8,7 @@ import styles from './LinePicker.module.css';
 interface Props {
   /** Displayed lines; the picked line number is the 1-based index into these. */
   lines: readonly string[];
-  lang: CodeLang;
+  lang: PanelLang;
   /** The correct 1-based line. */
   answer: number;
   state: AnswerState;

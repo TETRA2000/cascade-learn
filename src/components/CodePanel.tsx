@@ -1,13 +1,14 @@
+import { LANG, type CodeLang } from '../lib/codeLang';
 import { highlightLine } from '../lib/highlight';
-import { highlightRust } from '../lib/highlightRust';
 import { BLANK, visibleLines } from '../lib/code';
 import styles from './CodePanel.module.css';
 
-export type CodeLang = 'css' | 'rust';
+/** 'css' plus every code course's language. */
+export type PanelLang = 'css' | CodeLang;
 
 /** One syntax-colored line (no wrapper). In CSS, `§` lines are HTML. */
-export function CodeTokens({ line, lang = 'css' }: { line: string; lang?: CodeLang }) {
-  const tokens = lang === 'rust' ? highlightRust(line) : highlightLine(line);
+export function CodeTokens({ line, lang = 'css' }: { line: string; lang?: PanelLang }) {
+  const tokens = lang === 'css' ? highlightLine(line) : LANG[lang].highlight(line);
   return (
     <>
       {tokens.map((t, j) => (
@@ -19,7 +20,7 @@ export function CodeTokens({ line, lang = 'css' }: { line: string; lang?: CodeLa
   );
 }
 
-/** Dark editor panel with syntax colors. Rust panels hide `# ` lines and number the rest. */
+/** Dark editor panel with syntax colors. Non-CSS panels hide `# ` lines and number the rest. */
 export function CodePanel({
   lines,
   label,
@@ -29,19 +30,19 @@ export function CodePanel({
 }: {
   lines: readonly string[];
   label?: string;
-  lang?: CodeLang;
+  lang?: PanelLang;
   id?: string;
-  /** rs-type: text shown in the `___` blank (the blank itself while empty). */
+  /** *-type: text shown in the `___` blank (the blank itself while empty). */
   blank?: string;
 }) {
-  const rust = lang === 'rust';
-  const shown = rust ? visibleLines(lines) : lines;
+  const numbered = lang !== 'css';
+  const shown = numbered ? visibleLines(lines) : lines;
   return (
-    <pre id={id} className={rust ? `${styles.panel} ${styles.numbered}` : styles.panel} aria-label={label}>
+    <pre id={id} className={numbered ? `${styles.panel} ${styles.numbered}` : styles.panel} aria-label={label}>
       <code>
         {shown.map((line, i) => (
           <span key={i} className={styles.line}>
-            {rust && (
+            {numbered && (
               <span className={styles.gutter} aria-hidden="true">
                 {i + 1}
               </span>
@@ -55,7 +56,7 @@ export function CodePanel({
   );
 }
 
-function LineContent({ line, lang, blank }: { line: string; lang: CodeLang; blank?: string }) {
+function LineContent({ line, lang, blank }: { line: string; lang: PanelLang; blank?: string }) {
   const at = blank === undefined ? -1 : line.indexOf(BLANK);
   if (at === -1) return <CodeTokens line={line} lang={lang} />;
   return (

@@ -1,9 +1,10 @@
-// Rust feedback copy. `compiler` carries rustc's message whenever the question is about a compile error.
-import type { RustQuestion } from '../../content';
+// Code-course feedback copy (Rust, TypeScript). `compiler` carries the compiler's message whenever
+// the question is about a compile error.
+import type { CodeQuestion } from '../../content';
 import type { AnswerState } from '../types';
 import { optionLetter, pairsSummary, type FeedbackText } from './shared';
 
-export function rustFeedback(q: RustQuestion, a: AnswerState, praise: string): FeedbackText {
+export function codeFeedback(q: CodeQuestion, a: AnswerState, praise: string): FeedbackText {
   let title = a.ok ? praise : 'Not quite';
   if (q.type === 'rs-pairs') title = 'All pairs matched!';
   if (!a.ok && q.type === 'rs-error') title = `Not that one — it’s line ${q.answer}`;
@@ -13,7 +14,7 @@ export function rustFeedback(q: RustQuestion, a: AnswerState, praise: string): F
   return compiler ? { title, detail, compiler } : { title, detail };
 }
 
-function answerLine(q: RustQuestion): string | null {
+function answerLine(q: CodeQuestion): string | null {
   switch (q.type) {
     case 'rs-predict':
     case 'rs-fix':
@@ -30,7 +31,7 @@ function answerLine(q: RustQuestion): string | null {
   }
 }
 
-function compilerMessage(q: RustQuestion): string | undefined {
+function compilerMessage(q: CodeQuestion): string | undefined {
   switch (q.type) {
     case 'rs-compiles':
     case 'rs-error':

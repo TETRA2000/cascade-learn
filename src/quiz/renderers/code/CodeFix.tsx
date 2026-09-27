@@ -1,22 +1,24 @@
-import type { RustFixQuestion } from '../../../content';
+import { langOf, type CodeQ } from '../../../content';
 import { CodePanel } from '../../../components/CodePanel';
 import { OutputPanel } from '../../../components/OutputPanel';
+import { LANG } from '../../../lib/codeLang';
 import { parseDiff } from '../../../lib/code';
 import { tone, toneLabel } from '../../tone';
 import { ToneMark } from '../../ToneMark';
 import toneStyles from '../../tone.module.css';
 import type { RendererProps } from '../types';
 import choice from './choice.module.css';
-import styles from './RustFix.module.css';
+import styles from './CodeFix.module.css';
 
 const quote = (lines: string[]) => `“${lines.map((l) => l.trim()).join(' ')}”`;
 
-/** Read rustc's complaint, then pick the change that fixes it. Diff signs are glyphs, not just color. */
-export function RustFix({ question: q, answer, act }: RendererProps<RustFixQuestion>) {
+/** Read the compiler's complaint, then pick the change that fixes it. Diff signs are glyphs, not just color. */
+export function CodeFix({ question: q, answer, act }: RendererProps<CodeQ<'fix'>>) {
+  const lang = langOf(q);
   return (
     <>
       <OutputPanel error={q.error} />
-      <CodePanel lines={q.code} lang="rust" label="Rust code" />
+      <CodePanel lines={q.code} lang={lang} label={LANG[lang].codeLabel} />
       <div className={choice.list} role="group" aria-label="Fixes">
         {q.opts.map((o, i) => {
           const letter = String.fromCharCode(65 + i);

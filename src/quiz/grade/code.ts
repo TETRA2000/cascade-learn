@@ -1,10 +1,10 @@
-// Rust answer rules.
-import type { RustQuestion } from '../../content';
+// Code-course answer rules (Rust, TypeScript).
+import type { CodeQuestion } from '../../content';
 import { normalizeToken } from '../../lib/code';
 import type { AnswerState } from '../types';
 
-/** Whether Check is enabled (the caller has already ruled out a checked answer). rs-pairs has no Check. */
-export function canCheckRust(q: RustQuestion, a: AnswerState): boolean {
+/** Whether Check is enabled (the caller has already ruled out a checked answer). *-pairs has no Check. */
+export function canCheckCode(q: CodeQuestion, a: AnswerState): boolean {
   switch (q.type) {
     case 'rs-predict':
     case 'rs-compiles':
@@ -20,7 +20,7 @@ export function canCheckRust(q: RustQuestion, a: AnswerState): boolean {
   }
 }
 
-export function isCorrectRust(q: RustQuestion, a: AnswerState): boolean {
+export function isCorrectCode(q: CodeQuestion, a: AnswerState): boolean {
   switch (q.type) {
     case 'rs-predict':
     case 'rs-compiles':
