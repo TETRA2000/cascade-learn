@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react';
 import type { RustQuestion } from '../../../content';
 import type { RendererProps } from '../types';
 import { RustBuild } from './RustBuild';
@@ -8,7 +9,7 @@ import { RustPairs } from './RustPairs';
 import { RustPredict } from './RustPredict';
 import { RustType } from './RustType';
 
-export function RustQuestionBody({ question, answer, act }: RendererProps<RustQuestion>) {
+export function RustQuestionBody({ question, answer, act }: RendererProps<RustQuestion>): ReactElement {
   switch (question.type) {
     case 'rs-predict':
       return <RustPredict question={question} answer={answer} act={act} />;

@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react';
 import type { CssQuestion } from '../../../content';
 import type { RendererProps } from '../types';
 import { Bug } from './Bug';
@@ -8,7 +9,7 @@ import { Tune } from './Tune';
 import { TypeValue } from './TypeValue';
 import { Versus } from './Versus';
 
-export function CssQuestionBody({ question, answer, act }: RendererProps<CssQuestion>) {
+export function CssQuestionBody({ question, answer, act }: RendererProps<CssQuestion>): ReactElement {
   switch (question.type) {
     case 'predict':
       return <Predict question={question} answer={answer} act={act} />;
