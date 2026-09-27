@@ -140,5 +140,149 @@
         }
       }
     ]
+  },
+  {
+    "key": "objects",
+    "name": "Objects & arrays",
+    "blurb": "Model data with object types, and predict aliasing",
+    "cards": [
+      {
+        "title": "Objects and object types",
+        "body": "An object literal groups named values: `{ name: \"Ada\", age: 36 }`. `type User = { … }` names a shape, and tsc checks that every `User` has each property with the right type.",
+        "tip": "A missing property is a type error: `{ name: \"Ada\" }` is not a `User`.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "type User = { name: string; age: number };",
+            "const ada: User = { name: \"Ada\", age: 36 };",
+            "console.log(ada.name, ada.age);",
+            "console.log(ada);"
+          ],
+          "output": ["Ada 36", "{ name: 'Ada', age: 36 }"]
+        }
+      },
+      {
+        "title": "Shapes, not names",
+        "body": "tsc compares shapes, not type names: any object with a `name: string` fits `type Named = { name: string }`, even with extra properties. The exception is an object literal written straight into a typed slot, where an extra property is probably a typo.",
+        "tip": "This is called structural typing: a type is a list of what a value must have.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "const n: Named = …",
+          "opts": [
+            {
+              "label": "user",
+              "code": ["type Named = { name: string };", "const user = { name: \"Ada\", age: 36 };", "const n: Named = user;", "console.log(n.name);"],
+              "output": ["Ada"],
+              "note": "`user` has a `name: string`, so it fits `Named`. The extra `age` is fine."
+            },
+            {
+              "label": "{ name: \"Ada\", age: 36 }",
+              "code": ["type Named = { name: string };", "const n: Named = { name: \"Ada\", age: 36 };", "console.log(n.name);"],
+              "error": "error TS2353: Object literal may only specify known properties, and 'age' does not exist in type 'Named'.",
+              "note": "A fresh literal typed as `Named` gets an excess-property check: nothing could ever read `age` through `n`."
+            },
+            {
+              "label": "pet",
+              "code": ["type Named = { name: string };", "const pet = { species: \"cat\" };", "const n: Named = pet;", "console.log(n.name);"],
+              "error": "error TS2741: Property 'name' is missing in type '{ species: string; }' but required in type 'Named'.",
+              "note": "`pet` has no `name`, so its shape doesn't fit."
+            }
+          ]
+        }
+      },
+      {
+        "title": "Objects are references",
+        "body": "Assigning an object copies a reference, not the object: after `const b = a`, both names point at one object, so changing `b.x` changes `a.x`. `===` on objects asks \"same object?\", not \"same contents?\".",
+        "tip": "Two separate objects with equal contents are never `===`.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "const a = { x: 1 };",
+            "const b = a;",
+            "b.x = 2;",
+            "console.log(a.x);",
+            "const c = { x: 2 };",
+            "console.log(a === b, a === c);"
+          ],
+          "output": ["2", "true false"]
+        }
+      },
+      {
+        "title": "const doesn't freeze",
+        "body": "`const` stops you rebinding a name, but you can still change the object it points to. To have tsc reject a property change, mark the property `readonly`, or add `as const` to make the whole literal read-only.",
+        "tip": "`readonly` and `as const` are checked by tsc only; they don't exist in the JavaScript that runs.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "Declare point with …",
+          "opts": [
+            {
+              "label": "just const",
+              "code": ["const point = { x: 1, y: 2 };", "point.x = 5;", "console.log(point);"],
+              "output": ["{ x: 5, y: 2 }"],
+              "note": "`point` still names the same object; only its contents changed."
+            },
+            {
+              "label": "readonly x",
+              "code": ["const point: { readonly x: number; y: number } = { x: 1, y: 2 };", "point.x = 5;", "console.log(point);"],
+              "error": "error TS2540: Cannot assign to 'x' because it is a read-only property.",
+              "note": "Only `x` is read-only here; `point.y = 5` would be fine."
+            },
+            {
+              "label": "as const",
+              "code": ["const point = { x: 1, y: 2 } as const;", "point.x = 5;", "console.log(point);"],
+              "error": "error TS2540: Cannot assign to 'x' because it is a read-only property.",
+              "note": "`as const` makes every property of the literal `readonly`."
+            }
+          ]
+        }
+      },
+      {
+        "title": "Arrays",
+        "body": "`number[]` is an array of numbers. `map` makes a new array by transforming each element, and `filter` keeps the elements that pass a test; both take a function such as `(n) => n * 2`. Reading past the end gives `undefined`, yet tsc still types `words[5]` as `string`.",
+        "tip": "tsc can't see out-of-range reads, so that mistake only shows up when the code runs. Check the index against `words.length`.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "const nums: number[] = [1, 2, 3, 4];",
+            "const doubled = nums.map((n) => n * 2);",
+            "const evens = nums.filter((n) => n % 2 === 0);",
+            "console.log(doubled, evens);",
+            "const words = [\"hi\", \"there\"];",
+            "console.log(words[5].toUpperCase());"
+          ],
+          "output": ["[ 2, 4, 6, 8 ] [ 2, 4 ]"],
+          "thrown": "TypeError: Cannot read properties of undefined (reading 'toUpperCase')"
+        }
+      },
+      {
+        "title": "Spread copies one level",
+        "body": "`{ ...orig }` makes a new object with the same properties, and `const { name, tags } = orig` pulls properties out into variables. A spread copies only the top level: a nested array or object is still shared.",
+        "tip": "Copy a nested array too with `[...orig.tags]`.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "const copy = …",
+          "opts": [
+            {
+              "label": "orig",
+              "code": ["const orig = { name: \"Ada\", tags: [\"math\"] };", "const copy = orig;", "copy.name = \"Grace\";", "copy.tags.push(\"code\");", "const { name, tags } = orig;", "console.log(name, tags);"],
+              "output": ["Grace [ 'math', 'code' ]"],
+              "note": "No copy at all: `copy` and `orig` are one object."
+            },
+            {
+              "label": "{ ...orig }",
+              "code": ["const orig = { name: \"Ada\", tags: [\"math\"] };", "const copy = { ...orig };", "copy.name = \"Grace\";", "copy.tags.push(\"code\");", "const { name, tags } = orig;", "console.log(name, tags);"],
+              "output": ["Ada [ 'math', 'code' ]"],
+              "note": "`name` was copied, but `tags` is still the same array in both objects."
+            },
+            {
+              "label": "{ ...orig, tags: [...orig.tags] }",
+              "code": ["const orig = { name: \"Ada\", tags: [\"math\"] };", "const copy = { ...orig, tags: [...orig.tags] };", "copy.name = \"Grace\";", "copy.tags.push(\"code\");", "const { name, tags } = orig;", "console.log(name, tags);"],
+              "output": ["Ada [ 'math' ]"],
+              "note": "The nested array is copied too, so `orig` is untouched."
+            }
+          ]
+        }
+      }
+    ]
   }
 ]

@@ -1,3 +1,4 @@
 {
-  "values": ["ts-predict-1", "ts-pairs-1", "ts-infer-1", "ts-compiles-1", "ts-build-1", "ts-error-1", "ts-fix-1", "ts-type-1"]
+  "values": ["ts-predict-1", "ts-pairs-1", "ts-infer-1", "ts-compiles-1", "ts-build-1", "ts-error-1", "ts-fix-1", "ts-type-1"],
+  "objects": ["ts-predict-2", "ts-pairs-2", "ts-infer-2", "ts-compiles-2", "ts-build-2", "ts-error-2", "ts-fix-2", "ts-type-2"]
 }

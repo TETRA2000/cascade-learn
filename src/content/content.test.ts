@@ -157,10 +157,19 @@ describe('ts content', () => {
   it('is valid', () => expect(validateContent(ts)).toEqual([]));
 
   it('has Values & equality with 6 cards and an 8-question quiz in type order', () => {
-    expect(ts.units.map((u) => u.key)).toEqual(['values']);
+    expect(ts.units.map((u) => u.key)).toEqual(['values', 'objects']);
     expect(ts.units[0]!.cards).toHaveLength(6);
     const quiz = ts.topics.values!.map((id) => ts.questions.find((q) => q.id === id)!.type);
     expect(quiz).toEqual([...TS_TYPE_KEYS]);
+  });
+
+  it('has Objects & arrays with 6 cards and an 8-question quiz in type order', () => {
+    const unit = ts.units.find((u) => u.key === 'objects')!;
+    expect(unit.name).toBe('Objects & arrays');
+    expect(unit.cards).toHaveLength(6);
+    const quiz = ts.topics.objects!.map((id) => ts.questions.find((q) => q.id === id)!.type);
+    expect(quiz).toEqual([...TS_TYPE_KEYS]);
+    expect(ts.topics.objects).toEqual(TS_TYPE_KEYS.map((k) => `${k}-2`));
   });
 
   it('builds runs from TypeScript questions only', () => {

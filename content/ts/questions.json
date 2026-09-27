@@ -97,5 +97,105 @@
     "code": ["let winner: string | ___ = null;", "winner = \"Ada\";", "console.log(winner);"],
     "accept": ["null"],
     "explain": "`string | null` allows exactly a string or `null`. Under strict checks, `null` fits only where the type names it."
+  },
+  {
+    "id": "ts-predict-2",
+    "type": "ts-predict",
+    "prompt": "What does this program print?",
+    "code": ["const team = { names: [\"Ada\", \"Grace\"] };", "const copy = { ...team };", "copy.names.pop();", "console.log(team.names[1].toUpperCase());"],
+    "opts": [
+      { "text": "GRACE", "kind": "output" },
+      { "text": "undefined", "kind": "output" },
+      { "text": "Type error", "kind": "error" },
+      { "text": "Throws at runtime", "kind": "throws" }
+    ],
+    "answer": 3,
+    "thrown": "TypeError: Cannot read properties of undefined (reading 'toUpperCase')",
+    "explain": "A spread copies one level, so `copy.names` is the same array as `team.names`, and `pop()` removes `\"Grace\"` from both. `team.names[1]` is then `undefined`, which tsc can't see, so `.toUpperCase()` throws."
+  },
+  {
+    "id": "ts-pairs-2",
+    "type": "ts-pairs",
+    "prompt": "Match each piece of code to what it means",
+    "items": [
+      { "id": "alias", "left": "const b = a;", "right": "A second name for the same object" },
+      { "id": "spread", "left": "const b = { ...a };", "right": "A new object, copied one level deep" },
+      { "id": "same", "left": "a === b", "right": "True only if both are the same object" },
+      { "id": "ro", "left": "readonly x: number", "right": "tsc rejects assigning to this property" }
+    ],
+    "order": ["same", "ro", "alias", "spread"],
+    "explain": "Assigning an object shares it; a spread copies its top level. `===` compares object identity, and `readonly` makes tsc refuse assignments to that property."
+  },
+  {
+    "id": "ts-infer-2",
+    "type": "ts-infer",
+    "prompt": "What type does the editor show for `book` on line 1?",
+    "code": ["const book = { title: \"Dune\", pages: 412 };", "book.pages = 500;", "console.log(book);"],
+    "line": 1,
+    "name": "book",
+    "opts": ["{ title: \"Dune\"; pages: 412; }", "{ title: string; pages: number; }", "{ readonly title: string; readonly pages: number; }", "object"],
+    "answer": 1,
+    "explain": "tsc infers an object type from the literal, widening each property to `string` or `number` because properties can be reassigned. `const` only fixes which object `book` names, so nothing is `readonly`."
+  },
+  {
+    "id": "ts-compiles-2",
+    "type": "ts-compiles",
+    "prompt": "Which one type-checks?",
+    "a": ["type Point = { x: number; y: number };", "const p: Point = { x: 1, y: 2, z: 3 };", "console.log(p);"],
+    "b": ["type Point = { x: number; y: number };", "const p3 = { x: 1, y: 2, z: 3 };", "const p: Point = p3;", "console.log(p);"],
+    "answer": "b",
+    "error": "error TS2353: Object literal may only specify known properties, and 'z' does not exist in type 'Point'.",
+    "explain": "`p3` has an `x` and a `y`, so its shape fits `Point` and the extra `z` is allowed. A is an object literal written straight into a `Point`, so tsc flags `z` as a likely typo."
+  },
+  {
+    "id": "ts-build-2",
+    "type": "ts-build",
+    "prompt": "Fill the blanks so `prices` is an array of numbers and this prints the ones under 10",
+    "code": [
+      ["const prices: ", { "slot": 0 }, " = [4, 12, 7];"],
+      ["const cheap = prices.", { "slot": 1 }, "((p) => p < 10);"],
+      "console.log(cheap);"
+    ],
+    "bank": ["number", "number[]", "string[]", "map", "filter"],
+    "answer": ["number[]", "filter"],
+    "output": ["[ 4, 7 ]"],
+    "explain": "`number[]` is an array of numbers. `filter` keeps the elements that pass the test; `map` would give `[ true, false, true ]`."
+  },
+  {
+    "id": "ts-error-2",
+    "type": "ts-error",
+    "prompt": "tsc rejects one line. Which one?",
+    "code": [
+      "type Config = { readonly host: string; port: number };",
+      "const config: Config = { host: \"localhost\", port: 8080 };",
+      "config.port = 3000;",
+      "config.host = \"example.com\";",
+      "console.log(config);"
+    ],
+    "answer": 4,
+    "error": "error TS2540: Cannot assign to 'host' because it is a read-only property.",
+    "explain": "`const` doesn't freeze the object, so changing `port` on line 3 is fine. `host` is marked `readonly`, so tsc rejects line 4."
+  },
+  {
+    "id": "ts-fix-2",
+    "type": "ts-fix",
+    "prompt": "Pick the change that makes this type-check",
+    "code": ["type User = { name: string; email: string };", "const ada: User = { name: \"Ada\" };", "console.log(ada.name);"],
+    "error": "error TS2741: Property 'email' is missing in type '{ name: string; }' but required in type 'User'.",
+    "opts": [
+      { "diff": ["- type User = { name: string; email: string };", "+ type User = { name: string; email: string | null };"] },
+      { "diff": ["- const ada: User = { name: \"Ada\" };", "+ const ada: User = { name: \"Ada\", email: null };"] },
+      { "diff": ["- const ada: User = { name: \"Ada\" };", "+ const ada: User = { name: \"Ada\", email: \"ada@example.com\" };"] }
+    ],
+    "answer": 2,
+    "explain": "Every `User` needs an `email` that is a `string`. Allowing `null` in the type still leaves the property missing, and `null` is not a `string`."
+  },
+  {
+    "id": "ts-type-2",
+    "type": "ts-type",
+    "prompt": "Type the missing token so `b` is a separate copy of `a` and this prints `1 99`",
+    "code": ["const a = { x: 1, y: 2 };", "const b = { ___a };", "b.x = 99;", "console.log(a.x, b.x);"],
+    "accept": ["..."],
+    "explain": "`{ ...a }` builds a new object with `a`'s properties, so changing `b.x` leaves `a.x` alone. `const b = a` would make both names share one object."
   }
 ]
