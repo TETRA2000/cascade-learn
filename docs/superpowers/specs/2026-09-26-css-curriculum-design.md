@@ -2,6 +2,7 @@
 
 Status: approved in brainstorming 2026-09-26, awaiting spec review
 Scope: Learn + Practice content for the whole app, and the engine/app changes that content needs.
+Paths: since the multi-course change (`2026-09-26-multi-course-rust-design.md`), CSS content lives in `content/css/`, and unit/question lookups take the course (`unitByKey(course, key)`).
 
 ## 1. Intent
 

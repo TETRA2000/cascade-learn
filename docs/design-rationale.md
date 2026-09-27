@@ -35,3 +35,19 @@ Learn cards come before practice: each unit teaches the idea with a playground, 
 - **Code looks like code.** Dark editor panel with syntax colors so skills transfer to real tools.
 - **Accessible feedback.** Correct/incorrect differ in lightness and use ✓/✕ icons, not just green/red.
 - **Deliberate breakage in Learn.** Demos let learners break things safely (a selector matching nothing, white text on white) — failure is memorable.
+
+## Rust course
+
+The Rust course reuses the game loop and swaps the CSS "see it render" previews for "see what the compiler says". Answers are authored and verified by `npm run check:rust`, so the app stays offline and deterministic.
+
+| Type | Why |
+|---|---|
+| Predict the output | Reading code and tracing values is the first skill; a "Doesn't compile" option trains the reflex that ownership errors are compile-time. |
+| Match pairs | Cheap vocabulary drill (`&T`, `&mut T`, `clone()`), never costs hearts. |
+| Compiles? | Two near-identical snippets isolate one ownership/borrowing rule — the Rust counterpart of "Which rule wins?". |
+| Word bank | Production with scaffolding; showing the program's output afterwards closes the loop. |
+| Spot the error | Learners meet rustc's errors daily; finding the line rustc points at builds the habit of reading diagnostics. |
+| Fix it | The real-world follow-up to an error: choose the idiomatic fix, not just any change. |
+| Type the token | Free recall of the small tokens that carry meaning (`&mut`, `?`, `'a`). |
+
+"Tune to target" has no Rust counterpart: it trains a visual eye for spacing.

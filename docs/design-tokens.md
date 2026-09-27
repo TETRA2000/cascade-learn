@@ -20,6 +20,8 @@
 
 Code syntax (on `--ink`): selector `#F9A8D4`, property `#A5B4FC`, value `#FCD34D`, punctuation `#D6D3E0`, HTML/comment `#9C98B3`.
 
+Rust code syntax (on `--ink`), from `src/styles/tokens.css`: `--code-keyword` `#F9A8D4` (9.4:1), `--code-type` `#7DD3FC` (10.2:1), `--code-string` `#86EFAC` (12.1:1), `--code-number` `#FCD34D` (11.8:1), `--code-comment` `#9C98B3` (6.1:1), `--code-lifetime` `#FDBA74` (10.1:1), `--code-macro` `#C4B5FD` (9.2:1), `--code-add` `#86EFAC` (12.1:1), `--code-del` `#FCA5A5` (8.9:1).
+
 ## Type
 
 - Display: **Bricolage Grotesque** 700/800 (titles, feedback headings, numbers).

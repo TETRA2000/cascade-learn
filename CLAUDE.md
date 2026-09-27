@@ -1,15 +1,17 @@
-# Cascade — a Duolingo-style app for learning CSS
+# Cascade — a Duolingo-style app for learning to code
 
-This folder is a **handoff from a design prototype**. Nothing is built yet. Your job is to turn the prototype into a real app.
+A multi-course learning app (CSS and Rust so far). It started as a handoff from a CSS design prototype; the prototype in reference/ is still the source of truth for shared behavior (quiz engine, hearts, XP, feedback).
 
 ## What exists
 
 | Path | What it is |
 |---|---|
-| `content/lessons.json` | 5 learning units, 19 cards. Each card has a title, body, optional live playground (`demo`) and a key-idea `tip`. |
-| `content/questions.json` | 22 practice questions across 7 question types. |
-| `content/question-types.json` | The 7 question types (key, display name, blurb), in difficulty order. |
-| `content/topics.json` | Maps each unit key to the question ids used for its "Practice this" quiz. |
+| `content/courses.json` | The course list, in picker order (`id`, `name`, `tagline`, `blurb`, `icon`). |
+| `content/<course>/lessons.json` | Units and cards. CSS cards may have knob/choice playgrounds; Rust cards may have `code`/`rs-choice` demos. |
+| `content/<course>/questions.json` | Practice questions. CSS: 7 types drawn with real CSS. Rust: 7 `rs-*` types. |
+| `content/<course>/question-types.json` | That course's question types in difficulty order. |
+| `content/<course>/topics.json` | Unit key → question ids for its "Practice this" quiz. |
+| `scripts/check-rust.ts` | `npm run check:rust`: compiles Rust content against its authored answers. |
 | `reference/design-canvas/Prototype.dc.html` | **The source of truth for behavior.** The complete working prototype (Learn + Practice tabs, all question types, hearts/XP, results screens). |
 | `reference/design-canvas/{Main,Pairs,Versus,Build,Tune,Bug,Type}.dc.html` | One static design screen per question type (earlier exploration). |
 | `reference/design-canvas/canvas.json` | Canvas layout + sticky notes explaining the design rationale. |
@@ -19,38 +21,37 @@ This folder is a **handoff from a design prototype**. Nothing is built yet. Your
 
 The `.dc.html` files are written for a design-canvas runtime (`support.js`, `<x-dc>`, `<sc-for>`, `<sc-if>`, `{{holes}}`, `class Component extends DCLogic`). **They will not run on their own.** Read them as a spec: the markup shows layout and inline styles; `renderVals()` and the class methods show every behavior. Do not try to ship or port that runtime.
 
-## Suggested stack (confirm with the user before scaffolding)
+## Stack
 
-- Vite + React + TypeScript, plain CSS modules or vanilla CSS with custom properties for the tokens in `docs/design-tokens.md`.
-- Load `content/*.json` as typed data. Keep content out of components.
-- Vitest for unit tests of grading logic; Playwright for a smoke test of one lesson and one quiz.
-- Mobile-first, a 390px-wide phone layout that centers on desktop.
+Vite + React + TypeScript, CSS Modules with the tokens in `docs/design-tokens.md`, Vitest, Playwright, GitHub Actions. Content is typed JSON behind `src/content` (`courseById`, `unitByKey(course, …)`, …); components never import JSON.
 
-## Build order
+## Adding a course
 
-1. **Types + content loading.** TypeScript types generated from `docs/content-schema.md`, loaded from the JSON.
-2. **App shell.** Home with bottom tabs (Learn / Practice), hearts in the header.
-3. **Learn flow.** Unit list → cards with Back / Next → last card offers "Done" or "Practice this" (starts a quiz with `topics[unitKey]`).
-   Implement the playground engine (`demo.knobs` and `demo.kind: "choice"`) exactly as `demoVm()` in the prototype does. Note that `§` at the start of a code line marks an HTML line (render grey, strip the `§`).
-4. **Quiz engine** (see `start`, `grade`, `check`, `next`, `resolvePair` in the prototype):
-   - 5 hearts per lesson. A wrong answer costs 1 heart and re-queues the question at the end.
-   - XP: +10 on first try, +5 when answered correctly after a miss.
-   - Match pairs never costs hearts and auto-completes when all 4 pairs match. A wrong pair flashes for 700 ms.
-   - Out of hearts → "Out of hearts" screen. Queue exhausted → results (XP, first-try %, hearts left).
-   - Mixed review = one random question per type, in `question-types.json` order.
-5. **The 7 question renderers**: predict, pairs, versus, build (word bank), tune, bug, type. Each is data-driven from `questions.json`. The live previews must be drawn with **real CSS** from the question data, never images.
-6. **Feedback sheet**: slides up after Check; green/orange with icon + title, "Answer: …" line when wrong, explanation (backtick segments render as inline code), Continue.
-7. **Persistence** (new — the prototype resets on reload): completed units, completed practice sets, total XP. Start with `localStorage`; keep it behind a small storage module so a backend can replace it.
+1. Add its id to `COURSE_IDS` and its question-type keys to `TYPE_KEYS` in `src/content/typeKeys.ts`.
+2. Add `content/<id>/` (four files) and an entry in `content/courses.json`, and bundle it in `src/content/index.ts`.
+3. Add its question shapes to `src/content/types.ts`, a validator, a grader (`src/quiz/grade/`), feedback copy (`src/quiz/feedback/`) and renderers (`src/quiz/renderers/<id>/`). Exhaustive switches make `tsc` point at anything missing.
 
-## Rules
+## Rules (all courses)
 
-- Never inject user-typed text into CSS without sanitizing. The prototype strips everything except `[a-zA-Z-]` for the "Type the value" preview; keep that.
 - Accessibility is part of the spec: real `<button>` elements, `aria-pressed` on selectable tiles/chips, `aria-live` on feedback, `role="progressbar"` with values, 44px minimum touch targets, text contrast ≥ 4.5:1, correct/incorrect never signaled by color alone (icons + text).
 - Respect `prefers-reduced-motion` (the feedback slide-up is the only animation).
 - Keep new content in the JSON files, not in components.
 
+## CSS course
+
+- Never inject user-typed text into CSS without sanitizing. The prototype strips everything except `[a-zA-Z-]` for the "Type the value" preview; keep that.
+- `§` at the start of a code line marks an HTML line (render grey, strip the `§`).
+- Live previews are real CSS from question data, never images.
+
+## Rust course
+
+- Answers are authored data; nothing runs Rust in the app.
+- Every snippet must pass `npm run check:rust` (CI enforces it).
+- Lines starting with `# ` are hidden setup (rustdoc convention), and displayed line numbers count visible lines only.
+- Errors are written as rustc's first line: `error[E0382]: …`.
+- Typed tokens are trimmed, whitespace-collapsed, case-sensitive, and at most 40 characters.
+
 ## Open questions for the user
 
-- Stack confirmation (web vs. native mobile).
 - Accounts/sync, streaks, and a lesson map are not designed yet.
-- App name "Cascade" is a working title.
+- The full Rust curriculum (12–15 units) is the next spec.
