@@ -34,8 +34,14 @@ Vite + React + TypeScript, CSS Modules with the tokens in `docs/design-tokens.md
 2. Add its icon: a name in `COURSE_ICON_NAMES` (`src/content/typeKeys.ts`), an SVG in `src/components/icons.tsx`, and a case for it in `CourseIcon`'s switch there (it has an explicit `ReactElement` return type and no `default`, so a missing case fails `tsc`).
 3. Add `content/<id>/` (four files) and an entry in `content/courses.json`, and bundle it in `src/content/index.ts`.
 4. Add its question and demo shapes to `src/content/types.ts`, family guards for them in `src/content/guards.ts`, a validator, a grader (`src/quiz/grade/`), feedback copy (`src/quiz/feedback/`) and renderers (`src/quiz/renderers/<id>/`). **A course with authored code answers** (like Rust and TypeScript) shares the "code" family instead of writing its own: add a highlighter (`src/lib/highlightRust.ts`/`highlightTs.ts`-style), a `LANG` entry and a `courseLang`/`langOfKey` case in `src/lib/codeLang.ts`, then a paired key case (`case 'rs-foo': case 'xx-foo':`) in each exhaustive switch across `src/content/validateCode.ts`, `src/quiz/grade/code.ts`, `src/quiz/feedback/code.ts`, `src/quiz/renderers/code/CodeQuestionBody.tsx` and `scripts/code-check-lib.ts`, plus its own compiler adapter (`scripts/check-<id>.ts`, an npm script and a CI job — see `scripts/check-ts.ts`/`scripts/tsc-lib.ts` for the pattern).
+   **`tsc` will not catch these for a new code course** (prefix or equality checks, not exhaustive switches), so update each by hand:
+   - `isCodeQuestion` in `src/content/guards.ts` checks the `rs-`/`ts-` prefixes; a question with a new prefix is otherwise not treated as a code question.
+   - `langOfKey` in `src/lib/codeLang.ts` falls back to `'rust'` for any key that isn't `ts-`, so a new language silently gets Rust labels.
+   - `isPairs` and `isBuild` in `src/content/guards.ts` list keys by name; a missed pairs key shows Check and costs hearts, a missed build key ignores the word bank.
+   - `codeFeedback` in `src/quiz/feedback/code.ts` names the pairs and error keys (`rs-pairs`/`ts-pairs`, `rs-error`/`ts-error`) for its titles.
+   - The `*-type` input cap (`TOKEN_MAX_LENGTH`) in `src/quiz/session.ts` checks `rs-type`/`ts-type` by name.
 5. `src/screens/Learn.tsx` branches on `isCodeDemo`, not per course, so a code course's Learn playground already works through `CodePlayground`/`courseLang` — no new branch needed there unless the course adds a genuinely new demo shape.
-6. Exhaustive switches (explicit return types, no `default`) make `tsc` point at anything missing across all of the above.
+6. Exhaustive switches (explicit return types, no `default`) make `tsc` point at anything missing across the above, except the hand-maintained checks listed in step 4.
 
 ## Rules (all courses)
 
