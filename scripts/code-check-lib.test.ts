@@ -1,12 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import type { Question, Unit } from '../src/content/types';
 import { rsBuild, rsCompiles, rsError, rsFix, rsPairs, rsPredict, rsType } from '../src/quiz/rustFixtures';
-import { collectSnippets, errorCode, firstError, judge, type Snippet } from './rust-check-lib.ts';
+import { collectSnippets, errorCode, firstError, judge, type Snippet } from './code-check-lib.ts';
 
 describe('errorCode', () => {
   it('reads the code from an authored error', () => {
     expect(errorCode('error[E0382]: borrow of moved value: `s`')).toBe('E0382');
     expect(errorCode('borrow of moved value')).toBeNull();
+  });
+
+  it('reads TS error codes', () => {
+    expect(errorCode("error TS2322: Type 'string' is not assignable to type 'number'.")).toBe('TS2322');
   });
 });
 
@@ -67,6 +71,26 @@ describe('judge', () => {
     expect(judge(snippet({ kind: 'error', code: 'E0382' }), { ok: true, stdout: '', runError: 'timed out after 5s' })).toBe(
       'expected a compile error, but it compiled',
     );
+  });
+
+  it('judges runtime throws', () => {
+    const s = snippet({ kind: 'throws', thrown: 'TypeError: boom', output: ['a'] });
+    expect(judge(s, { ok: true, stdout: 'a\n', thrown: 'TypeError: boom' }, 'tsc')).toBeNull();
+    expect(judge(s, { ok: true, stdout: 'a\n' }, 'tsc')).toBe('expected it to throw, but it ran to completion');
+    expect(judge(s, { ok: true, stdout: 'a\n', thrown: 'RangeError: x' }, 'tsc')).toBe('expected it to throw "TypeError: boom", got "RangeError: x"');
+    expect(judge(s, { ok: true, stdout: 'b\n', thrown: 'TypeError: boom' }, 'tsc')).toBe('expected output "a", got "b"');
+    expect(judge(s, { ok: false, errorCode: 'TS2322', line: 2 }, 'tsc')).toBe('expected it to type-check and throw, tsc reported TS2322');
+  });
+
+  it('fails an unexpected throw', () => {
+    expect(judge(snippet({ kind: 'output', output: ['a'] }), { ok: true, stdout: 'a\n', thrown: 'TypeError: t' }, 'tsc')).toBe('program threw: TypeError: t');
+  });
+
+  it('checks errors on an exact program line (inserted assertions), and rejects a different code there', () => {
+    const e = snippet({ kind: 'error', code: 'TS2322', programLine: 3 });
+    expect(judge(e, { ok: false, errorCode: 'TS2322', line: 3 }, 'tsc')).toBeNull();
+    expect(judge(e, { ok: false, errorCode: 'TS2322', line: 2 }, 'tsc')).toBe('expected the error on program line 3, tsc points at program line 2');
+    expect(judge(e, { ok: false, errorCode: 'TS2304', line: 3 }, 'tsc')).toBe('expected TS2322, tsc reported TS2304'); // Review Focus: invalid distractor
   });
 });
 
@@ -139,5 +163,10 @@ describe('collectSnippets', () => {
     const { snippets, problems } = collectSnippets([], [rsPairs, cssPredict]);
     expect(snippets).toEqual([]);
     expect(problems).toEqual([]);
+  });
+
+  it('collects a thrown demo', () => {
+    const units = [{ key: 'u', name: 'U', blurb: 'B', cards: [{ title: 'T', body: 'B', demo: { kind: 'code', code: ['x;'], output: ['a'], thrown: 'TypeError: t' } }] }] as Unit[];
+    expect(collectSnippets(units, []).snippets[0]!.expect).toEqual({ kind: 'throws', thrown: 'TypeError: t', output: ['a'] });
   });
 });

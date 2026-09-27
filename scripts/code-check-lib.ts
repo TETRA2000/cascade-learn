@@ -1,13 +1,17 @@
-// Pure logic for `npm run check:rust`: which Rust snippets to compile, what
-// each must do, and how to read rustc's JSON diagnostics. check-rust.ts does the I/O.
+// Pure logic shared by the content checkers (check-rust.ts, and later a TS counterpart):
+// which snippets to compile, what each must do, and how to read a compiler's JSON diagnostics.
+// The checker scripts do the I/O.
 import type { Question, Unit } from '../src/content/types';
 import { applyDiff, fillBlank, fillSlots, visibleLineNumber } from '../src/lib/code.ts';
 
 export type Expect =
   | { kind: 'compiles' }
   | { kind: 'output'; output: string[] }
-  /** `code` null = any error. `line` is a 1-based visible line. */
-  | { kind: 'error'; code: string | null; line?: number };
+  /** `code` null = any error. `line` is a 1-based visible line; `programLine` is a 1-based
+   * program line (for inserted assertions, which have no visible-code line of their own). */
+  | { kind: 'error'; code: string | null; line?: number; programLine?: number }
+  /** TS only: the program must throw at runtime, with output up to the point it throws. */
+  | { kind: 'throws'; thrown: string; output?: string[] };
 
 export interface Snippet {
   /** Where it came from, for the report (e.g. `rs-fix-1/option B`). */
@@ -23,15 +27,18 @@ export type CompileResult =
       stdout: string;
       /** The program compiled but exited non-zero, was killed, or timed out. */
       runError?: string;
+      /** TS only: what the program threw at runtime (Node's `String(error)`). */
+      thrown?: string;
     }
   | { ok: false; errorCode: string | null; line: number | null };
 
-/** `error[E0382]: …` → `E0382`. */
+/** `error[E0382]: …` → `E0382`; `error TS2322: …` → `TS2322`. */
 export function errorCode(message: string): string | null {
-  return /^error\[(E\d{4})\]/.exec(message)?.[1] ?? null;
+  return /^error\[(E\d{4})\]/.exec(message)?.[1] ?? /^error (TS\d+):/.exec(message)?.[1] ?? null;
 }
 
-function resultExpect(r: { output?: string[]; error?: string }): Expect {
+function resultExpect(r: { output?: string[]; error?: string; thrown?: string }): Expect {
+  if (r.thrown !== undefined) return { kind: 'throws', thrown: r.thrown, output: r.output };
   if (r.error !== undefined) return { kind: 'error', code: errorCode(r.error) };
   if (r.output !== undefined) return { kind: 'output', output: r.output };
   return { kind: 'compiles' };
@@ -102,20 +109,37 @@ export function collectSnippets(units: readonly Unit[], questions: readonly Ques
   return { snippets, problems };
 }
 
-/** Why a compile result doesn't match the snippet's expectation, or null when it does. */
-export function judge(s: Snippet, r: CompileResult): string | null {
+/** Why a compile result doesn't match the snippet's expectation, or null when it does.
+ * `compiler` names the tool in messages ('rustc' or 'tsc'). Error-kind checks run in this
+ * order: compiled, code, visible `line`, `programLine`. */
+export function judge(s: Snippet, r: CompileResult, compiler = 'rustc'): string | null {
   const e = s.expect;
   if (e.kind === 'error') {
     if (r.ok) return 'expected a compile error, but it compiled';
-    if (e.code && r.errorCode !== e.code) return `expected ${e.code}, rustc reported ${r.errorCode ?? 'no error code'}`;
+    if (e.code && r.errorCode !== e.code) return `expected ${e.code}, ${compiler} reported ${r.errorCode ?? 'no error code'}`;
     if (e.line !== undefined) {
       const shown = r.line === null ? null : visibleLineNumber(s.code, r.line);
-      if (shown !== e.line) return `expected the error on line ${e.line}, rustc points at ${shown === null ? 'a hidden line' : `line ${shown}`}`;
+      if (shown !== e.line) return `expected the error on line ${e.line}, ${compiler} points at ${shown === null ? 'a hidden line' : `line ${shown}`}`;
+    }
+    if (e.programLine !== undefined && r.line !== e.programLine) {
+      return `expected the error on program line ${e.programLine}, ${compiler} points at ${r.line === null ? 'no line' : `program line ${r.line}`}`;
     }
     return null;
   }
-  if (!r.ok) return `expected it to compile, rustc reported ${r.errorCode ?? 'an error'}`;
+  if (e.kind === 'throws') {
+    if (!r.ok) return `expected it to type-check and throw, ${compiler} reported ${r.errorCode ?? 'an error'}`;
+    if (r.thrown === undefined) return 'expected it to throw, but it ran to completion';
+    if (r.thrown !== e.thrown) return `expected it to throw ${JSON.stringify(e.thrown)}, got ${JSON.stringify(r.thrown)}`;
+    if (e.output) {
+      const got = r.stdout.replace(/\n$/, '');
+      const want = e.output.join('\n');
+      if (got !== want) return `expected output ${JSON.stringify(want)}, got ${JSON.stringify(got)}`;
+    }
+    return null;
+  }
+  if (!r.ok) return `expected it to compile, ${compiler} reported ${r.errorCode ?? 'an error'}`;
   if (r.runError) return `program failed at runtime: ${r.runError}`;
+  if (r.thrown !== undefined) return `program threw: ${r.thrown}`;
   if (e.kind === 'output') {
     const got = r.stdout.replace(/\n$/, '');
     const want = e.output.join('\n');
