@@ -17,7 +17,7 @@ export function CodeFix({ question: q, answer, act }: RendererProps<CodeQ<'fix'>
   const lang = langOf(q);
   return (
     <>
-      <OutputPanel error={q.error} />
+      <OutputPanel lang={lang} error={q.error} />
       <CodePanel lines={q.code} lang={lang} label={LANG[lang].codeLabel} />
       <div className={choice.list} role="group" aria-label="Fixes">
         {q.opts.map((o, i) => {

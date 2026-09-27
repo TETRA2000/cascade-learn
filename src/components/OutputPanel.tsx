@@ -7,12 +7,12 @@ import styles from './OutputPanel.module.css';
  * throw after some output — icon + words, never color alone.
  */
 export function OutputPanel({
-  lang = 'rust',
+  lang,
   output,
   error,
   thrown,
 }: {
-  lang?: CodeLang;
+  lang: CodeLang;
   output?: readonly string[];
   error?: string;
   thrown?: string;
