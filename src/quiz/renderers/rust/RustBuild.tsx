@@ -41,7 +41,7 @@ export function RustBuild({ question: q, answer, act }: RendererProps<RustBuildQ
         })}
       </div>
       <WordBank bank={q.bank} slots={answer.slots} checked={answer.checked} act={act} />
-      {answer.checked && q.output && <OutputPanel output={q.output} />}
+      {answer.checked && answer.ok && q.output && <OutputPanel output={q.output} />}
     </>
   );
 }

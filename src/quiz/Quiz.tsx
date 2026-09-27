@@ -5,6 +5,7 @@ import { HeartCount } from '../components/HeartCount';
 import { CloseIcon } from '../components/icons';
 import { ProgressBar } from '../components/ProgressBar';
 import { ACTIVATION_GUARD_MS } from '../state/rules';
+import { RichText } from '../components/RichText';
 import { FeedbackSheet } from './FeedbackSheet';
 import { canCheck } from './grade';
 import { QuizDone, QuizOut } from './QuizEnd';
@@ -87,7 +88,7 @@ function QuizQuestion({ session, dispatch, onExit, guardMs }: QuestionProps) {
       <div className={styles.titleBlock}>
         <span className={styles.typeChip}>{courseById(session.courseId).questionTypes.find((t) => t.key === q.type)?.name}</span>
         <h1 ref={promptRef} tabIndex={-1} className={styles.prompt}>
-          {q.prompt}
+          <RichText text={q.prompt} />
         </h1>
       </div>
 

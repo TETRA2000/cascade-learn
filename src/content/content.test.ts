@@ -53,6 +53,32 @@ describe('css content', () => {
     (broken.units[0]!.cards as unknown[]).push(card);
     expect(validateContent(broken)).toContain('lessons/basics/card 4: demo kind "code" does not belong in the css course');
   });
+
+  it('reports an unmatched backtick in a question prompt', () => {
+    const broken = structuredClone(css);
+    const q = broken.questions[0]!;
+    (q as { prompt: string }).prompt = 'bad `prompt';
+    expect(validateContent(broken)).toContain(`questions/${q.id}: prompt has an unmatched backtick`);
+  });
+
+  it('reports an unmatched backtick in a choice demo note', () => {
+    const broken = structuredClone(css);
+    const card = {
+      title: 'T',
+      body: 'B',
+      demo: {
+        kind: 'choice',
+        label: 'L',
+        base: '',
+        opts: [
+          { label: 'a', code: ['a'], kids: [{ s: '', t: 'x' }], note: 'bad `note' },
+          { label: 'b', code: ['b'], kids: [{ s: '', t: 'y' }] },
+        ],
+      },
+    };
+    (broken.units[0]!.cards as unknown[]).push(card);
+    expect(validateContent(broken)).toContain('lessons/basics/card 4/option a: note has an unmatched backtick');
+  });
 });
 
 describe('lessonQuestionIds', () => {
@@ -102,5 +128,23 @@ describe('rust content', () => {
     expect(lessonQuestionIds(rust, 'topic:ownership')).toHaveLength(7);
     expect(lessonName(rust, 'topic:ownership')).toBe('Ownership & moves — practice');
     expect(lessonName(rust, 'rs-fix')).toBe('Fix it');
+  });
+
+  it('reports an unmatched backtick in an rs-choice demo note', () => {
+    const broken = structuredClone(rust);
+    const card = {
+      title: 'T',
+      body: 'B',
+      demo: {
+        kind: 'rs-choice',
+        label: 'L',
+        opts: [
+          { label: 'a', code: ['fn main() {}'], output: ['x'], note: 'bad `note' },
+          { label: 'b', code: ['fn main() {}'], output: ['y'] },
+        ],
+      },
+    };
+    (broken.units[0]!.cards as unknown[]).push(card);
+    expect(validateContent(broken)).toContain('lessons/ownership/card 6/option a: note has an unmatched backtick');
   });
 });

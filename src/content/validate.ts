@@ -33,6 +33,11 @@ function validateDemo(courseId: CourseId, d: Demo, at: string, err: Err) {
   }
   if (isRustDemo(d)) validateRustDemo(d, at, err);
   else validateCssDemo(d, at, err);
+  if ((d.kind === 'choice' || d.kind === 'rs-choice') && Array.isArray(d.opts)) {
+    d.opts.forEach((o) => {
+      if (isStr(o?.note) && o.note.split('`').length % 2 === 0) err(`${at}/option ${o.label}`, 'note has an unmatched backtick');
+    });
+  }
 }
 
 export function validateContent(c: Course): string[] {
@@ -73,6 +78,7 @@ export function validateContent(c: Course): string[] {
     if (ids.has(q.id)) err(at, 'duplicate id');
     ids.add(q.id);
     if (!keys.includes(q.type)) return err(at, `unknown type "${String(q.type)}"`);
+    if (q.prompt && q.prompt.split('`').length % 2 === 0) err(at, 'prompt has an unmatched backtick');
     if (q.explain && q.explain.split('`').length % 2 === 0) err(at, 'explain has an unmatched backtick');
     if (isRustQuestion(q)) validateRustQuestion(q, at, err);
     else validateCssQuestion(q, at, err);

@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { renderQuiz } from '../../testUtils';
 
@@ -23,5 +23,12 @@ describe('Word bank (Rust)', () => {
     await user.click(screen.getByRole('button', { name: 'name' }));
     await user.click(screen.getByRole('button', { name: 'Check' }));
     expect(screen.getByRole('region', { name: 'Feedback' })).toHaveTextContent('Answer: &String, &name');
+    expect(screen.queryByRole('region', { name: 'Output' })).not.toBeInTheDocument();
+  });
+
+  it('renders the prompt’s backtick segments as inline code', () => {
+    renderQuiz('rs-build', {}, 0, 'rust');
+    const heading = screen.getByRole('heading', { level: 1 });
+    expect(within(heading).getByText('shout', { selector: 'code' })).toBeInTheDocument();
   });
 });

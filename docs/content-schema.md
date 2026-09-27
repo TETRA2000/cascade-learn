@@ -2,7 +2,7 @@
 
 The schema is per course: each course has its own `content/<course>/` folder with the four files below, plus the shared `content/courses.json`. Notes marked **CSS** below are specific to that course; the Rust course's schema is under "Rust courses".
 
-In explanation/body/tip text, text between backticks renders as inline code.
+In body, tip, explain, prompt and note text, text between backticks renders as inline code.
 
 **CSS:** style strings are inline CSS declarations applied with real CSS. In code arrays, a line starting with `§` is HTML (render grey, drop the `§`).
 

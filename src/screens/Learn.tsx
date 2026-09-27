@@ -129,7 +129,7 @@ function Playground({ view, onPick }: { view: DemoView; onPick: (control: number
 
       {view.caption !== null && (
         <p className={styles.caption} aria-live="polite">
-          {view.caption}
+          <RichText text={view.caption} />
         </p>
       )}
 
@@ -144,10 +144,12 @@ function RustPlayground({ view, onPick }: { view: RustDemoView; onPick: (control
   return (
     <section className={styles.playground} aria-label="Playground">
       <CodePanel lines={view.code} lang="rust" label="Rust code" />
-      {(view.output !== undefined || view.error !== undefined) && <OutputPanel output={view.output} error={view.error} />}
+      <div aria-live="polite">
+        {(view.output !== undefined || view.error !== undefined) && <OutputPanel output={view.output} error={view.error} />}
+      </div>
       {view.caption !== null && (
         <p className={styles.caption} aria-live="polite">
-          {view.caption}
+          <RichText text={view.caption} />
         </p>
       )}
       <DemoControls controls={view.controls} onPick={onPick} />

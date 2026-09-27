@@ -28,7 +28,12 @@ const course: Course = {
             kind: 'rs-choice',
             label: 'let t = …',
             opts: [
-              { label: 's', code: ['# fn main() {', 'let t = s;', '# }'], error: 'error[E0382]: borrow of moved value: `s`', note: 'Moved.' },
+              {
+                label: 's',
+                code: ['# fn main() {', 'let t = s;', '# }'],
+                error: 'error[E0382]: borrow of moved value: `s`',
+                note: 'The `String` moved into `t`.',
+              },
               { label: 's.clone()', code: ['let t = s.clone();'], output: ['hi hi'] },
             ],
           },
@@ -57,7 +62,7 @@ describe('Learn with Rust demos', () => {
     const error = screen.getByRole('region', { name: 'Compiler error' });
     expect(error).toHaveTextContent('Doesn’t compile');
     expect(error).toHaveTextContent('E0382');
-    expect(screen.getByText('Moved.')).toBeInTheDocument();
+    expect(screen.getByText('String', { selector: 'code' })).toBeInTheDocument();
 
     const group = screen.getByRole('group', { name: 'let t = …' });
     await user.click(within(group).getByRole('button', { name: 's.clone()' }));
