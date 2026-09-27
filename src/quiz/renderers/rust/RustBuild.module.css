@@ -1,24 +1,19 @@
 .code {
-  padding: 10px 16px;
+  padding: 10px 14px;
   background: var(--ink);
   border-radius: var(--radius-tile);
   font-family: var(--font-code);
   font-size: 13px;
   line-height: 1.7;
   color: var(--code-punct);
+  overflow-x: auto;
 }
 
+/* Wraps at 390px so slots never force a horizontal page scroll. */
 .line {
-  white-space: pre;
-}
-
-.slotLine {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  min-height: 52px;
-  padding-left: 2ch;
-}
-
-.prop {
-  color: var(--code-property);
+  min-height: 1.7em;
+  white-space: pre;
 }

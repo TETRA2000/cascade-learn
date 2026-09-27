@@ -3,6 +3,7 @@ import { CodeTokens } from '../../../components/CodePanel';
 import { CssBox } from '../../../components/CssBox';
 import { buildPreview, type BuildPreview } from '../../previews';
 import type { RendererProps } from '../types';
+import { SlotButton, WordBank } from '../WordBank';
 import preview from './preview.module.css';
 import styles from './Build.module.css';
 
@@ -31,38 +32,14 @@ export function Build({ question: q, answer, act }: RendererProps<BuildQuestion>
           return (
             <div key={i} className={styles.slotLine}>
               <span className={styles.prop}>{q.props[line.slot]}</span>:
-              <button
-                type="button"
-                className={word ? styles.filled : styles.empty}
-                disabled={answer.checked}
-                aria-label={word ? `Blank ${n}: ${word}. Tap to remove` : `Blank ${n}, empty`}
-                onClick={() => act({ type: 'clearSlot', slot: line.slot })}
-              >
-                {word}
-              </button>
+              <SlotButton n={n} word={word} checked={answer.checked} onClear={() => act({ type: 'clearSlot', slot: line.slot })} />
               ;
             </div>
           );
         })}
       </div>
 
-      <div className={styles.bank} role="group" aria-label="Word bank">
-        {q.bank.map((word, ci) => {
-          const used = answer.slots.includes(ci);
-          return (
-            <button
-              key={ci}
-              type="button"
-              className={used ? styles.used : styles.chip}
-              disabled={used || answer.checked}
-              aria-label={used ? `${word}, placed` : word}
-              onClick={() => act({ type: 'placeWord', bankIndex: ci })}
-            >
-              {word}
-            </button>
-          );
-        })}
-      </div>
+      <WordBank bank={q.bank} slots={answer.slots} checked={answer.checked} act={act} />
     </>
   );
 }
