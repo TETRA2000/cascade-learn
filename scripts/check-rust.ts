@@ -15,11 +15,18 @@ function compile(s: Snippet, work: string, n: number): CompileResult {
   const src = join(work, `snippet${n}.rs`);
   const bin = join(work, `snippet${n}`);
   writeFileSync(src, programSource(s.code));
-  const rustc = spawnSync('rustc', ['--edition', '2024', '--error-format=json', '-A', 'warnings', '-o', bin, src], { encoding: 'utf8' });
-  if (rustc.error) throw rustc.error;
+  const rustc = spawnSync('rustc', ['--edition', '2024', '--error-format=json', '-A', 'warnings', '-o', bin, src], {
+    encoding: 'utf8',
+    timeout: 60_000,
+  });
+  if (rustc.error && (rustc.error as NodeJS.ErrnoException).code !== 'ETIMEDOUT') throw rustc.error;
+  if (rustc.signal || rustc.error) return { ok: false, errorCode: null, line: null };
   if (rustc.status !== 0) return { ok: false, ...firstError(rustc.stderr) };
+
   const run = spawnSync(bin, { encoding: 'utf8', timeout: 5000 });
-  return { ok: true, stdout: run.stdout ?? '' };
+  const timedOut = (run.error as NodeJS.ErrnoException | undefined)?.code === 'ETIMEDOUT' || run.signal === 'SIGTERM';
+  const runError = timedOut ? 'timed out after 5s' : run.signal ? `killed by ${run.signal}` : run.status !== 0 ? `exited with code ${run.status}` : undefined;
+  return runError === undefined ? { ok: true, stdout: run.stdout ?? '' } : { ok: true, stdout: run.stdout ?? '', runError };
 }
 
 const version = spawnSync('rustc', ['--version'], { encoding: 'utf8' });

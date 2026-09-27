@@ -17,7 +17,14 @@ export interface Snippet {
   expect: Expect;
 }
 
-export type CompileResult = { ok: true; stdout: string } | { ok: false; errorCode: string | null; line: number | null };
+export type CompileResult =
+  | {
+      ok: true;
+      stdout: string;
+      /** The program compiled but exited non-zero, was killed, or timed out. */
+      runError?: string;
+    }
+  | { ok: false; errorCode: string | null; line: number | null };
 
 /** `error[E0382]: …` → `E0382`. */
 export function errorCode(message: string): string | null {
@@ -96,6 +103,7 @@ export function judge(s: Snippet, r: CompileResult): string | null {
     return null;
   }
   if (!r.ok) return `expected it to compile, rustc reported ${r.errorCode ?? 'an error'}`;
+  if (r.runError) return `program failed at runtime: ${r.runError}`;
   if (e.kind === 'output') {
     const got = r.stdout.replace(/\n$/, '');
     const want = e.output.join('\n');

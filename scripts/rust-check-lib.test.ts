@@ -56,6 +56,18 @@ describe('judge', () => {
     expect(judge(snippet({ kind: 'compiles' }), { ok: false, errorCode: 'E0308', line: 2 })).toBe('expected it to compile, rustc reported E0308');
     expect(judge(snippet({ kind: 'output', output: ['5 6'] }), { ok: true, stdout: '5 5\n' })).toBe('expected output "5 6", got "5 5"');
   });
+
+  it('fails a compiled snippet that fails at runtime, even when its stdout matches', () => {
+    expect(judge(snippet({ kind: 'compiles' }), { ok: true, stdout: '', runError: 'exited with code 101' })).toBe(
+      'program failed at runtime: exited with code 101',
+    );
+    expect(judge(snippet({ kind: 'output', output: ['5 6'] }), { ok: true, stdout: '5 6\n', runError: 'exited with code 101' })).toBe(
+      'program failed at runtime: exited with code 101',
+    );
+    expect(judge(snippet({ kind: 'error', code: 'E0382' }), { ok: true, stdout: '', runError: 'timed out after 5s' })).toBe(
+      'expected a compile error, but it compiled',
+    );
+  });
 });
 
 describe('collectSnippets', () => {
