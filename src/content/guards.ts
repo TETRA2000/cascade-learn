@@ -1,21 +1,27 @@
 // Narrowing helpers for the content unions.
+import { langOfKey, type CodeLang } from '../lib/codeLang';
 import type {
   BuildQuestion,
+  CodeCourseDemo,
+  CodeQuestion,
   Demo,
   PairsQuestion,
   Question,
   RustBuildQuestion,
-  RustDemo,
   RustPairsQuestion,
-  RustQuestion,
 } from './types';
 
-export function isRustDemo(d: Demo): d is RustDemo {
-  return d.kind === 'code' || d.kind === 'rs-choice';
+export function isCodeDemo(d: Demo): d is CodeCourseDemo {
+  return d.kind === 'code' || d.kind === 'code-choice';
 }
 
-export function isRustQuestion(q: Question): q is RustQuestion {
-  return q.type.startsWith('rs-');
+export function isCodeQuestion(q: Question): q is CodeQuestion {
+  return q.type.startsWith('rs-') || q.type.startsWith('ts-');
+}
+
+/** A code question's language, from its key prefix. */
+export function langOf(q: CodeQuestion): CodeLang {
+  return langOfKey(q.type);
 }
 
 /** Match pairs in any course: self-completing, never costs hearts. */

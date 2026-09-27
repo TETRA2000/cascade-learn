@@ -25,7 +25,7 @@ const course: Course = {
           title: 'Moves',
           body: 'Pick one.',
           demo: {
-            kind: 'rs-choice',
+            kind: 'code-choice',
             label: 'let t = …',
             opts: [
               {

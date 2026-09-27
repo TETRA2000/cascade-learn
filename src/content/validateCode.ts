@@ -1,25 +1,25 @@
-// Checks for Rust-course demos and questions.
-import type { RustDemo, RustQuestion } from './types';
+// Checks for code-course demos and questions. The language decides the error format.
+import { langOf } from './guards';
+import type { CodeCourseDemo, CodeQuestion } from './types';
 import { inRange, isInt, isStr, isStrArr, type Err } from './validateUtil';
 import { BLANK, findDiffRange, isHiddenLine, normalizeToken, TOKEN_MAX_LENGTH, visibleLines } from '../lib/code';
+import { LANG, type CodeLang } from '../lib/codeLang';
 
-export const isRustError = (v: unknown): v is string => isStr(v) && /^error\[E\d{4}\]: \S/.test(v);
-export const BAD_ERROR = 'error must look like "error[E0000]: message"';
-/** The one string an rs-predict error option's text may read. */
-export const ERROR_OPTION_TEXT = 'Doesn’t compile';
+export const isCodeError = (v: unknown, lang: CodeLang): v is string => isStr(v) && LANG[lang].errorPattern.test(v);
+export const badError = (lang: CodeLang): string => `error must look like "${LANG[lang].errorFormat}"`;
 
 const hasCode = (c: unknown): c is string[] => isStrArr(c) && visibleLines(c).length > 0;
 
-function validateResult(r: { output?: unknown; error?: unknown }, at: string, err: Err) {
+function validateResult(r: { output?: unknown; error?: unknown }, lang: CodeLang, at: string, err: Err) {
   if (r.output !== undefined && !isStrArr(r.output)) err(at, 'output must be a list of strings');
-  if (r.error !== undefined && !isRustError(r.error)) err(at, BAD_ERROR);
+  if (r.error !== undefined && !isCodeError(r.error, lang)) err(at, badError(lang));
 }
 
-export function validateRustDemo(d: RustDemo, at: string, err: Err) {
+export function validateCodeDemo(d: CodeCourseDemo, lang: CodeLang, at: string, err: Err) {
   if (d.kind === 'code') {
     if (!hasCode(d.code)) err(at, 'code demo needs visible code');
     if (d.output !== undefined && d.error !== undefined) return err(at, 'code demo has both output and error');
-    return validateResult(d, at, err);
+    return validateResult(d, lang, at, err);
   }
   if (!isStr(d.label)) err(at, 'rs-choice demo needs a label');
   if (!Array.isArray(d.opts) || d.opts.length < 2) return err(at, 'rs-choice demo needs 2+ options');
@@ -28,7 +28,7 @@ export function validateRustDemo(d: RustDemo, at: string, err: Err) {
     const oat = `${at}/option ${o.label ?? i}`;
     if (!isStr(o.label) || !hasCode(o.code)) err(oat, 'needs label and visible code');
     if ((o.output === undefined) === (o.error === undefined)) return err(oat, 'needs exactly one of output and error');
-    validateResult(o, oat, err);
+    validateResult(o, lang, oat, err);
   });
 }
 
@@ -38,20 +38,22 @@ function validateOpts(opts: unknown, at: string, err: Err): boolean {
   return false;
 }
 
-export function validateRustQuestion(q: RustQuestion, at: string, err: Err) {
+export function validateCodeQuestion(q: CodeQuestion, at: string, err: Err) {
+  const lang = langOf(q);
+  const errorTitle = LANG[lang].errorTitle;
   switch (q.type) {
     case 'rs-predict': {
       if (!hasCode(q.code)) err(at, 'needs visible code');
       if (!validateOpts(q.opts, at, err)) return;
       q.opts.forEach((o, i) => {
         if (!isStr(o.text) || (o.kind !== 'output' && o.kind !== 'error')) err(at, `opt ${i} needs text and kind "output" or "error"`);
-        if (o.kind === 'error' && o.text !== ERROR_OPTION_TEXT) err(at, `the error option must read "${ERROR_OPTION_TEXT}"`);
+        if (o.kind === 'error' && o.text !== errorTitle) err(at, `the error option must read "${errorTitle}"`);
       });
       if (!inRange(q.answer, q.opts.length)) return err(at, 'answer out of range');
       if ((q.opts[q.answer]!.kind === 'error') !== (q.error !== undefined)) {
         err(at, 'error is required exactly when the answer is the error option');
       }
-      if (q.error !== undefined && !isRustError(q.error)) err(at, BAD_ERROR);
+      if (q.error !== undefined && !isCodeError(q.error, lang)) err(at, badError(lang));
       return;
     }
     case 'rs-pairs': {
@@ -66,7 +68,7 @@ export function validateRustQuestion(q: RustQuestion, at: string, err: Err) {
     case 'rs-compiles':
       if (!hasCode(q.a) || !hasCode(q.b)) err(at, 'needs visible code in a and b');
       if (q.answer !== 'a' && q.answer !== 'b') err(at, "answer must be 'a' or 'b'");
-      if (!isRustError(q.error)) err(at, BAD_ERROR);
+      if (!isCodeError(q.error, lang)) err(at, badError(lang));
       return;
     case 'rs-build': {
       if (!isStrArr(q.answer) || q.answer.length === 0 || !isStrArr(q.bank)) return err(at, 'needs answer and bank as string lists');
@@ -96,11 +98,11 @@ export function validateRustQuestion(q: RustQuestion, at: string, err: Err) {
     case 'rs-error':
       if (!hasCode(q.code)) return err(at, 'needs visible code');
       if (!isInt(q.answer) || q.answer < 1 || q.answer > visibleLines(q.code).length) err(at, 'answer must be a visible line number');
-      if (!isRustError(q.error)) err(at, BAD_ERROR);
+      if (!isCodeError(q.error, lang)) err(at, badError(lang));
       return;
     case 'rs-fix':
       if (!hasCode(q.code)) return err(at, 'needs visible code');
-      if (!isRustError(q.error)) err(at, BAD_ERROR);
+      if (!isCodeError(q.error, lang)) err(at, badError(lang));
       if (!validateOpts(q.opts, at, err)) return;
       q.opts.forEach((o, i) => {
         const name = `option ${String.fromCharCode(65 + i)}`;

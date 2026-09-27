@@ -82,7 +82,7 @@ describe('collectSnippets', () => {
           title: 'b',
           body: '',
           demo: {
-            kind: 'rs-choice',
+            kind: 'code-choice',
             label: 'x',
             opts: [
               { label: 'one', code: ['A'], output: ['1'] },

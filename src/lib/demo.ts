@@ -1,7 +1,7 @@
 // The Learn playground engine — a port of demoVm() in
 // reference/design-canvas/Prototype.dc.html. Pure: content + selection in,
 // CSS strings and code lines out.
-import type { CssDemo, Demo, LegendItem, RustDemo } from '../content/types';
+import type { CodeCourseDemo, CssDemo, Demo, LegendItem } from '../content/types';
 
 export interface DemoChild {
   /** Wrapper CSS (`display:contents` unless the content sets `w`). */
@@ -30,7 +30,7 @@ export interface DemoView {
 /** Selected option index per control: a choice's `start`, or each knob's `start` (default 0). */
 export function initialSelection(demo: Demo | undefined): number[] {
   if (!demo || demo.kind === 'code') return [];
-  if (demo.kind === 'choice' || demo.kind === 'rs-choice') return [demo.start ?? 0];
+  if (demo.kind === 'choice' || demo.kind === 'code-choice') return [demo.start ?? 0];
   return demo.knobs.map((k) => k.start ?? 0);
 }
 
@@ -101,12 +101,12 @@ export interface RustDemoView {
   code: string[];
   output?: string[];
   error?: string;
-  /** Empty for a code demo; one control for rs-choice. */
+  /** Empty for a code demo; one control for code-choice. */
   controls: DemoControl[];
   caption: string | null;
 }
 
-export function buildRustDemo(demo: RustDemo, selection: readonly number[]): RustDemoView {
+export function buildRustDemo(demo: CodeCourseDemo, selection: readonly number[]): RustDemoView {
   if (demo.kind === 'code') {
     return { code: demo.code, output: demo.output, error: demo.error, controls: [], caption: null };
   }

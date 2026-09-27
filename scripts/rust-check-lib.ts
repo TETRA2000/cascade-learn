@@ -47,7 +47,7 @@ export function collectSnippets(units: readonly Unit[], questions: readonly Ques
       const where = `${unit.key}/card ${i + 1}`;
       const demo = card.demo;
       if (demo?.kind === 'code') add(where, demo.code, resultExpect(demo));
-      if (demo?.kind === 'rs-choice') demo.opts.forEach((o) => add(`${where}/${o.label}`, o.code, resultExpect(o)));
+      if (demo?.kind === 'code-choice') demo.opts.forEach((o) => add(`${where}/${o.label}`, o.code, resultExpect(o)));
     });
   }
 

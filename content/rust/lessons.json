@@ -19,7 +19,7 @@
         "body": "Assigning a `String` to another variable moves it: the new variable becomes the owner and the old one can no longer be used. Pick what `t` gets and watch the compiler react.",
         "tip": "`let t = s;` moves a `String`. Use `s.clone()` for a second copy, or `&s` to borrow.",
         "demo": {
-          "kind": "rs-choice",
+          "kind": "code-choice",
           "label": "let t = …",
           "opts": [
             {
@@ -78,7 +78,7 @@
         "body": "To change a borrowed value you need `&mut`. While a `&mut` borrow is in use, nothing else may touch the value — not even another `&mut`.",
         "tip": "Many `&T` or one `&mut T` — never both at once.",
         "demo": {
-          "kind": "rs-choice",
+          "kind": "code-choice",
           "label": "Borrows",
           "opts": [
             {

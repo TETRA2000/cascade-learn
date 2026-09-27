@@ -130,13 +130,13 @@ describe('rust content', () => {
     expect(lessonName(rust, 'rs-fix')).toBe('Fix it');
   });
 
-  it('reports an unmatched backtick in an rs-choice demo note', () => {
+  it('reports an unmatched backtick in a code-choice demo note', () => {
     const broken = structuredClone(rust);
     const card = {
       title: 'T',
       body: 'B',
       demo: {
-        kind: 'rs-choice',
+        kind: 'code-choice',
         label: 'L',
         opts: [
           { label: 'a', code: ['fn main() {}'], output: ['x'], note: 'bad `note' },

@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, type Dispatch } from 'react';
-import { isRustDemo, unitByKey, type Course } from '../content';
+import { isCodeDemo, unitByKey, type Course } from '../content';
 import { Button } from '../components/Button';
 import { CodePanel } from '../components/CodePanel';
 import { CssBox } from '../components/CssBox';
@@ -64,7 +64,7 @@ export function Learn({ course, unitKey, card: cardIndex, selection, dispatch }:
         </p>
 
         {card.demo &&
-          (isRustDemo(card.demo) ? (
+          (isCodeDemo(card.demo) ? (
             <RustPlayground view={buildRustDemo(card.demo, selection)} onPick={pick} />
           ) : (
             <Playground view={buildDemo(card.demo, selection)} onPick={pick} />

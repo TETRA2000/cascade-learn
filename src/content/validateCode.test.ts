@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { rsBuild, rsCompiles, rsError, rsFix, rsPairs, rsPredict, rsPredictError, rsType } from '../quiz/rustFixtures';
-import type { RustDemo, RustQuestion } from './types';
-import { validateRustDemo, validateRustQuestion } from './validateRust';
+import type { CodeCourseDemo, CodeQuestion } from './types';
+import { validateCodeDemo, validateCodeQuestion } from './validateCode';
 
 const check = (d: unknown) => {
   const errors: string[] = [];
-  validateRustDemo(d as RustDemo, 'd', (where, msg) => errors.push(`${where}: ${msg}`));
+  validateCodeDemo(d as CodeCourseDemo, 'rust', 'd', (where, msg) => errors.push(`${where}: ${msg}`));
   return errors;
 };
 
@@ -51,7 +51,7 @@ describe('validateRustDemo', () => {
 
 const checkQ = (q: unknown) => {
   const errors: string[] = [];
-  validateRustQuestion(q as RustQuestion, 'q', (where, msg) => errors.push(`${where}: ${msg}`));
+  validateCodeQuestion(q as CodeQuestion, 'q', (where, msg) => errors.push(`${where}: ${msg}`));
   return errors;
 };
 

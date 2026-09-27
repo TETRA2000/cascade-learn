@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { courseById, type ChoiceDemo, type KnobDemo, type RustChoiceDemo } from '../content';
+import { courseById, type ChoiceDemo, type KnobDemo, type CodeChoiceDemo } from '../content';
 import { buildDemo, buildRustDemo, initialSelection } from './demo';
 import { highlightLine } from './highlight';
 import { splitInlineCode } from './inlineCode';
@@ -141,8 +141,8 @@ describe('buildDemo — choice', () => {
 });
 
 describe('buildRustDemo', () => {
-  const choice: RustChoiceDemo = {
-    kind: 'rs-choice',
+  const choice: CodeChoiceDemo = {
+    kind: 'code-choice',
     label: 'let t = …',
     opts: [
       { label: 's', code: ['let t = s;'], error: 'error[E0382]: borrow of moved value: `s`', note: 'Moved.' },
@@ -150,7 +150,7 @@ describe('buildRustDemo', () => {
     ],
   };
 
-  it('starts rs-choice at its start option and code demos with no controls', () => {
+  it('starts code-choice at its start option and code demos with no controls', () => {
     expect(initialSelection(choice)).toEqual([0]);
     expect(initialSelection({ ...choice, start: 1 })).toEqual([1]);
     expect(initialSelection({ kind: 'code', code: ['fn main() {}'] })).toEqual([]);

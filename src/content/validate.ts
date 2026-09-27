@@ -1,11 +1,12 @@
 // Runtime checks for the content JSON. The typed exports in ./index.ts are
 // unchecked casts, so this is what guarantees they tell the truth.
 // Each function returns a list of human-readable problems; empty means valid.
-import { isRustDemo, isRustQuestion } from './guards';
+import { courseLang } from '../lib/codeLang';
+import { isCodeDemo, isCodeQuestion } from './guards';
 import { COURSE_ICON_NAMES, isCourseId, TYPE_KEYS, type CourseId } from './typeKeys';
 import type { Course, CourseInfo, Demo } from './types';
 import { validateCssDemo, validateCssQuestion } from './validateCss';
-import { validateRustDemo, validateRustQuestion } from './validateRust';
+import { validateCodeDemo, validateCodeQuestion } from './validateCode';
 import { isStr, isStrArr, type Err } from './validateUtil';
 
 /** courses.json against the course ids this build bundles content for. */
@@ -28,12 +29,12 @@ export function validateCourses(infos: readonly CourseInfo[], bundled: readonly 
 }
 
 function validateDemo(courseId: CourseId, d: Demo, at: string, err: Err) {
-  if (isRustDemo(d) !== (courseId === 'rust')) {
+  if (isCodeDemo(d) !== (courseLang(courseId) !== null)) {
     return err(at, `demo kind "${d.kind ?? 'knobs'}" does not belong in the ${courseId} course`);
   }
-  if (isRustDemo(d)) validateRustDemo(d, at, err);
+  if (isCodeDemo(d)) validateCodeDemo(d, courseLang(courseId)!, at, err);
   else validateCssDemo(d, at, err);
-  if ((d.kind === 'choice' || d.kind === 'rs-choice') && Array.isArray(d.opts)) {
+  if ((d.kind === 'choice' || d.kind === 'code-choice') && Array.isArray(d.opts)) {
     d.opts.forEach((o) => {
       if (isStr(o?.note) && o.note.split('`').length % 2 === 0) err(`${at}/option ${o.label}`, 'note has an unmatched backtick');
     });
@@ -80,7 +81,7 @@ export function validateContent(c: Course): string[] {
     if (!keys.includes(q.type)) return err(at, `unknown type "${String(q.type)}"`);
     if (q.prompt && q.prompt.split('`').length % 2 === 0) err(at, 'prompt has an unmatched backtick');
     if (q.explain && q.explain.split('`').length % 2 === 0) err(at, 'explain has an unmatched backtick');
-    if (isRustQuestion(q)) validateRustQuestion(q, at, err);
+    if (isCodeQuestion(q)) validateCodeQuestion(q, at, err);
     else validateCssQuestion(q, at, err);
   });
   keys.forEach((t) => {
