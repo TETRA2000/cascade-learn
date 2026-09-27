@@ -342,7 +342,13 @@ export type TsTypeQuestion = CodeTypeQuestion<'ts-type'>;
 export interface TsInferQuestion extends QuestionBase {
   type: 'ts-infer';
   code: string[];
-  /** 1-based visible line. It must not reassign `name`, apart from declaring it. */
+  /**
+   * 1-based visible line. It must not reassign `name` (declaring it is fine, but not with both
+   * a type annotation and an initializer, which narrows by assignment), and it must not narrow
+   * `name` (`if`/`else`/`while`/`switch`/`case` lines, `typeof`/`instanceof`/`in` tests, calls
+   * that may be assertion functions). check:ts asserts the type just after this line, so it has
+   * to match the hover. The prompt names `name` in backticks and says `line N`.
+   */
   line: number;
   /** An identifier that appears on `line` as a whole word. */
   name: string;

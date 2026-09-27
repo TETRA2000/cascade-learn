@@ -99,7 +99,7 @@ A `throws` answer means the program throws, whatever it printed first.
 - **Screen:** a code panel with `name` on `line` marked by a dotted underline plus a small "hover" tag (never color alone), then option tiles in monospace reading `name: <type>` with `aria-pressed`. The accessible name of the code region includes "`name` on line N". The prompt comes from content, e.g. "What type does the editor show for `x` on line 4?"
 - **Grading and feedback:** `sel === answer`. A wrong answer shows `Answer: B`.
 - **Validation:** `line` is a visible line, `name` appears on it as a whole word (`\bname\b`), options are unique and non-empty, `answer` is in range.
-- **Authoring rule** (enforced by `check:ts`, §5): `line` must not reassign `name`, apart from declaring it.
+- **Authoring rule** (enforced by content validation, since `check:ts` asserts the type just after the line): `line` must not reassign `name`, apart from declaring it, and must not narrow it. The prompt names `` `name` `` and `line N`.
 
 ### Feedback
 - `FeedbackText.compiler` holds the `error` for `ts-compiles`, `ts-error`, `ts-fix`, and `ts-predict` when the answer's kind is `error`, as for Rust. Its label comes from `LANG`: "rustc says" or "tsc says".

@@ -13,6 +13,46 @@ const IDENTIFIER = /^[A-Za-z_$][\w$]*$/;
 
 const hasCode = (c: unknown): c is string[] => isStrArr(c) && visibleLines(c).length > 0;
 
+/**
+ * Whether a ts-infer line might change `name`'s type by its end. check:ts asserts the type
+ * just after the line, while the editor hover is on the line itself, so the two must agree.
+ * A syntactic heuristic, deliberately conservative: a false rejection only asks the author to
+ * pick another line; a false acceptance lets check:ts pass an answer the hover contradicts.
+ * `name` is a validated identifier.
+ */
+export function changesTypeOnLine(line: string, name: string): boolean {
+  const n = name.replace(/[$]/g, '\\$&');
+  const word = `(?<![\\w$])${n}(?![\\w$])`;
+  // A variable, not a property: `obj.x = 1` leaves `x` alone.
+  const variable = `(?<![\\w$.])${n}(?![\\w$])`;
+  const isDeclaration = /^\s*(?:let|const|var)\b/.test(line);
+  const reassigns = [
+    // `x = …` and compound `x += …`, `x ??= …`, `x **= …`…, but not `==`, `===`, `=>`,
+    // nor the declaration `let x = …` itself.
+    new RegExp(`(?<!\\b(?:let|const|var)\\s+)${variable}\\s*(?:\\*\\*|<<|>>>?|\\?\\?|\\|\\||&&|[-+*/%&|^])?=(?![=>])`),
+    // `x++`, `x--`, `++x`, `--x`.
+    new RegExp(`${variable}\\s*(?:\\+\\+|--)|(?:\\+\\+|--)\\s*${word}`),
+    // `for (x of xs)` / `for (x in o)` assign without `=`.
+    new RegExp(`\\bfor\\s*\\(\\s*${n}\\s+(?:of|in)\\b`),
+    // Destructuring assignment: `[x, y] = …`, `({ x } = o)` (a declaration is fine).
+    ...(isDeclaration ? [] : [new RegExp(`${word}[^=]*[\\]}]\\s*=(?![=>])`)]),
+    // `let x: string | number = "a"` narrows `x` to `string` by assignment, even through a
+    // type alias, while the hover shows the annotation. Annotate or initialize, not both.
+    new RegExp(`\\b(?:let|const|var)\\s+${n}\\s*:.*(?<![=!<>])=(?![=>])`),
+  ];
+  const narrows = [
+    // Lines whose condition narrows what follows: `if (`, `} else if (`, `} else {`, `while (`,
+    // `switch (`, `case …:`, `default:`. This covers guards like `if (x === null) return;`.
+    /^\s*(?:\}\s*)?(?:if|else|while|switch|case|default)\b/,
+    // Type tests anywhere on the line: `typeof x`, `x instanceof C`, `"k" in x`.
+    new RegExp(`\\btypeof\\s+${word}|${word}\\s+instanceof\\b|\\bin\\s+${word}`),
+    // A bare call statement may be an assertion function (`assertIsString(x);`) that narrows
+    // its argument; only `console.log`/`console.error` (the one global) are known not to.
+    /^\s*(?!console\.(?:log|error)\s*\()[\w$.]+\s*(?:<[^>]*>)?\s*\(.*\)\s*;?\s*$/,
+  ];
+  return [...reassigns, ...narrows].some((re) => re.test(line));
+}
+
 function validateResult(r: { output?: unknown; error?: unknown; thrown?: unknown }, lang: CodeLang, at: string, err: Err) {
   if (r.output !== undefined && !isStrArr(r.output)) err(at, 'output must be a list of strings');
   if (r.error !== undefined && !isCodeError(r.error, lang)) err(at, badError(lang));
@@ -85,7 +125,14 @@ export function validateCodeQuestion(q: CodeQuestion, at: string, err: Err) {
       const lineText = isInt(q.line) && q.line >= 1 ? visibleLines(q.code)[q.line - 1] : undefined;
       if (lineText === undefined) err(at, 'line must be a visible line number');
       if (!isStr(q.name) || !IDENTIFIER.test(q.name)) err(at, 'name must be an identifier');
-      else if (lineText !== undefined && findWord(lineText, q.name) === -1) err(at, `name "${q.name}" does not appear on line ${q.line}`);
+      else if (lineText !== undefined) {
+        if (findWord(lineText, q.name) === -1) err(at, `name "${q.name}" does not appear on line ${q.line}`);
+        else if (changesTypeOnLine(lineText, q.name)) err(at, `line ${q.line} must not reassign or narrow "${q.name}"`);
+      }
+      // The code panel's label is on a role-less <pre>, so the prompt carries the naming.
+      if (isStr(q.name) && isInt(q.line) && (!isStr(q.prompt) || !q.prompt.includes(`\`${q.name}\``) || !new RegExp(`\\bline ${q.line}(?!\\d)`).test(q.prompt))) {
+        err(at, `prompt must name \`${q.name}\` and line ${q.line}`);
+      }
       if (!validateOpts(q.opts, at, err)) return;
       if (!isStrArr(q.opts) || q.opts.some((o) => o.trim() === '') || new Set(q.opts).size !== q.opts.length) {
         err(at, 'opts must be unique and non-empty');

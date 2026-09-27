@@ -3,7 +3,7 @@ import { rsBuild, rsCompiles, rsError, rsFix, rsPairs, rsPredict, rsPredictError
 import { tsCompiles, tsInfer, tsPredict, tsPredictError, tsPredictThrows } from '../quiz/tsFixtures';
 import type { CodeCourseDemo, CodeQuestion } from './types';
 import type { CodeLang } from '../lib/codeLang';
-import { validateCodeDemo, validateCodeQuestion } from './validateCode';
+import { changesTypeOnLine, validateCodeDemo, validateCodeQuestion } from './validateCode';
 
 const check = (d: unknown, lang: CodeLang = 'rust') => {
   const errors: string[] = [];
@@ -157,8 +157,55 @@ describe('validateTsQuestion', () => {
     expect(checkQ({ ...tsInfer, opts: ['string', '', 'number'] })).toContain('q: opts must be unique and non-empty');
     expect(checkQ({ ...tsInfer, opts: ['string', 'number'] })).toContain('q: needs 3 or 4 opts');
     expect(checkQ({ ...tsInfer, answer: 4 })).toContain('q: answer out of range');
-    expect(checkQ({ ...tsInfer, code: ['# function f(x: string) {', 'x;', '# }'], line: 1 })).toEqual([]);
+    expect(checkQ({ ...tsInfer, prompt: 'What type is `x` on line 1?', code: ['# function f(x: string) {', 'x;', '# }'], line: 1 })).toEqual([]);
     expect(checkQ({ ...tsInfer, code: ['# const x = 1;', 'const y = 2;'], line: 1 })).toContain('q: name "x" does not appear on line 1');
+  });
+
+  it('rejects a ts-infer line that reassigns or narrows the name', () => {
+    // `x` is `string | number` in the editor; the asked line is visible line 2.
+    const on = (line: string) => checkQ({ ...tsInfer, prompt: 'What type does the editor show for `x` on line 2?', code: ['let x: string | number = "a" as string | number;', line], line: 2 });
+    const bad = 'q: line 2 must not reassign or narrow "x"';
+    // Reassignment, compound assignment, increment and decrement.
+    for (const line of ['x = 5;', 'x += 1;', 'x ??= 0;', 'x **= 2;', 'x ||= "b";', 'x++;', '--x;', '[x] = [1];', 'for (x of [1]) {}']) {
+      expect(on(line), line).toContain(bad);
+    }
+    // Narrowing: conditions that open a narrowed block, type tests, guards, assertion calls.
+    for (const line of [
+      'if (typeof x === "string") {',
+      '} else if (x === 1) {',
+      'case x:',
+      'switch (x) {',
+      'while (x !== 0) {',
+      'if (x === 0) return;',
+      'const isNum = typeof x === "number";',
+      'console.log(x instanceof Date);',
+      'console.log("length" in x);',
+      'assertIsString(x);',
+    ]) {
+      expect(on(line), line).toContain(bad);
+    }
+    // A declaration of the name, and ordinary uses, are fine.
+    for (const line of ['console.log(x.toString());', 'const y = x === 1 ? "one" : "other";', 'const f = (x: number) => x * 2;', 'console.log(x == 1, x !== 2, x <= 3);']) {
+      expect(on(line), line).toEqual([]);
+    }
+    expect(checkQ({ ...tsInfer, prompt: 'What type does the editor show for `x` on line 1?', code: ['let x = 5;', 'console.log(x);'], line: 1 })).toEqual([]);
+    expect(checkQ({ ...tsInfer, code: ['function show(x: string) {', '  const s = "a";', '  console.log(x.toUpperCase());', '}'] })).toEqual([]);
+    // Annotating and initializing narrows by assignment, so the hover and check:ts would disagree.
+    expect(checkQ({ ...tsInfer, prompt: 'What type does the editor show for `x` on line 1?', code: ['let x: string | number = "a";', 'console.log(x);'], line: 1 })).toContain(
+      'q: line 1 must not reassign or narrow "x"',
+    );
+    // A property named like the variable is not the variable.
+    expect(changesTypeOnLine('obj.x = 5;', 'x')).toBe(false);
+    expect(changesTypeOnLine('$x = 5;', '$x')).toBe(true);
+    expect(changesTypeOnLine('x$ = 5;', 'x')).toBe(false);
+  });
+
+  it('requires the ts-infer prompt to name the identifier and the line', () => {
+    const bad = 'q: prompt must name `x` and line 3';
+    expect(checkQ({ ...tsInfer, prompt: 'What type does the editor show here?' })).toContain(bad);
+    expect(checkQ({ ...tsInfer, prompt: 'What type does the editor show for x on line 3?' })).toContain(bad);
+    expect(checkQ({ ...tsInfer, prompt: 'What type does the editor show for `x` on line 30?' })).toContain(bad);
+    expect(checkQ({ ...tsInfer, prompt: 'On line 3, what type is `x`?' })).toEqual([]);
   });
 
   it('pairs the shared ts- types with the Rust rules', () => {
