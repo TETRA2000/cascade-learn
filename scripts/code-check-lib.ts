@@ -109,6 +109,14 @@ export function collectSnippets(units: readonly Unit[], questions: readonly Ques
   return { snippets, problems };
 }
 
+/** Compares a program's stdout against its expected lines; null when they match. Shared by the
+ * `output` kind and the (optional) output check after a `throws` kind. */
+function outputMismatch(stdout: string, want: readonly string[]): string | null {
+  const got = stdout.replace(/\n$/, '');
+  const wantJoined = want.join('\n');
+  return got === wantJoined ? null : `expected output ${JSON.stringify(wantJoined)}, got ${JSON.stringify(got)}`;
+}
+
 /** Why a compile result doesn't match the snippet's expectation, or null when it does.
  * `compiler` names the tool in messages ('rustc' or 'tsc'). Error-kind checks run in this
  * order: compiled, code, visible `line`, `programLine`. */
@@ -130,21 +138,12 @@ export function judge(s: Snippet, r: CompileResult, compiler = 'rustc'): string 
     if (!r.ok) return `expected it to type-check and throw, ${compiler} reported ${r.errorCode ?? 'an error'}`;
     if (r.thrown === undefined) return 'expected it to throw, but it ran to completion';
     if (r.thrown !== e.thrown) return `expected it to throw ${JSON.stringify(e.thrown)}, got ${JSON.stringify(r.thrown)}`;
-    if (e.output) {
-      const got = r.stdout.replace(/\n$/, '');
-      const want = e.output.join('\n');
-      if (got !== want) return `expected output ${JSON.stringify(want)}, got ${JSON.stringify(got)}`;
-    }
-    return null;
+    return e.output ? outputMismatch(r.stdout, e.output) : null;
   }
   if (!r.ok) return `expected it to compile, ${compiler} reported ${r.errorCode ?? 'an error'}`;
   if (r.runError) return `program failed at runtime: ${r.runError}`;
   if (r.thrown !== undefined) return `program threw: ${r.thrown}`;
-  if (e.kind === 'output') {
-    const got = r.stdout.replace(/\n$/, '');
-    const want = e.output.join('\n');
-    if (got !== want) return `expected output ${JSON.stringify(want)}, got ${JSON.stringify(got)}`;
-  }
+  if (e.kind === 'output') return outputMismatch(r.stdout, e.output);
   return null;
 }
 
