@@ -1,0 +1,23 @@
+/* Stacked answer tiles for the Rust single-pick types. Tone colors come from tone.module.css. */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 40px 10px 14px;
+  text-align: left;
+}
+
+.letter {
+  flex-shrink: 0;
+  width: 1.5ch;
+  font-weight: 700;
+  font-size: 15px;
+}

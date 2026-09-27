@@ -1,0 +1,9 @@
+.tile {
+  align-items: flex-start;
+  padding: 10px 36px 10px 10px;
+}
+
+.code {
+  flex-grow: 1;
+  min-width: 0;
+}

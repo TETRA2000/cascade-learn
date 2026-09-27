@@ -1,0 +1,28 @@
+.diff {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-grow: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  background: var(--ink);
+  border-radius: 8px;
+  font-family: var(--font-code);
+  font-size: 13px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.del {
+  color: var(--code-del);
+}
+
+.add {
+  color: var(--code-add);
+}
+
+.sign {
+  display: inline-block;
+  width: 2ch;
+  font-weight: 700;
+}

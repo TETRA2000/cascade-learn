@@ -1,0 +1,10 @@
+.output {
+  font-family: var(--font-code);
+  font-size: 14px;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.error {
+  font-weight: 700;
+}
