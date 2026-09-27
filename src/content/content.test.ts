@@ -46,6 +46,13 @@ describe('css content', () => {
     (broken.topics as Record<string, string[]>).flex = ['nope'];
     expect(validateContent(broken)).toContain('topics/flex: unknown question id "nope"');
   });
+
+  it('keeps demo kinds to their course', () => {
+    const broken = structuredClone(css);
+    const card = { title: 'T', body: 'B', demo: { kind: 'code', code: ['fn main() {}'] } };
+    (broken.units[0]!.cards as unknown[]).push(card);
+    expect(validateContent(broken)).toContain('lessons/basics/card 4: demo kind "code" does not belong in the css course');
+  });
 });
 
 describe('lessonQuestionIds', () => {

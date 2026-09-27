@@ -10,6 +10,7 @@ import type { ContentBundle, Course, CourseInfo, LessonKey, Question, QuestionTy
 
 export * from './types';
 export * from './typeKeys';
+export * from './guards';
 
 // JSON imports infer wide types (e.g. `string` instead of `'parent'`), so
 // these casts are checked at test time by validateContent() instead.

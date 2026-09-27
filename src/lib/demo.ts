@@ -1,7 +1,7 @@
 // The Learn playground engine — a port of demoVm() in
 // reference/design-canvas/Prototype.dc.html. Pure: content + selection in,
 // CSS strings and code lines out.
-import type { Demo, LegendItem } from '../content/types';
+import type { CssDemo, Demo, LegendItem, RustDemo } from '../content/types';
 
 export interface DemoChild {
   /** Wrapper CSS (`display:contents` unless the content sets `w`). */
@@ -27,14 +27,14 @@ export interface DemoView {
   legend: LegendItem[];
 }
 
-/** Selected option index per control, i.e. each knob's `start` (default 0). */
+/** Selected option index per control: a choice's `start`, or each knob's `start` (default 0). */
 export function initialSelection(demo: Demo | undefined): number[] {
-  if (!demo) return [];
-  if (demo.kind === 'choice') return [demo.start ?? 0];
+  if (!demo || demo.kind === 'code') return [];
+  if (demo.kind === 'choice' || demo.kind === 'rs-choice') return [demo.start ?? 0];
   return demo.knobs.map((k) => k.start ?? 0);
 }
 
-export function buildDemo(demo: Demo, selection: readonly number[]): DemoView {
+export function buildDemo(demo: CssDemo, selection: readonly number[]): DemoView {
   const wrapChild = (k: { s: string; t: string; w?: string }, extra = ''): DemoChild => ({
     wrap: k.w ?? 'display:contents',
     css: k.s + ';' + extra,
@@ -94,5 +94,29 @@ export function buildDemo(demo: Demo, selection: readonly number[]): DemoView {
     })),
     caption: null,
     legend: demo.legend ?? [],
+  };
+}
+
+export interface RustDemoView {
+  code: string[];
+  output?: string[];
+  error?: string;
+  /** Empty for a code demo; one control for rs-choice. */
+  controls: DemoControl[];
+  caption: string | null;
+}
+
+export function buildRustDemo(demo: RustDemo, selection: readonly number[]): RustDemoView {
+  if (demo.kind === 'code') {
+    return { code: demo.code, output: demo.output, error: demo.error, controls: [], caption: null };
+  }
+  const active = selection[0] ?? 0;
+  const opt = demo.opts[active] ?? demo.opts[0]!;
+  return {
+    code: opt.code,
+    output: opt.output,
+    error: opt.error,
+    controls: [{ label: demo.label, options: demo.opts.map((o, i) => ({ label: o.label, active: i === active })) }],
+    caption: opt.note ?? null,
   };
 }

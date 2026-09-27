@@ -8,7 +8,7 @@ export function OutputPanel({ output, error }: { output?: readonly string[]; err
       <section className={`${styles.panel} ${styles.error}`} aria-label="Compiler error">
         <p className={styles.title}>
           <XCircleIcon size={18} />
-          Doesn't compile
+          Doesn’t compile
         </p>
         <pre className={styles.body}>{error}</pre>
       </section>

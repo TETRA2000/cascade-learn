@@ -1,12 +1,13 @@
 import { useEffect, useId, useRef, type Dispatch } from 'react';
-import { unitByKey, type Course } from '../content';
+import { isRustDemo, unitByKey, type Course } from '../content';
 import { Button } from '../components/Button';
 import { CodePanel } from '../components/CodePanel';
 import { CssBox } from '../components/CssBox';
 import { BulbIcon, CloseIcon } from '../components/icons';
+import { OutputPanel } from '../components/OutputPanel';
 import { ProgressBar } from '../components/ProgressBar';
 import { RichText } from '../components/RichText';
-import { buildDemo, type DemoView } from '../lib/demo';
+import { buildDemo, buildRustDemo, type DemoControl, type DemoView, type RustDemoView } from '../lib/demo';
 import type { Action } from '../state/app';
 import styles from './Learn.module.css';
 
@@ -35,7 +36,7 @@ export function Learn({ course, unitKey, card: cardIndex, selection, dispatch }:
   const card = unit.cards[cardIndex]!;
   const first = cardIndex === 0;
   const last = cardIndex === total - 1;
-  const demo = card.demo ? buildDemo(card.demo, selection) : null;
+  const pick = (control: number, option: number) => dispatch({ type: 'pickOption', control, option });
 
   return (
     <div className={styles.screen}>
@@ -62,7 +63,12 @@ export function Learn({ course, unitKey, card: cardIndex, selection, dispatch }:
           <RichText text={card.body} />
         </p>
 
-        {demo && <Playground view={demo} onPick={(control, option) => dispatch({ type: 'pickOption', control, option })} />}
+        {card.demo &&
+          (isRustDemo(card.demo) ? (
+            <RustPlayground view={buildRustDemo(card.demo, selection)} onPick={pick} />
+          ) : (
+            <Playground view={buildDemo(card.demo, selection)} onPick={pick} />
+          ))}
 
         {card.tip && (
           <aside className={styles.tip} aria-label="Key idea">
@@ -100,7 +106,6 @@ export function Learn({ course, unitKey, card: cardIndex, selection, dispatch }:
 }
 
 function Playground({ view, onPick }: { view: DemoView; onPick: (control: number, option: number) => void }) {
-  const idBase = useId();
   return (
     <section className={styles.playground} aria-label="Playground">
       <CssBox className={styles.stage} css={view.stage} data-testid="demo-stage">
@@ -130,7 +135,32 @@ function Playground({ view, onPick }: { view: DemoView; onPick: (control: number
 
       <CodePanel lines={view.code} label="CSS" />
 
-      {view.controls.map((control, ci) => {
+      <DemoControls controls={view.controls} onPick={onPick} />
+    </section>
+  );
+}
+
+function RustPlayground({ view, onPick }: { view: RustDemoView; onPick: (control: number, option: number) => void }) {
+  return (
+    <section className={styles.playground} aria-label="Playground">
+      <CodePanel lines={view.code} lang="rust" label="Rust code" />
+      {(view.output !== undefined || view.error !== undefined) && <OutputPanel output={view.output} error={view.error} />}
+      {view.caption !== null && (
+        <p className={styles.caption} aria-live="polite">
+          {view.caption}
+        </p>
+      )}
+      <DemoControls controls={view.controls} onPick={onPick} />
+    </section>
+  );
+}
+
+/** One chip group per knob (or the single choice). */
+function DemoControls({ controls, onPick }: { controls: DemoControl[]; onPick: (control: number, option: number) => void }) {
+  const idBase = useId();
+  return (
+    <>
+      {controls.map((control, ci) => {
         const labelId = `${idBase}-knob-${ci}`;
         return (
           <div key={control.label} className={styles.knob}>
@@ -153,6 +183,6 @@ function Playground({ view, onPick }: { view: DemoView; onPick: (control: number
           </div>
         );
       })}
-    </section>
+    </>
   );
 }

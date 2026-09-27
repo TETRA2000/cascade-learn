@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { courseById, type ChoiceDemo, type KnobDemo } from '../content';
-import { buildDemo, initialSelection } from './demo';
+import { courseById, type ChoiceDemo, type KnobDemo, type RustChoiceDemo } from '../content';
+import { buildDemo, buildRustDemo, initialSelection } from './demo';
 import { highlightLine } from './highlight';
 import { splitInlineCode } from './inlineCode';
 import { sanitizeCssKeyword } from './sanitize';
@@ -137,5 +137,43 @@ describe('buildDemo — choice', () => {
     expect(view.controls).toHaveLength(1);
     expect(view.controls[0]!.label).toBe('second rule’s selector');
     expect(view.controls[0]!.options.map((o) => o.active)).toEqual([false, false, true]);
+  });
+});
+
+describe('buildRustDemo', () => {
+  const choice: RustChoiceDemo = {
+    kind: 'rs-choice',
+    label: 'let t = …',
+    opts: [
+      { label: 's', code: ['let t = s;'], error: 'error[E0382]: borrow of moved value: `s`', note: 'Moved.' },
+      { label: 's.clone()', code: ['let t = s.clone();'], output: ['hi hi'] },
+    ],
+  };
+
+  it('starts rs-choice at its start option and code demos with no controls', () => {
+    expect(initialSelection(choice)).toEqual([0]);
+    expect(initialSelection({ ...choice, start: 1 })).toEqual([1]);
+    expect(initialSelection({ kind: 'code', code: ['fn main() {}'] })).toEqual([]);
+  });
+
+  it('shows the picked option’s code, result and note', () => {
+    expect(buildRustDemo(choice, [0])).toEqual({
+      code: ['let t = s;'],
+      error: 'error[E0382]: borrow of moved value: `s`',
+      output: undefined,
+      controls: [{ label: 'let t = …', options: [{ label: 's', active: true }, { label: 's.clone()', active: false }] }],
+      caption: 'Moved.',
+    });
+    expect(buildRustDemo(choice, [1])).toMatchObject({ output: ['hi hi'], error: undefined, caption: null });
+  });
+
+  it('passes a code demo through', () => {
+    expect(buildRustDemo({ kind: 'code', code: ['fn main() {}'], output: [''] }, [])).toEqual({
+      code: ['fn main() {}'],
+      output: [''],
+      error: undefined,
+      controls: [],
+      caption: null,
+    });
   });
 });

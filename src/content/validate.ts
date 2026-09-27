@@ -1,10 +1,12 @@
 // Runtime checks for the content JSON. The typed exports in ./index.ts are
 // unchecked casts, so this is what guarantees they tell the truth.
 // Each function returns a list of human-readable problems; empty means valid.
-import { COURSE_ICON_NAMES, isCourseId, TYPE_KEYS } from './typeKeys';
-import type { Course, CourseInfo } from './types';
+import { isRustDemo } from './guards';
+import { COURSE_ICON_NAMES, isCourseId, TYPE_KEYS, type CourseId } from './typeKeys';
+import type { Course, CourseInfo, Demo } from './types';
 import { validateCssDemo, validateCssQuestion } from './validateCss';
-import { isStr, isStrArr } from './validateUtil';
+import { validateRustDemo } from './validateRust';
+import { isStr, isStrArr, type Err } from './validateUtil';
 
 /** courses.json against the course ids this build bundles content for. */
 export function validateCourses(infos: readonly CourseInfo[], bundled: readonly string[]): string[] {
@@ -23,6 +25,14 @@ export function validateCourses(infos: readonly CourseInfo[], bundled: readonly 
     if (!ids.includes(id as CourseInfo['id'])) err('courses', `bundled course "${id}" is not listed`);
   });
   return errors;
+}
+
+function validateDemo(courseId: CourseId, d: Demo, at: string, err: Err) {
+  if (isRustDemo(d) !== (courseId === 'rust')) {
+    return err(at, `demo kind "${d.kind ?? 'knobs'}" does not belong in the ${courseId} course`);
+  }
+  if (isRustDemo(d)) validateRustDemo(d, at, err);
+  else validateCssDemo(d, at, err);
 }
 
 export function validateContent(c: Course): string[] {
@@ -51,7 +61,7 @@ export function validateContent(c: Course): string[] {
       if (card.tip !== undefined && !isStr(card.tip)) err(cat, 'tip must be a string');
       if (card.body && card.body.split('`').length % 2 === 0) err(cat, 'body has an unmatched backtick');
       if (card.tip && card.tip.split('`').length % 2 === 0) err(cat, 'tip has an unmatched backtick');
-      if (card.demo) validateCssDemo(card.demo, cat, err);
+      if (card.demo) validateDemo(c.id, card.demo, cat, err);
     });
   });
 

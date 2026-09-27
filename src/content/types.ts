@@ -30,7 +30,9 @@ export interface Card {
   demo?: Demo;
 }
 
-export type Demo = KnobDemo | ChoiceDemo;
+export type CssDemo = KnobDemo | ChoiceDemo;
+export type RustDemo = CodeDemo | RustChoiceDemo;
+export type Demo = CssDemo | RustDemo;
 
 /** A styled child of a demo stage. */
 export interface DemoKid {
@@ -86,6 +88,32 @@ export interface ChoiceDemo {
   start?: number;
   base: string;
   opts: ChoiceOption[];
+}
+
+/** A Rust example and what it does. At most one of `output` / `error`; neither means "compiles, prints nothing". */
+export interface CodeDemo {
+  kind: 'code';
+  code: string[];
+  output?: string[];
+  /** rustc's first error line, e.g. `error[E0382]: borrow of moved value: \`s\``. */
+  error?: string;
+}
+
+export interface RustChoiceOption {
+  label: string;
+  code: string[];
+  /** Exactly one of `output` / `error`. */
+  output?: string[];
+  error?: string;
+  note?: string;
+}
+
+/** Tap between variants of a Rust snippet and see how the result changes. */
+export interface RustChoiceDemo {
+  kind: 'rs-choice';
+  label: string;
+  start?: number;
+  opts: RustChoiceOption[];
 }
 
 // ----- questions.json -----

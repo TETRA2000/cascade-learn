@@ -1,9 +1,9 @@
 // Checks for CSS-course demos and questions.
 import { sanitizeCssKeyword } from '../lib/sanitize';
-import type { CssQuestion, Demo } from './types';
+import type { CssDemo, CssQuestion } from './types';
 import { inRange, isInt, isStr, isStrArr, type Err } from './validateUtil';
 
-export function validateCssDemo(d: Demo, at: string, err: Err) {
+export function validateCssDemo(d: CssDemo, at: string, err: Err) {
   if (!isStr(d.base)) err(at, 'demo.base must be a string');
   const kidsOk = (kids: unknown, where: string) => {
     if (!Array.isArray(kids) || kids.length === 0) return err(where, 'needs at least one kid');
