@@ -17,4 +17,14 @@ describe('CodePanel', () => {
     expect(gutters[0]).toHaveAttribute('aria-hidden', 'true');
     expect(within(panel).getAllByText('let')[0]).toHaveClass('keyword');
   });
+
+  it('gives a Rust panel a hanging indent so a wrapped line starts after the gutter', () => {
+    render(<CodePanel lines={['let a = 1;']} lang="rust" label="Rust code" />);
+    expect(screen.getByLabelText('Rust code')).toHaveClass('numbered');
+  });
+
+  it('leaves a CSS panel without the hanging-indent class', () => {
+    render(<CodePanel lines={['.a { color: red; }']} label="CSS" />);
+    expect(screen.getByLabelText('CSS')).not.toHaveClass('numbered');
+  });
 });

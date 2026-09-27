@@ -174,6 +174,14 @@ describe('Course picker', () => {
     expect(heading()).toHaveTextContent('The box model');
   });
 
+  it('pluralizes the unit count singularly for a course with one unit', async () => {
+    const user = userEvent.setup();
+    startIn('rust');
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: 'Rust, change course' }));
+    expect(screen.getByRole('button', { name: 'Rust, 0 of 1 unit, 0 XP, current' })).toBeInTheDocument();
+  });
+
   it('falls back to the picker when the stored course is not in this build', () => {
     startIn('go');
     render(<App />);

@@ -1,6 +1,6 @@
 # Content schema
 
-The schema is per course: each course has its own `content/<course>/` folder with the four files below, plus the shared `content/courses.json`. Notes marked **CSS** below are specific to that course; the Rust course's schema is under "Rust courses".
+The schema is per course: each course has its own `content/<course>/` folder with the four files below, plus the shared `content/courses.json`. Notes marked **CSS** below are specific to that course; the Rust course's schema is under "Rust course".
 
 In body, tip, explain, prompt and note text, text between backticks renders as inline code.
 
@@ -49,9 +49,9 @@ Word-bank chips are tracked by **index**, not word, because `bank` can contain d
 ```ts
 type CourseInfo = { id: 'css' | 'rust'; name: string; tagline: string; blurb: string; icon: 'css' | 'rust' };
 ```
-Each listed course has a folder `content/<id>/` with the four files below.
+Each listed course has a folder `content/<id>/` with the four files described in this document.
 
-## Rust courses
+## Rust course
 
 Code arrays are plain Rust. A line starting with `# ` (or exactly `#`) is hidden setup: compiled by `npm run check:rust`, never shown (rustdoc's convention). Displayed line numbers count visible lines only. `error` strings are rustc's first error line, e.g. `` error[E0382]: borrow of moved value: `s` ``.
 

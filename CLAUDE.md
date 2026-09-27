@@ -28,12 +28,15 @@ Vite + React + TypeScript, CSS Modules with the tokens in `docs/design-tokens.md
 ## Adding a course
 
 1. Add its id to `COURSE_IDS` and its question-type keys to `TYPE_KEYS` in `src/content/typeKeys.ts`.
-2. Add `content/<id>/` (four files) and an entry in `content/courses.json`, and bundle it in `src/content/index.ts`.
-3. Add its question shapes to `src/content/types.ts`, a validator, a grader (`src/quiz/grade/`), feedback copy (`src/quiz/feedback/`) and renderers (`src/quiz/renderers/<id>/`). Exhaustive switches make `tsc` point at anything missing.
+2. Add its icon: a name in `COURSE_ICON_NAMES` (`src/content/typeKeys.ts`), an SVG in `src/components/icons.tsx`, and a case for it in `CourseIcon`'s switch there (it has an explicit `ReactElement` return type and no `default`, so a missing case fails `tsc`).
+3. Add `content/<id>/` (four files) and an entry in `content/courses.json`, and bundle it in `src/content/index.ts`.
+4. Add its question and demo shapes to `src/content/types.ts`, family guards for them in `src/content/guards.ts` (`isRustDemo`/`isRustQuestion`-style), a validator (a per-course branch in `validateDemo` plus a `validate<Id>.ts`), a grader (`src/quiz/grade/`), feedback copy (`src/quiz/feedback/`) and renderers (`src/quiz/renderers/<id>/`).
+5. Add its Learn playground branch (alongside `Playground`/`RustPlayground` in `src/screens/Learn.tsx`).
+6. Exhaustive switches (explicit return types, no `default`) make `tsc` point at anything missing across all of the above.
 
 ## Rules (all courses)
 
-- Accessibility is part of the spec: real `<button>` elements, `aria-pressed` on selectable tiles/chips, `aria-live` on feedback, `role="progressbar"` with values, 44px minimum touch targets, text contrast ≥ 4.5:1, correct/incorrect never signaled by color alone (icons + text).
+- Accessibility is part of the spec: real `<button>` elements, `aria-pressed` on selectable tiles/chips, `aria-current` on the active course, `aria-live` on feedback, `role="progressbar"` with values, 44px minimum touch targets, text contrast ≥ 4.5:1, correct/incorrect never signaled by color alone (icons + text).
 - Respect `prefers-reduced-motion` (the feedback slide-up is the only animation).
 - Keep new content in the JSON files, not in components.
 

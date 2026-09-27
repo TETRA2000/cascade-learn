@@ -38,7 +38,9 @@ function compilerMessage(q: RustQuestion): string | undefined {
       return q.error;
     case 'rs-predict':
       return q.opts[q.answer]?.kind === 'error' ? q.error : undefined;
-    default:
+    case 'rs-pairs':
+    case 'rs-build':
+    case 'rs-type':
       return undefined;
   }
 }

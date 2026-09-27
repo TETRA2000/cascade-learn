@@ -27,13 +27,14 @@ export function Courses({ state, dispatch }: { state: AppState; dispatch: Dispat
           const p = courseProgress(state, c.id);
           const done = c.units.filter((u) => p.completedUnits[u.key]).length;
           const current = c.id === state.course;
+          const unitWord = c.units.length === 1 ? 'unit' : 'units';
           return (
             <li key={c.id}>
               <button
                 type="button"
                 className={styles.course}
                 aria-current={current ? 'true' : undefined}
-                aria-label={`${c.name}, ${done} of ${c.units.length} units, ${p.xp} XP${current ? ', current' : ''}`}
+                aria-label={`${c.name}, ${done} of ${c.units.length} ${unitWord}, ${p.xp} XP${current ? ', current' : ''}`}
                 onClick={() => dispatch({ type: 'selectCourse', course: c.id })}
               >
                 <span className={styles.icon}>
@@ -43,7 +44,7 @@ export function Courses({ state, dispatch }: { state: AppState; dispatch: Dispat
                   <span className={styles.name}>{c.name}</span>
                   <span className={styles.blurb}>{c.blurb}</span>
                   <span className={styles.meta}>
-                    {done} / {c.units.length} units · {p.xp} XP
+                    {done} / {c.units.length} {unitWord} · {p.xp} XP
                   </span>
                 </span>
                 {current ? (

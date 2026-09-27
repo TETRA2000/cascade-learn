@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Unit } from '../src/content/types';
+import type { Question, Unit } from '../src/content/types';
 import { rsBuild, rsCompiles, rsError, rsFix, rsPairs, rsPredict, rsType } from '../src/quiz/rustFixtures';
 import { collectSnippets, errorCode, firstError, judge, type Snippet } from './rust-check-lib.ts';
 
@@ -122,5 +122,22 @@ describe('collectSnippets', () => {
   it('reports a fix diff that no longer applies', () => {
     const broken = { ...rsFix, opts: [{ diff: ['- gone', '+ x'] }, ...rsFix.opts.slice(1)] };
     expect(collectSnippets([], [broken]).problems).toEqual(['rs-fix-1/option A: diff does not apply to the code']);
+  });
+
+  it('has nothing to compile for rs-pairs or a CSS question type', () => {
+    const cssPredict = {
+      id: 'predict-1',
+      type: 'predict',
+      prompt: 'p',
+      explain: 'e',
+      code: [],
+      stage: '',
+      kids: [],
+      opts: [],
+      answer: 0,
+    } as unknown as Question;
+    const { snippets, problems } = collectSnippets([], [rsPairs, cssPredict]);
+    expect(snippets).toEqual([]);
+    expect(problems).toEqual([]);
   });
 });

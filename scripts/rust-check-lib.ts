@@ -83,8 +83,20 @@ export function collectSnippets(units: readonly Unit[], questions: readonly Ques
       case 'rs-type':
         q.accept.forEach((value) => add(`${q.id}/${value}`, fillBlank(q.code, value), { kind: 'compiles' }));
         break;
-      default:
-        break; // rs-pairs and CSS questions have nothing to compile
+      // rs-pairs and every CSS question type have nothing to compile.
+      case 'rs-pairs':
+      case 'predict':
+      case 'pairs':
+      case 'versus':
+      case 'build':
+      case 'tune':
+      case 'bug':
+      case 'type':
+        break;
+      default: {
+        const exhaustive: never = q;
+        throw new Error(`collectSnippets: unhandled question type ${JSON.stringify((exhaustive as { type?: unknown }).type)}`);
+      }
     }
   }
   return { snippets, problems };

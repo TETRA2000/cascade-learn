@@ -78,7 +78,7 @@ function LearnTab({ course, state, dispatch }: Props) {
       <Hero
         kicker={kicker}
         title={hero.name}
-        blurb={`${hero.blurb} · ${hero.cards.length} short cards with live playgrounds`}
+        blurb={`${hero.blurb} · ${hero.cards.length} short cards`}
         action={nextUnit ? 'Start' : 'Review'}
         onAction={() => dispatch({ type: 'openUnit', unitKey: hero.key })}
       />

@@ -85,7 +85,7 @@ test('learn Ownership in Rust, practice it, and keep XP across courses', async (
 
   // Progress is per course; the header XP is global.
   await page.getByRole('button', { name: 'Rust, change course' }).click();
-  await expect(page.getByRole('button', { name: 'Rust, 1 of 1 units, 65 XP, current' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Rust, 1 of 1 unit, 65 XP, current' })).toBeVisible();
   await page.getByRole('button', { name: /^CSS,/ }).click();
   await expect(page.getByText('Start here')).toBeVisible();
   await expect(page.getByText('65 XP')).toBeVisible();

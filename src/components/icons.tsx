@@ -1,5 +1,5 @@
 // Inline SVG icons from the prototype. All decorative (aria-hidden); pair with text.
-import type { SVGProps } from 'react';
+import type { ReactElement, SVGProps } from 'react';
 import type { CourseIconName } from '../content';
 
 type IconProps = SVGProps<SVGSVGElement> & { size?: number };
@@ -162,6 +162,11 @@ export function RustIcon({ size = 24, ...rest }: IconProps) {
 }
 
 /** The icon a course names in courses.json. */
-export function CourseIcon({ name, ...rest }: IconProps & { name: CourseIconName }) {
-  return name === 'rust' ? <RustIcon {...rest} /> : <CssIcon {...rest} />;
+export function CourseIcon({ name, ...rest }: IconProps & { name: CourseIconName }): ReactElement {
+  switch (name) {
+    case 'css':
+      return <CssIcon {...rest} />;
+    case 'rust':
+      return <RustIcon {...rest} />;
+  }
 }

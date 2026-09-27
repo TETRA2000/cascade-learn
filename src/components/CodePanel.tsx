@@ -37,7 +37,7 @@ export function CodePanel({
   const rust = lang === 'rust';
   const shown = rust ? visibleLines(lines) : lines;
   return (
-    <pre id={id} className={styles.panel} aria-label={label}>
+    <pre id={id} className={rust ? `${styles.panel} ${styles.numbered}` : styles.panel} aria-label={label}>
       <code>
         {shown.map((line, i) => (
           <span key={i} className={styles.line}>
