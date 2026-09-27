@@ -34,3 +34,38 @@
 .html {
   color: var(--code-html);
 }
+
+.gutter {
+  display: inline-block;
+  width: 2.5ch;
+  margin-right: 1.5ch;
+  text-align: right;
+  color: var(--ink-faint);
+  user-select: none;
+}
+
+.keyword {
+  color: var(--code-keyword);
+}
+.type {
+  color: var(--code-type);
+}
+.string {
+  color: var(--code-string);
+}
+.number {
+  color: var(--code-number);
+}
+.comment {
+  color: var(--code-comment);
+  font-style: italic;
+}
+.lifetime {
+  color: var(--code-lifetime);
+}
+.macro {
+  color: var(--code-macro);
+}
+.plain {
+  color: var(--code-punct);
+}

@@ -37,6 +37,15 @@
   --code-value: #fcd34d;
   --code-punct: #d6d3e0;
   --code-html: #9c98b3;
+  --code-keyword: #f9a8d4; /* 9.4:1 */
+  --code-type: #7dd3fc; /* 10.2:1 */
+  --code-string: #86efac; /* 12.1:1 */
+  --code-number: #fcd34d; /* 11.8:1 */
+  --code-comment: #9c98b3; /* 6.1:1 */
+  --code-lifetime: #fdba74; /* 10.1:1 */
+  --code-macro: #c4b5fd; /* 9.2:1 */
+  --code-add: #86efac; /* 12.1:1 */
+  --code-del: #fca5a5; /* 8.9:1 */
 
   /* Type */
   --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
