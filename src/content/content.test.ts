@@ -79,3 +79,28 @@ describe('lessonName', () => {
     expect(lessonName(css, 'tune')).toBe('Tune to target');
   });
 });
+
+describe('rust content', () => {
+  const rust = courseById('rust');
+
+  it('has the starter unit and one question per type, in type order', () => {
+    expect(rust.units.map((u) => u.key)).toEqual(['ownership']);
+    expect(rust.units[0]!.cards).toHaveLength(5);
+    expect(rust.questions.map((q) => q.type)).toEqual(rust.questionTypes.map((t) => t.key));
+  });
+
+  it('builds runs from Rust questions only', () => {
+    expect(lessonQuestionIds(rust, 'mixed', () => 0)).toEqual([
+      'rs-predict-1',
+      'rs-pairs-1',
+      'rs-compiles-1',
+      'rs-build-1',
+      'rs-error-1',
+      'rs-fix-1',
+      'rs-type-1',
+    ]);
+    expect(lessonQuestionIds(rust, 'topic:ownership')).toHaveLength(7);
+    expect(lessonName(rust, 'topic:ownership')).toBe('Ownership & moves — practice');
+    expect(lessonName(rust, 'rs-fix')).toBe('Fix it');
+  });
+});

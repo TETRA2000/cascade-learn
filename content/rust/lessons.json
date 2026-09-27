@@ -1,0 +1,101 @@
+[
+  {
+    "key": "ownership",
+    "name": "Ownership & moves",
+    "blurb": "One owner per value, and what borrowing buys you",
+    "cards": [
+      {
+        "title": "Every value has one owner",
+        "body": "A `String` keeps its text on the heap and belongs to exactly one variable. When that owner goes out of scope, Rust frees the text for you — no garbage collector, no manual `free()`.",
+        "tip": "Owner leaves scope → value is dropped.",
+        "demo": {
+          "kind": "code",
+          "code": ["fn main() {", "    let s = String::from(\"hi\");", "    println!(\"{s}\");", "} // s is dropped here"],
+          "output": ["hi"]
+        }
+      },
+      {
+        "title": "Assignment moves",
+        "body": "Assigning a `String` to another variable moves it: the new variable becomes the owner and the old one can no longer be used. Pick what `t` gets and watch the compiler react.",
+        "tip": "`let t = s;` moves a `String`. Use `s.clone()` for a second copy, or `&s` to borrow.",
+        "demo": {
+          "kind": "rs-choice",
+          "label": "let t = …",
+          "opts": [
+            {
+              "label": "s",
+              "code": ["# fn main() {", "let s = String::from(\"hi\");", "let t = s;", "println!(\"{s} {t}\");", "# }"],
+              "error": "error[E0382]: borrow of moved value: `s`",
+              "note": "The String moved into `t`, so `s` is no longer usable."
+            },
+            {
+              "label": "s.clone()",
+              "code": ["# fn main() {", "let s = String::from(\"hi\");", "let t = s.clone();", "println!(\"{s} {t}\");", "# }"],
+              "output": ["hi hi"],
+              "note": "`clone()` copies the heap text: two owners, two Strings."
+            },
+            {
+              "label": "&s",
+              "code": ["# fn main() {", "let s = String::from(\"hi\");", "let t = &s;", "println!(\"{s} {t}\");", "# }"],
+              "output": ["hi hi"],
+              "note": "`t` borrows the String; `s` still owns it."
+            }
+          ]
+        }
+      },
+      {
+        "title": "Copy types don't move",
+        "body": "Integers, `bool`, `char` and other small fixed-size types are `Copy`: assignment copies the bits, so both variables stay usable.",
+        "tip": "Only types that own heap data (like `String` and `Vec`) move on assignment.",
+        "demo": {
+          "kind": "code",
+          "code": ["# fn main() {", "let a = 5;", "let b = a;", "println!(\"{a} {b}\");", "# }"],
+          "output": ["5 5"]
+        }
+      },
+      {
+        "title": "Borrowing with &",
+        "body": "A function that only needs to read a value can take a reference, `&String`. The caller passes `&s` and keeps ownership.",
+        "tip": "`&T` lends a value without giving it away.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "fn len(s: &String) -> usize {",
+            "    s.len()",
+            "}",
+            "",
+            "fn main() {",
+            "    let s = String::from(\"hello\");",
+            "    let n = len(&s);",
+            "    println!(\"{s} has {n} bytes\");",
+            "}"
+          ],
+          "output": ["hello has 5 bytes"]
+        }
+      },
+      {
+        "title": "&mut is exclusive",
+        "body": "To change a borrowed value you need `&mut`. While a `&mut` borrow is in use, nothing else may touch the value — not even another `&mut`.",
+        "tip": "Many `&T` or one `&mut T` — never both at once.",
+        "demo": {
+          "kind": "rs-choice",
+          "label": "Borrows",
+          "opts": [
+            {
+              "label": "one &mut",
+              "code": ["# fn main() {", "let mut v = vec![1, 2];", "let r = &mut v;", "r.push(3);", "println!(\"{v:?}\");", "# }"],
+              "output": ["[1, 2, 3]"],
+              "note": "`r` is done before `println!` reads `v`, so this is fine."
+            },
+            {
+              "label": "two &mut",
+              "code": ["# fn main() {", "let mut v = vec![1, 2];", "let a = &mut v;", "let b = &mut v;", "a.push(3);", "b.push(4);", "# }"],
+              "error": "error[E0499]: cannot borrow `v` as mutable more than once at a time",
+              "note": "`a` is still in use when `b` borrows `v` again."
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

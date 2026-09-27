@@ -1,0 +1,107 @@
+[
+  {
+    "id": "rs-predict-1",
+    "type": "rs-predict",
+    "prompt": "What does this program print?",
+    "code": ["# fn main() {", "let a = 5;", "let mut b = a;", "b += 1;", "println!(\"{a} {b}\");", "# }"],
+    "opts": [
+      { "text": "5 6", "kind": "output" },
+      { "text": "6 6", "kind": "output" },
+      { "text": "5 5", "kind": "output" },
+      { "text": "Doesn't compile", "kind": "error" }
+    ],
+    "answer": 0,
+    "explain": "`i32` is `Copy`, so `let mut b = a;` copies the number. Changing `b` leaves `a` at 5."
+  },
+  {
+    "id": "rs-pairs-1",
+    "type": "rs-pairs",
+    "prompt": "Match each type to what it means",
+    "items": [
+      { "id": "own", "left": "String", "right": "Owned, growable text" },
+      { "id": "shr", "left": "&String", "right": "Shared borrow, read-only" },
+      { "id": "mut", "left": "&mut String", "right": "Exclusive borrow, can change it" },
+      { "id": "cln", "left": "s.clone()", "right": "A deep copy with its own owner" }
+    ],
+    "order": ["mut", "cln", "own", "shr"],
+    "explain": "Owning, borrowing and copying are the three ways to hand a `String` around. `&` reads, `&mut` changes, `clone()` duplicates."
+  },
+  {
+    "id": "rs-compiles-1",
+    "type": "rs-compiles",
+    "prompt": "Which one compiles?",
+    "a": ["# fn main() {", "let s = String::from(\"hi\");", "let t = s;", "println!(\"{s} {t}\");", "# }"],
+    "b": ["# fn main() {", "let s = String::from(\"hi\");", "let t = &s;", "println!(\"{s} {t}\");", "# }"],
+    "answer": "b",
+    "error": "error[E0382]: borrow of moved value: `s`",
+    "explain": "In A, `let t = s;` moves the String into `t`, so `s` can't be printed afterwards. B only borrows it."
+  },
+  {
+    "id": "rs-build-1",
+    "type": "rs-build",
+    "prompt": "Fill the blanks so `shout` borrows the name and `main` can still print it",
+    "code": [
+      ["fn shout(s: ", { "slot": 0 }, ") -> String {"],
+      "    s.to_uppercase()",
+      "}",
+      "",
+      "fn main() {",
+      "    let name = String::from(\"ferris\");",
+      ["    let loud = shout(", { "slot": 1 }, ");"],
+      "    println!(\"{name} {loud}\");",
+      "}"
+    ],
+    "bank": ["String", "&String", "name", "&name", "&mut name"],
+    "answer": ["&String", "&name"],
+    "output": ["ferris FERRIS"],
+    "explain": "The parameter type `&String` asks for a borrow, and the call passes one with `&name`. Ownership stays in `main`."
+  },
+  {
+    "id": "rs-error-1",
+    "type": "rs-error",
+    "prompt": "rustc rejects one line. Which one?",
+    "code": [
+      "fn main() {",
+      "    let v = vec![1, 2, 3];",
+      "    let w = v;",
+      "    println!(\"{}\", w.len());",
+      "    println!(\"{}\", v.len());",
+      "}"
+    ],
+    "answer": 5,
+    "error": "error[E0382]: borrow of moved value: `v`",
+    "explain": "Line 3 moves the vector into `w`. That line is fine; rustc reports the error where `v` is used after the move."
+  },
+  {
+    "id": "rs-fix-1",
+    "type": "rs-fix",
+    "prompt": "Pick the change that makes this compile",
+    "code": ["fn main() {", "    let s = String::from(\"hi\");", "    let t = s;", "    println!(\"{s} {t}\");", "}"],
+    "error": "error[E0382]: borrow of moved value: `s`",
+    "opts": [
+      { "diff": ["-     let t = s;", "+     let t = s.clone();"] },
+      { "diff": ["-     println!(\"{s} {t}\");", "+     println!(\"{t} {s}\");"] },
+      { "diff": ["-     let s = String::from(\"hi\");", "+     let mut s = String::from(\"hi\");"] }
+    ],
+    "answer": 0,
+    "explain": "`s.clone()` gives `t` its own String, so `s` is never moved. Reordering the print or adding `mut` doesn't undo the move."
+  },
+  {
+    "id": "rs-type-1",
+    "type": "rs-type",
+    "prompt": "Type the missing token so `add_one` can change the vector",
+    "code": [
+      "fn add_one(v: ___ Vec<i32>) {",
+      "    v.push(1);",
+      "}",
+      "",
+      "fn main() {",
+      "    let mut v = vec![];",
+      "    add_one(&mut v);",
+      "    println!(\"{v:?}\");",
+      "}"
+    ],
+    "accept": ["&mut", "& mut"],
+    "explain": "Changing a borrowed value needs an exclusive borrow: `&mut Vec<i32>`."
+  }
+]

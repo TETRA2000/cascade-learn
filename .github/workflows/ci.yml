@@ -46,3 +46,20 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  rust-content:
+    name: Rust content compiles
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # Reads rust-toolchain.toml. The checker calls rustc directly, so no cargo cache.
+      - uses: actions-rust-lang/setup-rust-toolchain@v2
+        with:
+          cache: false
+          rustflags: ''
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run check:rust

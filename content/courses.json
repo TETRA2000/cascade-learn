@@ -5,5 +5,12 @@
     "tagline": "CSS, one tap at a time",
     "blurb": "Selectors, the box model, flexbox and grid, with live playgrounds.",
     "icon": "css"
+  },
+  {
+    "id": "rust",
+    "name": "Rust",
+    "tagline": "Rust, one tap at a time",
+    "blurb": "Ownership, borrowing, enums and errors, for developers who already code.",
+    "icon": "rust"
   }
 ]

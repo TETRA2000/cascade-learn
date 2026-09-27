@@ -1,0 +1,9 @@
+[
+  { "key": "rs-predict", "name": "Predict the output", "blurb": "Read Rust, pick what it prints" },
+  { "key": "rs-pairs", "name": "Match pairs", "blurb": "Code ↔ what it means" },
+  { "key": "rs-compiles", "name": "Compiles?", "blurb": "Pick the snippet rustc accepts" },
+  { "key": "rs-build", "name": "Word bank", "blurb": "Fill the blanks, see the output" },
+  { "key": "rs-error", "name": "Spot the error", "blurb": "Find the line rustc rejects" },
+  { "key": "rs-fix", "name": "Fix it", "blurb": "Pick the change that compiles" },
+  { "key": "rs-type", "name": "Type the token", "blurb": "Recall it from memory" }
+]
