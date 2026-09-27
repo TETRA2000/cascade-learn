@@ -1,0 +1,5 @@
+# rustc for `npm run check:rust` (content checks only; the app never runs Rust).
+# Pinned so error codes and spans in authored answers stay stable.
+[toolchain]
+channel = "1.93.0"
+profile = "minimal"
