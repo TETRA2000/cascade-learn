@@ -157,7 +157,7 @@ describe('ts content', () => {
   it('is valid', () => expect(validateContent(ts)).toEqual([]));
 
   it('has Values & equality with 6 cards and an 8-question quiz in type order', () => {
-    expect(ts.units.map((u) => u.key)).toEqual(['values', 'objects', 'functions']);
+    expect(ts.units.map((u) => u.key)).toEqual(['values', 'objects', 'functions', 'narrowing']);
     expect(ts.units[0]!.cards).toHaveLength(6);
     const quiz = ts.topics.values!.map((id) => ts.questions.find((q) => q.id === id)!.type);
     expect(quiz).toEqual([...TS_TYPE_KEYS]);
@@ -179,6 +179,21 @@ describe('ts content', () => {
     const quiz = ts.topics.functions!.map((id) => ts.questions.find((q) => q.id === id)!.type);
     expect(quiz).toEqual([...TS_TYPE_KEYS]);
     expect(ts.topics.functions).toEqual(TS_TYPE_KEYS.map((k) => `${k}-3`));
+  });
+
+  it('has Unions & narrowing with 6 cards and an 8-question quiz in type order', () => {
+    const unit = ts.units.find((u) => u.key === 'narrowing')!;
+    expect(unit.name).toBe('Unions & narrowing');
+    expect(unit.blurb).toBe('Model "one of these" and let the compiler prove which');
+    expect(unit.cards).toHaveLength(6);
+    const quiz = ts.topics.narrowing!.map((id) => ts.questions.find((q) => q.id === id)!.type);
+    expect(quiz).toEqual([...TS_TYPE_KEYS]);
+    expect(ts.topics.narrowing).toEqual(TS_TYPE_KEYS.map((k) => `${k}-4`));
+  });
+
+  it('has 23 cards and 32 questions in total', () => {
+    expect(ts.units.reduce((n, u) => n + u.cards.length, 0)).toBe(23);
+    expect(ts.questions).toHaveLength(32);
   });
 
   it('builds runs from TypeScript questions only', () => {

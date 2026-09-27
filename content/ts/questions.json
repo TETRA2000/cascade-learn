@@ -296,5 +296,120 @@
     "code": ["type Getter = () => number;", "const getters: Getter[] = [];", "for (___ i = 0; i < 3; i++) {", "  getters.push(() => i);", "}", "console.log(getters.map((g) => g()));"],
     "accept": ["let"],
     "explain": "`let` in a `for` header makes a fresh `i` for each pass, so each function captures its own. With `var`, all three share one `i` and print `[ 3, 3, 3 ]`."
+  },
+  {
+    "id": "ts-predict-4",
+    "type": "ts-predict",
+    "prompt": "What does this program print?",
+    "code": ["type Profile = { name: string | null; score: number | null };", "const p: Profile = { name: \"\", score: 0 };", "console.log(`[${p.name ?? \"guest\"}] ${p.score || 99}`);"],
+    "opts": [
+      { "text": "[] 0", "kind": "output" },
+      { "text": "[] 99", "kind": "output" },
+      { "text": "[guest] 0", "kind": "output" },
+      { "text": "[guest] 99", "kind": "output" }
+    ],
+    "answer": 1,
+    "explain": "`??` falls back only for `null` or `undefined`, so the empty name stays `\"\"`. `||` falls back for any falsy value, so the score of `0` becomes `99`."
+  },
+  {
+    "id": "ts-pairs-4",
+    "type": "ts-pairs",
+    "prompt": "Match each piece of code to what it means",
+    "items": [
+      { "id": "union", "left": "string | number", "right": "Either a string or a number" },
+      { "id": "literal", "left": "\"up\" | \"down\"", "right": "Only these two exact strings" },
+      { "id": "nullish", "left": "a ?? b", "right": "b only when a is null or undefined" },
+      { "id": "never", "left": "never", "right": "A type with no values" }
+    ],
+    "order": ["nullish", "never", "literal", "union"],
+    "explain": "`|` joins types into a union, and a union of literal types lists exact values. `??` falls back only for `null` and `undefined`, and `never` is what's left once every possibility is ruled out."
+  },
+  {
+    "id": "ts-infer-4",
+    "type": "ts-infer",
+    "prompt": "What type does the editor show for `x` on line 3?",
+    "code": ["function show(x: string | number) {", "  if (typeof x === \"string\") {", "    console.log(x.toUpperCase());", "  } else {", "    console.log(x * 2);", "  }", "}", "show(\"hi\");", "show(21);"],
+    "line": 3,
+    "name": "x",
+    "opts": ["string | number", "string", "number", "\"string\""],
+    "answer": 1,
+    "explain": "Inside the `if`, tsc has narrowed `x` from `string | number` to `string`, which is why `toUpperCase` is allowed. `\"string\"` is what `typeof` returns at runtime, not `x`'s type."
+  },
+  {
+    "id": "ts-compiles-4",
+    "type": "ts-compiles",
+    "prompt": "Which one type-checks?",
+    "a": ["type Size = \"small\" | \"large\";", "function order(size: Size) {", "  console.log(`One ${size} coffee`);", "}", "const drink = { size: \"large\" };", "order(drink.size);"],
+    "b": ["type Size = \"small\" | \"large\";", "function order(size: Size) {", "  console.log(`One ${size} coffee`);", "}", "const size = \"large\";", "order(size);"],
+    "answer": "b",
+    "error": "error TS2345: Argument of type 'string' is not assignable to parameter of type 'Size'.",
+    "explain": "A `const` string keeps its literal type `\"large\"`, which is a `Size`. An object property can be reassigned, so in A `drink.size` widens to `string`, even though `drink` is a `const`."
+  },
+  {
+    "id": "ts-build-4",
+    "type": "ts-build",
+    "prompt": "Fill the blanks so this type-checks and prints `radius 2 side 5`",
+    "code": [
+      "type Shape = { kind: \"circle\"; radius: number } | { kind: \"square\"; side: number };",
+      "function label(s: Shape) {",
+      ["  switch (s.", { "slot": 0 }, ") {"],
+      "    case \"circle\":",
+      ["      return `radius ${s.", { "slot": 1 }, "}`;"],
+      "    case \"square\":",
+      "      return `side ${s.side}`;",
+      "  }",
+      "}",
+      "console.log(label({ kind: \"circle\", radius: 2 }), label({ kind: \"square\", side: 5 }));"
+    ],
+    "bank": ["kind", "type", "radius", "side", "circle"],
+    "answer": ["kind", "radius"],
+    "output": ["radius 2 side 5"],
+    "explain": "Switching on the `kind` tag narrows `s`, so inside `case \"circle\":` it's a circle and has a `radius`. `s.side` there would be a type error, because only a square has a `side`."
+  },
+  {
+    "id": "ts-error-4",
+    "type": "ts-error",
+    "prompt": "tsc rejects one line. Which one?",
+    "code": [
+      "type Light = \"red\" | \"amber\" | \"green\";",
+      "function next(light: Light): Light {",
+      "  switch (light) {",
+      "    case \"red\":",
+      "      return \"green\";",
+      "    case \"green\":",
+      "      return \"amber\";",
+      "    default: {",
+      "      const unreachable: never = light;",
+      "      return unreachable;",
+      "    }",
+      "  }",
+      "}",
+      "console.log(next(\"red\"));"
+    ],
+    "answer": 9,
+    "error": "error TS2322: Type '\"amber\"' is not assignable to type 'never'.",
+    "explain": "There's no `case \"amber\":`, so `light` can still be `\"amber\"` in `default:`. tsc reports it where that value meets the `never` variable, on line 9."
+  },
+  {
+    "id": "ts-fix-4",
+    "type": "ts-fix",
+    "prompt": "Pick the change that makes this type-check",
+    "code": ["function shout(word: string | null) {", "  return word.toUpperCase();", "}", "console.log(shout(\"hi\"), shout(null));"],
+    "error": "error TS18047: 'word' is possibly 'null'.",
+    "opts": [
+      { "diff": ["- function shout(word: string | null) {", "+ function shout(word: string) {"] },
+      { "diff": ["- console.log(shout(\"hi\"), shout(null));", "+ console.log(shout(\"hi\"));"] },
+      { "diff": ["-   return word.toUpperCase();", "+   return word?.toUpperCase();"] }
+    ],
+    "answer": 2,
+    "explain": "`word?.toUpperCase()` gives `undefined` instead of throwing when `word` is `null`. Dropping `null` from the type breaks the `shout(null)` call, and removing that call doesn't change `word`'s type inside the function."
+  },
+  {
+    "id": "ts-type-4",
+    "type": "ts-type",
+    "prompt": "Type the missing keyword so tsc narrows `pet` and this type-checks",
+    "code": ["type Fish = { swim: string };", "type Bird = { fly: string };", "function move(pet: Fish | Bird) {", "  if (\"swim\" ___ pet) {", "    return pet.swim;", "  }", "  return pet.fly;", "}", "console.log(move({ swim: \"paddles\" }), move({ fly: \"flaps\" }));"],
+    "accept": ["in"],
+    "explain": "`\"swim\" in pet` checks whether `pet` has a `swim` property, so tsc narrows it to `Fish` inside the `if` and to `Bird` after it."
   }
 ]

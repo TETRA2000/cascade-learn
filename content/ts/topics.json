@@ -1,5 +1,6 @@
 {
   "values": ["ts-predict-1", "ts-pairs-1", "ts-infer-1", "ts-compiles-1", "ts-build-1", "ts-error-1", "ts-fix-1", "ts-type-1"],
   "objects": ["ts-predict-2", "ts-pairs-2", "ts-infer-2", "ts-compiles-2", "ts-build-2", "ts-error-2", "ts-fix-2", "ts-type-2"],
-  "functions": ["ts-predict-3", "ts-pairs-3", "ts-infer-3", "ts-compiles-3", "ts-build-3", "ts-error-3", "ts-fix-3", "ts-type-3"]
+  "functions": ["ts-predict-3", "ts-pairs-3", "ts-infer-3", "ts-compiles-3", "ts-build-3", "ts-error-3", "ts-fix-3", "ts-type-3"],
+  "narrowing": ["ts-predict-4", "ts-pairs-4", "ts-infer-4", "ts-compiles-4", "ts-build-4", "ts-error-4", "ts-fix-4", "ts-type-4"]
 }

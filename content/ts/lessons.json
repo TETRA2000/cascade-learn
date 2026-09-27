@@ -402,5 +402,169 @@
         }
       }
     ]
+  },
+  {
+    "key": "narrowing",
+    "name": "Unions & narrowing",
+    "blurb": "Model \"one of these\" and let the compiler prove which",
+    "cards": [
+      {
+        "title": "Union types",
+        "body": "`string | number` is a union type: the value is a string or a number. tsc accepts either, but only lets you do what works for both, like putting it in a template string. At runtime, `typeof id` tells you which one you have.",
+        "tip": "An array of either is `(string | number)[]`. Without the parentheses, `string | number[]` means a string or an array of numbers.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "function describe(id: string | number) {",
+            "  return `id ${id} is a ${typeof id}`;",
+            "}",
+            "console.log(describe(42));",
+            "console.log(describe(\"A-7\"));",
+            "const ids: (string | number)[] = [1, \"B-2\"];",
+            "console.log(ids);"
+          ],
+          "output": ["id 42 is a number", "id A-7 is a string", "[ 1, 'B-2' ]"]
+        }
+      },
+      {
+        "title": "Narrowing with typeof and in",
+        "body": "Inside `if (typeof x === \"string\")`, tsc knows `x` is a `string`; this is called narrowing. For a union of object types, `\"bark\" in pet` checks for a property and narrows `pet` to the members that have it.",
+        "tip": "After an `if` that returns, tsc knows the rest of the function only sees what's left: here, a `number`.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "Narrow with …",
+          "opts": [
+            {
+              "label": "no check",
+              "code": ["function boost(x: string | number) {", "  return x.toUpperCase();", "}", "console.log(boost(\"hi\"));"],
+              "error": "error TS2339: Property 'toUpperCase' does not exist on type 'string | number'.",
+              "note": "A `number` has no `toUpperCase`, so tsc won't call it on something that might be one."
+            },
+            {
+              "label": "typeof",
+              "code": ["function boost(x: string | number) {", "  if (typeof x === \"string\") {", "    return x.toUpperCase();", "  }", "  return x * 10;", "}", "console.log(boost(\"hi\"), boost(4));"],
+              "output": ["HI 40"],
+              "note": "`x` is a `string` inside the `if`. The `if` returns, so after it `x` can only be a `number`."
+            },
+            {
+              "label": "in",
+              "code": ["type Dog = { name: string; bark: string };", "type Fish = { name: string; swim: string };", "function describe(pet: Dog | Fish) {", "  if (\"bark\" in pet) {", "    return `${pet.name} says ${pet.bark}`;", "  }", "  return `${pet.name} can ${pet.swim}`;", "}", "console.log(describe({ name: \"Rex\", bark: \"woof\" }));"],
+              "output": ["Rex says woof"],
+              "note": "`typeof` gives `\"object\"` for both shapes, so check for a property with `in` instead."
+            }
+          ]
+        }
+      },
+      {
+        "title": "Literal types",
+        "body": "A literal type is one exact value, like `\"up\"` or `42`. `const dir = \"up\"` has type `\"up\"` because it can never change, but `let dir = \"up\"` widens to `string`. A union of literals such as `\"up\" | \"down\"` lists every allowed value.",
+        "tip": "Object properties widen like `let` does: `{ size: \"large\" }` has `size: string`.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "Declare dir with …",
+          "opts": [
+            {
+              "label": "const dir = \"up\"",
+              "code": ["type Dir = \"up\" | \"down\";", "function move(d: Dir) {", "  console.log(`Moving ${d}`);", "}", "const dir = \"up\";", "move(dir);"],
+              "output": ["Moving up"],
+              "note": "`dir` has type `\"up\"`, which is one of the values `Dir` allows."
+            },
+            {
+              "label": "let dir = \"up\"",
+              "code": ["type Dir = \"up\" | \"down\";", "function move(d: Dir) {", "  console.log(`Moving ${d}`);", "}", "let dir = \"up\";", "move(dir);"],
+              "error": "error TS2345: Argument of type 'string' is not assignable to parameter of type 'Dir'.",
+              "note": "A `let` could later hold any string, so tsc widens it to `string`, and not every string is a `Dir`."
+            },
+            {
+              "label": "let dir: Dir = \"up\"",
+              "code": ["type Dir = \"up\" | \"down\";", "function move(d: Dir) {", "  console.log(`Moving ${d}`);", "}", "let dir: Dir = \"up\";", "move(dir);"],
+              "output": ["Moving up"],
+              "note": "Annotate a `let` to keep it changeable but limited to `\"up\"` or `\"down\"`."
+            }
+          ]
+        }
+      },
+      {
+        "title": "Discriminated unions",
+        "body": "Give every member of a union the same property with a different literal type, such as `kind: \"circle\"`. Checking `kind` in a `switch` narrows the whole object, so each `case` can use that shape's own properties.",
+        "tip": "This pattern is called a discriminated union, and `kind` is its tag. The leading `|` just lets each member start its own line.",
+        "demo": {
+          "kind": "code",
+          "code": [
+            "type Shape =",
+            "  | { kind: \"circle\"; radius: number }",
+            "  | { kind: \"square\"; side: number };",
+            "function area(s: Shape): number {",
+            "  switch (s.kind) {",
+            "    case \"circle\":",
+            "      return 3.14 * s.radius * s.radius;",
+            "    case \"square\":",
+            "      return s.side * s.side;",
+            "  }",
+            "}",
+            "console.log(area({ kind: \"circle\", radius: 1 }), area({ kind: \"square\", side: 3 }));"
+          ],
+          "output": ["3.14 9"]
+        }
+      },
+      {
+        "title": "?. and ?? vs ||",
+        "body": "`a?.b` reads `b` only when `a` isn't `null` or `undefined`; otherwise it gives `undefined` instead of throwing. `x ?? 50` falls back to `50` only when `x` is `null` or `undefined`, but `x || 50` falls back for any falsy value, including `0` and `\"\"`.",
+        "tip": "Use `??` for defaults whenever `0` or `\"\"` is a real value.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "Read the volume with …",
+          "opts": [
+            {
+              "label": "settings.volume || 50",
+              "code": ["type User = { settings?: { volume?: number } };", "const user: User = { settings: { volume: 0 } };", "console.log(user.settings.volume || 50);"],
+              "error": "error TS18048: 'user.settings' is possibly 'undefined'.",
+              "note": "`settings` is optional, so tsc makes you handle the case where it's missing."
+            },
+            {
+              "label": "settings?.volume || 50",
+              "code": ["type User = { settings?: { volume?: number } };", "const user: User = { settings: { volume: 0 } };", "console.log(user.settings?.volume || 50);"],
+              "output": ["50"],
+              "note": "`?.` handles the missing `settings`, but `0` is falsy, so `||` replaces a real volume of zero."
+            },
+            {
+              "label": "settings?.volume ?? 50",
+              "code": ["type User = { settings?: { volume?: number } };", "const user: User = { settings: { volume: 0 } };", "console.log(user.settings?.volume ?? 50);"],
+              "output": ["0"],
+              "note": "`0` is neither `null` nor `undefined`, so `??` keeps it."
+            }
+          ]
+        }
+      },
+      {
+        "title": "Exhaustiveness with never",
+        "body": "`never` is the type with no values. When a `switch` handles every member of a union, the value in `default:` has type `never`, so it can go into a `never` variable. Add a member and forget its `case`, and that line becomes a type error.",
+        "tip": "The check costs nothing at runtime: when every case is handled, `default:` never runs.",
+        "demo": {
+          "kind": "code-choice",
+          "label": "type Shape = …",
+          "opts": [
+            {
+              "label": "circle | square",
+              "code": ["type Shape =", "  | { kind: \"circle\"; radius: number }", "  | { kind: \"square\"; side: number };", "function area(s: Shape): number {", "  switch (s.kind) {", "    case \"circle\":", "      return 3.14 * s.radius * s.radius;", "    case \"square\":", "      return s.side * s.side;", "    default: {", "      const unreachable: never = s;", "      return unreachable;", "    }", "  }", "}", "console.log(area({ kind: \"square\", side: 3 }));"],
+              "output": ["9"],
+              "note": "Both members have a `case`, so nothing is left for `default:` and `s` is `never` there."
+            },
+            {
+              "label": "… | triangle, no case",
+              "code": ["type Shape =", "  | { kind: \"circle\"; radius: number }", "  | { kind: \"square\"; side: number }", "  | { kind: \"triangle\"; base: number; height: number };", "function area(s: Shape): number {", "  switch (s.kind) {", "    case \"circle\":", "      return 3.14 * s.radius * s.radius;", "    case \"square\":", "      return s.side * s.side;", "    default: {", "      const unreachable: never = s;", "      return unreachable;", "    }", "  }", "}", "console.log(area({ kind: \"square\", side: 3 }));"],
+              "error": "error TS2322: Type '{ kind: \"triangle\"; base: number; height: number; }' is not assignable to type 'never'.",
+              "note": "A triangle reaches `default:`, so `s` isn't `never` there, and tsc flags the forgotten case."
+            },
+            {
+              "label": "… | triangle, with a case",
+              "code": ["type Shape =", "  | { kind: \"circle\"; radius: number }", "  | { kind: \"square\"; side: number }", "  | { kind: \"triangle\"; base: number; height: number };", "function area(s: Shape): number {", "  switch (s.kind) {", "    case \"circle\":", "      return 3.14 * s.radius * s.radius;", "    case \"square\":", "      return s.side * s.side;", "    case \"triangle\":", "      return (s.base * s.height) / 2;", "    default: {", "      const unreachable: never = s;", "      return unreachable;", "    }", "  }", "}", "console.log(area({ kind: \"triangle\", base: 4, height: 3 }));"],
+              "output": ["6"],
+              "note": "Handling the new member makes `s` `never` in `default:` again."
+            }
+          ]
+        }
+      }
+    ]
   }
 ]
