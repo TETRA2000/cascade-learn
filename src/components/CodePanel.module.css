@@ -69,3 +69,13 @@
 .plain {
   color: var(--code-punct);
 }
+
+/* --code-value on #34305a is 8.8:1. */
+.blank {
+  padding: 0 4px;
+  border-bottom: 2px solid var(--code-value);
+  border-radius: 4px;
+  background: #34305a;
+  color: var(--code-value);
+  font-weight: 700;
+}

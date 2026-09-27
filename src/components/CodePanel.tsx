@@ -1,6 +1,6 @@
 import { highlightLine } from '../lib/highlight';
 import { highlightRust } from '../lib/highlightRust';
-import { visibleLines } from '../lib/rustCode';
+import { BLANK, visibleLines } from '../lib/rustCode';
 import styles from './CodePanel.module.css';
 
 export type CodeLang = 'css' | 'rust';
@@ -20,7 +20,20 @@ export function CodeTokens({ line, lang = 'css' }: { line: string; lang?: CodeLa
 }
 
 /** Dark editor panel with syntax colors. Rust panels hide `# ` lines and number the rest. */
-export function CodePanel({ lines, label, lang = 'css', id }: { lines: readonly string[]; label?: string; lang?: CodeLang; id?: string }) {
+export function CodePanel({
+  lines,
+  label,
+  lang = 'css',
+  id,
+  blank,
+}: {
+  lines: readonly string[];
+  label?: string;
+  lang?: CodeLang;
+  id?: string;
+  /** rs-type: text shown in the `___` blank (the blank itself while empty). */
+  blank?: string;
+}) {
   const rust = lang === 'rust';
   const shown = rust ? visibleLines(lines) : lines;
   return (
@@ -33,11 +46,25 @@ export function CodePanel({ lines, label, lang = 'css', id }: { lines: readonly 
                 {i + 1}
               </span>
             )}
-            <CodeTokens line={line} lang={lang} />
+            <LineContent line={line} lang={lang} blank={blank} />
             {'\n'}
           </span>
         ))}
       </code>
     </pre>
+  );
+}
+
+function LineContent({ line, lang, blank }: { line: string; lang: CodeLang; blank?: string }) {
+  const at = blank === undefined ? -1 : line.indexOf(BLANK);
+  if (at === -1) return <CodeTokens line={line} lang={lang} />;
+  return (
+    <>
+      <CodeTokens line={line.slice(0, at)} lang={lang} />
+      <mark className={styles.blank} data-testid="code-blank">
+        {blank || BLANK}
+      </mark>
+      <CodeTokens line={line.slice(at + BLANK.length)} lang={lang} />
+    </>
   );
 }

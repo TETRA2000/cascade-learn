@@ -10,6 +10,7 @@ import {
   type Question,
   type RustPairsQuestion,
 } from '../content';
+import { TOKEN_MAX_LENGTH } from '../lib/rustCode';
 import { HEARTS_PER_LESSON, XP_FIRST_TRY, XP_RETRY } from '../state/rules';
 import { canCheck, freshAnswer, isCorrect } from './grade';
 import type { AnswerState, Session } from './types';
@@ -115,8 +116,11 @@ export function sessionReducer(s: Session, action: SessionAction): Session {
       return withAnswer(s, { num: Math.min(q.max, Math.max(q.min, a.num + action.dir * q.step)) });
     }
 
-    case 'input':
-      return a.checked ? s : withAnswer(s, { val: action.val });
+    case 'input': {
+      if (a.checked) return s;
+      // rs-type input is capped even if the input's maxlength is bypassed (e.g. a paste from a script).
+      return withAnswer(s, { val: q.type === 'rs-type' ? action.val.slice(0, TOKEN_MAX_LENGTH) : action.val });
+    }
 
     case 'pickPair': {
       if (!isPairs(q) || a.checked || a.matched[action.id]) return s;
