@@ -1,11 +1,11 @@
 // Runtime checks for the content JSON. The typed exports in ./index.ts are
 // unchecked casts, so this is what guarantees they tell the truth.
 // Each function returns a list of human-readable problems; empty means valid.
-import { isRustDemo } from './guards';
+import { isRustDemo, isRustQuestion } from './guards';
 import { COURSE_ICON_NAMES, isCourseId, TYPE_KEYS, type CourseId } from './typeKeys';
 import type { Course, CourseInfo, Demo } from './types';
 import { validateCssDemo, validateCssQuestion } from './validateCss';
-import { validateRustDemo } from './validateRust';
+import { validateRustDemo, validateRustQuestion } from './validateRust';
 import { isStr, isStrArr, type Err } from './validateUtil';
 
 /** courses.json against the course ids this build bundles content for. */
@@ -74,7 +74,8 @@ export function validateContent(c: Course): string[] {
     ids.add(q.id);
     if (!keys.includes(q.type)) return err(at, `unknown type "${String(q.type)}"`);
     if (q.explain && q.explain.split('`').length % 2 === 0) err(at, 'explain has an unmatched backtick');
-    validateCssQuestion(q, at, err);
+    if (isRustQuestion(q)) validateRustQuestion(q, at, err);
+    else validateCssQuestion(q, at, err);
   });
   keys.forEach((t) => {
     if (!c.questions.some((q) => q.type === t)) err('questions', `no question of type "${t}" (mixed review needs one)`);

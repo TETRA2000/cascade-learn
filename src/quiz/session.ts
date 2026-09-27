@@ -1,5 +1,15 @@
 // One quiz run — a pure port of start/grade/check/next/resolvePair in the prototype.
-import { courseById, questionById, type CourseId, type LessonKey, type PairsQuestion, type Question } from '../content';
+import {
+  courseById,
+  isBuild,
+  isPairs,
+  questionById,
+  type CourseId,
+  type LessonKey,
+  type PairsQuestion,
+  type Question,
+  type RustPairsQuestion,
+} from '../content';
 import { HEARTS_PER_LESSON, XP_FIRST_TRY, XP_RETRY } from '../state/rules';
 import { canCheck, freshAnswer, isCorrect } from './grade';
 import type { AnswerState, Session } from './types';
@@ -64,7 +74,7 @@ function grade(s: Session, q: Question, ok: boolean, patch: Partial<AnswerState>
   return { ...graded, hearts: Math.max(0, s.hearts - 1), missed: { ...s.missed, [q.id]: true }, queue: [...s.queue, q.id] };
 }
 
-function resolvePair(s: Session, q: PairsQuestion, left: string, right: string): Session {
+function resolvePair(s: Session, q: PairsQuestion | RustPairsQuestion, left: string, right: string): Session {
   if (left === right) {
     const matched = { ...s.answer.matched, [left]: true as const };
     const patch = { matched, left: null, right: null, miss: null };
@@ -85,7 +95,7 @@ export function sessionReducer(s: Session, action: SessionAction): Session {
       return a.checked ? s : withAnswer(s, { sel: action.sel });
 
     case 'placeWord': {
-      if (q.type !== 'build' || a.checked || a.slots.includes(action.bankIndex)) return s;
+      if (!isBuild(q) || a.checked || a.slots.includes(action.bankIndex)) return s;
       const at = a.slots.indexOf(null);
       if (at === -1) return s;
       const slots = [...a.slots];
@@ -109,7 +119,7 @@ export function sessionReducer(s: Session, action: SessionAction): Session {
       return a.checked ? s : withAnswer(s, { val: action.val });
 
     case 'pickPair': {
-      if (q.type !== 'pairs' || a.checked || a.matched[action.id]) return s;
+      if (!isPairs(q) || a.checked || a.matched[action.id]) return s;
       if (action.side === 'left') {
         return a.right ? resolvePair(s, q, action.id, a.right) : withAnswer(s, { left: action.id, miss: null });
       }

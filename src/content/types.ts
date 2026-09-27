@@ -223,7 +223,87 @@ export type CssQuestion =
   | BugQuestion
   | TypeQuestion;
 
-export type Question = CssQuestion;
+// ----- Rust questions -----
+// Code arrays are plain Rust. Lines starting with `# ` are hidden setup (see lib/rustCode.ts).
+// `error` strings are rustc's first error line, e.g. `error[E0382]: borrow of moved value: \`s\``.
+
+export interface RustPredictQuestion extends QuestionBase {
+  type: 'rs-predict';
+  code: string[];
+  /** `output` options render as program output; the `error` option reads "Doesn't compile". */
+  opts: { text: string; kind: 'output' | 'error' }[];
+  answer: number;
+  /** Required exactly when the answer is the `error` option. */
+  error?: string;
+}
+
+export interface RustPairsQuestion extends QuestionBase {
+  type: 'rs-pairs';
+  items: { id: string; left: string; right: string }[];
+  /** Right-column order, by item id. */
+  order: string[];
+}
+
+export interface RustCompilesQuestion extends QuestionBase {
+  type: 'rs-compiles';
+  a: string[];
+  b: string[];
+  /** The snippet that compiles. */
+  answer: 'a' | 'b';
+  /** What rustc says about the other one. */
+  error: string;
+}
+
+export type RustBuildSegment = string | { slot: number };
+/** A plain line, or text segments with inline slots. */
+export type RustBuildLine = string | RustBuildSegment[];
+
+export interface RustBuildQuestion extends QuestionBase {
+  type: 'rs-build';
+  code: RustBuildLine[];
+  /** May contain duplicates — chips are tracked by index. */
+  bank: string[];
+  /** The word for each slot, by slot number. */
+  answer: string[];
+  /** What the finished program prints. */
+  output?: string[];
+}
+
+export interface RustErrorQuestion extends QuestionBase {
+  type: 'rs-error';
+  code: string[];
+  /** 1-based visible line that rustc rejects. */
+  answer: number;
+  error: string;
+}
+
+export interface RustFixQuestion extends QuestionBase {
+  type: 'rs-fix';
+  code: string[];
+  error: string;
+  /** Each diff: `- old line` lines (a contiguous run of `code`) then `+ new line` lines. */
+  opts: { diff: string[] }[];
+  answer: number;
+}
+
+export interface RustTypeQuestion extends QuestionBase {
+  type: 'rs-type';
+  /** Exactly one `___` blank. */
+  code: string[];
+  /** Normalized answers (trimmed, single spaces); matching is case-sensitive. */
+  accept: string[];
+}
+
+export type RustQuestion =
+  | RustPredictQuestion
+  | RustPairsQuestion
+  | RustCompilesQuestion
+  | RustBuildQuestion
+  | RustErrorQuestion
+  | RustFixQuestion
+  | RustTypeQuestion;
+
+export type Question = CssQuestion | RustQuestion;
 
 // ----- topics.json -----
 

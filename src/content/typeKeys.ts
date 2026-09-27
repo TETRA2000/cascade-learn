@@ -16,10 +16,14 @@ export type CourseIconName = (typeof COURSE_ICON_NAMES)[number];
 export const CSS_TYPE_KEYS = ['predict', 'pairs', 'versus', 'build', 'tune', 'bug', 'type'] as const;
 export type CssTypeKey = (typeof CSS_TYPE_KEYS)[number];
 
-export type QuestionTypeKey = CssTypeKey;
+/** Rust question types in difficulty order; rust/question-types.json must match. */
+export const RUST_TYPE_KEYS = ['rs-predict', 'rs-pairs', 'rs-compiles', 'rs-build', 'rs-error', 'rs-fix', 'rs-type'] as const;
+export type RustTypeKey = (typeof RUST_TYPE_KEYS)[number];
+
+export type QuestionTypeKey = CssTypeKey | RustTypeKey;
 
 /** Each course's question types, in the order its question-types.json must list them. */
 export const TYPE_KEYS: Record<CourseId, readonly QuestionTypeKey[]> = {
   css: CSS_TYPE_KEYS,
-  rust: [],
+  rust: RUST_TYPE_KEYS,
 };

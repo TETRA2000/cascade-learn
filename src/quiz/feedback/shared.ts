@@ -5,6 +5,8 @@ export interface FeedbackText {
   title: string;
   /** Bold line under the title ("Answer: …"), or null when there is none to show. */
   detail: string | null;
+  /** rustc's message, for questions about a compile error. Absent otherwise. */
+  compiler?: string;
 }
 
 export const optionLetter = (i: number) => String.fromCharCode(65 + i);

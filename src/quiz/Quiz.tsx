@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useRef, type Dispatch } from 'react';
-import { courseById, lessonQuestionIds, type CourseId, type LessonKey } from '../content';
+import { courseById, isPairs, lessonQuestionIds, type CourseId, type LessonKey } from '../content';
 import { Button } from '../components/Button';
 import { HeartCount } from '../components/HeartCount';
 import { CloseIcon } from '../components/icons';
@@ -96,7 +96,7 @@ function QuizQuestion({ session, dispatch, onExit, guardMs }: QuestionProps) {
       </main>
 
       <div className={styles.footer}>
-        {!a.checked && q.type !== 'pairs' && (
+        {!a.checked && !isPairs(q) && (
           <div className={styles.bar}>
             <Button
               className={styles.check}
@@ -108,9 +108,9 @@ function QuizQuestion({ session, dispatch, onExit, guardMs }: QuestionProps) {
             </Button>
           </div>
         )}
-        {!a.checked && q.type === 'pairs' && (
+        {!a.checked && isPairs(q) && (
           <div className={`${styles.bar} ${styles.hint}`}>
-            <p>Tap a property, then its result.</p>
+            <p>{q.type === 'rs-pairs' ? 'Tap a code item, then its meaning.' : 'Tap a property, then its result.'}</p>
             <span>
               {Object.keys(a.matched).length} / {q.items.length}
             </span>
