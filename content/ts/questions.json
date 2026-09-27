@@ -93,9 +93,9 @@
   {
     "id": "ts-type-1",
     "type": "ts-type",
-    "prompt": "Type the missing token so `winner` may start out as `null`",
+    "prompt": "Type the missing token so `winner` can only ever be a `string` or `null`",
     "code": ["let winner: string | ___ = null;", "winner = \"Ada\";", "console.log(winner);"],
     "accept": ["null"],
-    "explain": "Under strict checks, `null` fits only where the type names it: `string | null`."
+    "explain": "`string | null` allows exactly a string or `null`. Under strict checks, `null` fits only where the type names it."
   }
 ]
