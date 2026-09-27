@@ -292,7 +292,7 @@
     "cards": [
       {
         "title": "Parameter and return types",
-        "body": "Every parameter needs a type, as in `function area(w: number, h: number)`. A return type goes after the `)`, like `: number`; leave it off and tsc infers it from the `return`.",
+        "body": "Parameters of a standalone function need a type unless they have a default, as in `function area(w: number, h: number)`. A return type goes after the `)`, like `: number`; leave it off and tsc infers it from the `return`.",
         "tip": "Unlike plain JavaScript, tsc checks every call: `area(3)` and `area(\"3\", 4)` are both type errors.",
         "demo": {
           "kind": "code",
@@ -525,7 +525,7 @@
               "label": "settings?.volume || 50",
               "code": ["type User = { settings?: { volume?: number } };", "const user: User = { settings: { volume: 0 } };", "console.log(user.settings?.volume || 50);"],
               "output": ["50"],
-              "note": "`?.` handles the missing `settings`, but `0` is falsy, so `||` replaces a real volume of zero."
+              "note": "`?.` handles a possibly missing `settings`, but `0` is falsy, so `||` replaces a real volume of zero."
             },
             {
               "label": "settings?.volume ?? 50",
