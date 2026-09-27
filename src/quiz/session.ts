@@ -5,10 +5,10 @@ import {
   isPairs,
   questionById,
   type CourseId,
+  type CodeQ,
   type LessonKey,
   type PairsQuestion,
   type Question,
-  type RustPairsQuestion,
 } from '../content';
 import { TOKEN_MAX_LENGTH } from '../lib/code';
 import { HEARTS_PER_LESSON, XP_FIRST_TRY, XP_RETRY } from '../state/rules';
@@ -75,7 +75,7 @@ function grade(s: Session, q: Question, ok: boolean, patch: Partial<AnswerState>
   return { ...graded, hearts: Math.max(0, s.hearts - 1), missed: { ...s.missed, [q.id]: true }, queue: [...s.queue, q.id] };
 }
 
-function resolvePair(s: Session, q: PairsQuestion | RustPairsQuestion, left: string, right: string): Session {
+function resolvePair(s: Session, q: PairsQuestion | CodeQ<'pairs'>, left: string, right: string): Session {
   if (left === right) {
     const matched = { ...s.answer.matched, [left]: true as const };
     const patch = { matched, left: null, right: null, miss: null };
@@ -118,8 +118,9 @@ export function sessionReducer(s: Session, action: SessionAction): Session {
 
     case 'input': {
       if (a.checked) return s;
-      // rs-type input is capped even if the input's maxlength is bypassed (e.g. a paste from a script).
-      return withAnswer(s, { val: q.type === 'rs-type' ? action.val.slice(0, TOKEN_MAX_LENGTH) : action.val });
+      // *-type input in a code course is capped even if the input's maxlength is bypassed (e.g. a paste from a script).
+      const capped = q.type === 'rs-type' || q.type === 'ts-type';
+      return withAnswer(s, { val: capped ? action.val.slice(0, TOKEN_MAX_LENGTH) : action.val });
     }
 
     case 'pickPair': {

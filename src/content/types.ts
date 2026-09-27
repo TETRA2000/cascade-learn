@@ -242,12 +242,13 @@ export type PredictKind<K> = K extends 'ts-predict' ? 'output' | 'error' | 'thro
 export interface CodePredictQuestion<K extends CodeKey<'predict'> = CodeKey<'predict'>> extends QuestionBase {
   type: K;
   code: string[];
-  /** `output` options render as program output; the `error` option reads the language's error title ("Doesn’t compile"). */
+  /** `output` options render as program output; the `error` option reads the language's error title ("Doesn’t compile",
+   * "Type error"), and TS's `throws` option reads "Throws at runtime". At most one `error` and one `throws` option. */
   opts: { text: string; kind: PredictKind<K> }[];
   answer: number;
   /** Required exactly when the answer is the `error` option. */
   error?: string;
-  /** TS only: what Node reports when the answer is the `throws` option. */
+  /** TS only: Node's `String(error)`, required exactly when the answer is the `throws` option. */
   thrown?: string;
 }
 
@@ -327,8 +328,41 @@ export type RustQuestion =
   | RustFixQuestion
   | RustTypeQuestion;
 
+// ----- TypeScript questions -----
+
+export type TsPredictQuestion = CodePredictQuestion<'ts-predict'>;
+export type TsPairsQuestion = CodePairsQuestion<'ts-pairs'>;
+export type TsCompilesQuestion = CodeCompilesQuestion<'ts-compiles'>;
+export type TsBuildQuestion = CodeBuildQuestion<'ts-build'>;
+export type TsErrorQuestion = CodeErrorQuestion<'ts-error'>;
+export type TsFixQuestion = CodeFixQuestion<'ts-fix'>;
+export type TsTypeQuestion = CodeTypeQuestion<'ts-type'>;
+
+/** "Hover the type": the type the editor shows for `name` on `line`, narrowing included. */
+export interface TsInferQuestion extends QuestionBase {
+  type: 'ts-infer';
+  code: string[];
+  /** 1-based visible line. It must not reassign `name`, apart from declaring it. */
+  line: number;
+  /** An identifier that appears on `line` as a whole word. */
+  name: string;
+  /** Type texts, e.g. `string | number`; each tile reads `name: <type>`. */
+  opts: string[];
+  answer: number;
+}
+
+export type TsQuestion =
+  | TsPredictQuestion
+  | TsPairsQuestion
+  | TsInferQuestion
+  | TsCompilesQuestion
+  | TsBuildQuestion
+  | TsErrorQuestion
+  | TsFixQuestion
+  | TsTypeQuestion;
+
 /** Every code-course question. */
-export type CodeQuestion = RustQuestion;
+export type CodeQuestion = RustQuestion | TsQuestion;
 /** The code questions of one shared type, e.g. `CodeQ<'predict'>`. */
 export type CodeQ<K extends string> = Extract<CodeQuestion, { type: CodeKey<K> }>;
 

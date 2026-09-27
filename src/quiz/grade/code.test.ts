@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Question } from '../../content';
 import { rsBuild, rsCompiles, rsError, rsFix, rsPairs, rsPredict, rsType } from '../rustFixtures';
+import { tsCompiles, tsInfer, tsPredictThrows } from '../tsFixtures';
 import type { AnswerState } from '../types';
 import { canCheck, freshAnswer, isCorrect } from './index';
 
@@ -41,5 +42,21 @@ describe('Rust grading', () => {
     expect(canCheck(rsPairs, answer(rsPairs))).toBe(false);
     expect(isCorrect(rsPairs, answer(rsPairs, { matched: { own: true, shr: true, mut: true } }))).toBe(false);
     expect(isCorrect(rsPairs, answer(rsPairs, { matched: { own: true, shr: true, mut: true, cln: true } }))).toBe(true);
+  });
+});
+
+describe('TypeScript grading', () => {
+  it('grades ts-infer and ts-predict by the picked option', () => {
+    for (const q of [tsInfer, tsPredictThrows]) {
+      expect(canCheck(q, answer(q))).toBe(false);
+      expect(isCorrect(q, answer(q, { sel: q.answer }))).toBe(true);
+      expect(isCorrect(q, answer(q, { sel: (q.answer + 1) % q.opts.length }))).toBe(false);
+    }
+  });
+
+  it('grades the shared ts- types like their Rust pairs', () => {
+    expect(canCheck(tsCompiles, answer(tsCompiles, { sel: 'a' }))).toBe(true);
+    expect(isCorrect(tsCompiles, answer(tsCompiles, { sel: 'b' }))).toBe(true);
+    expect(isCorrect(tsCompiles, answer(tsCompiles, { sel: 'a' }))).toBe(false);
   });
 });

@@ -2,11 +2,14 @@
 import { langOf } from './guards';
 import type { CodeCourseDemo, CodeQuestion } from './types';
 import { inRange, isInt, isStr, isStrArr, type Err } from './validateUtil';
-import { BLANK, findDiffRange, isHiddenLine, normalizeToken, TOKEN_MAX_LENGTH, visibleLines } from '../lib/code';
-import { LANG, type CodeLang } from '../lib/codeLang';
+import { BLANK, findDiffRange, findWord, isHiddenLine, normalizeToken, TOKEN_MAX_LENGTH, visibleLines } from '../lib/code';
+import { LANG, THROWS_TITLE, type CodeLang } from '../lib/codeLang';
 
 export const isCodeError = (v: unknown, lang: CodeLang): v is string => isStr(v) && LANG[lang].errorPattern.test(v);
 export const badError = (lang: CodeLang): string => `error must look like "${LANG[lang].errorFormat}"`;
+
+/** A ts-infer `name`: a JS identifier. */
+const IDENTIFIER = /^[A-Za-z_$][\w$]*$/;
 
 const hasCode = (c: unknown): c is string[] => isStrArr(c) && visibleLines(c).length > 0;
 
@@ -52,21 +55,46 @@ export function validateCodeQuestion(q: CodeQuestion, at: string, err: Err) {
   const lang = langOf(q);
   const errorTitle = LANG[lang].errorTitle;
   switch (q.type) {
-    case 'rs-predict': {
+    case 'rs-predict':
+    case 'ts-predict': {
       if (!hasCode(q.code)) err(at, 'needs visible code');
       if (!validateOpts(q.opts, at, err)) return;
+      const kinds: readonly string[] = lang === 'ts' ? ['output', 'error', 'throws'] : ['output', 'error'];
+      const kindList = lang === 'ts' ? '"output", "error" or "throws"' : '"output" or "error"';
       q.opts.forEach((o, i) => {
-        if (!isStr(o.text) || (o.kind !== 'output' && o.kind !== 'error')) err(at, `opt ${i} needs text and kind "output" or "error"`);
+        if (!isStr(o.text) || !kinds.includes(o.kind)) err(at, `opt ${i} needs text and kind ${kindList}`);
         if (o.kind === 'error' && o.text !== errorTitle) err(at, `the error option must read "${errorTitle}"`);
+        if (o.kind === 'throws' && o.text !== THROWS_TITLE) err(at, `the throws option must read "${THROWS_TITLE}"`);
       });
+      const count = (kind: string) => q.opts.filter((o) => o.kind === kind).length;
+      if (lang === 'ts' && (count('error') > 1 || count('throws') > 1)) err(at, 'at most one error option and one throws option');
+      // Format checks: the error string, and thrown (TS only, non-empty).
+      validateResult({ error: q.error, thrown: q.thrown }, lang, at, err);
       if (!inRange(q.answer, q.opts.length)) return err(at, 'answer out of range');
-      if ((q.opts[q.answer]!.kind === 'error') !== (q.error !== undefined)) {
+      const answerKind = q.opts[q.answer]!.kind;
+      if ((answerKind === 'error') !== (q.error !== undefined)) {
         err(at, 'error is required exactly when the answer is the error option');
       }
-      if (q.error !== undefined && !isCodeError(q.error, lang)) err(at, badError(lang));
+      if (lang === 'ts' && (answerKind === 'throws') !== (q.thrown !== undefined)) {
+        err(at, 'thrown is required exactly when the answer is the throws option');
+      }
       return;
     }
-    case 'rs-pairs': {
+    case 'ts-infer': {
+      if (!hasCode(q.code)) return err(at, 'needs visible code');
+      const lineText = isInt(q.line) && q.line >= 1 ? visibleLines(q.code)[q.line - 1] : undefined;
+      if (lineText === undefined) err(at, 'line must be a visible line number');
+      if (!isStr(q.name) || !IDENTIFIER.test(q.name)) err(at, 'name must be an identifier');
+      else if (lineText !== undefined && findWord(lineText, q.name) === -1) err(at, `name "${q.name}" does not appear on line ${q.line}`);
+      if (!validateOpts(q.opts, at, err)) return;
+      if (!isStrArr(q.opts) || q.opts.some((o) => o.trim() === '') || new Set(q.opts).size !== q.opts.length) {
+        err(at, 'opts must be unique and non-empty');
+      }
+      if (!inRange(q.answer, q.opts.length)) err(at, 'answer out of range');
+      return;
+    }
+    case 'rs-pairs':
+    case 'ts-pairs': {
       if (!Array.isArray(q.items) || q.items.length !== 4) return err(at, 'needs exactly 4 items');
       q.items.forEach((it, i) => {
         if (![it.id, it.left, it.right].every(isStr)) err(at, `item ${i} needs id, left and right`);
@@ -76,11 +104,13 @@ export function validateCodeQuestion(q: CodeQuestion, at: string, err: Err) {
       return;
     }
     case 'rs-compiles':
+    case 'ts-compiles':
       if (!hasCode(q.a) || !hasCode(q.b)) err(at, 'needs visible code in a and b');
       if (q.answer !== 'a' && q.answer !== 'b') err(at, "answer must be 'a' or 'b'");
       if (!isCodeError(q.error, lang)) err(at, badError(lang));
       return;
-    case 'rs-build': {
+    case 'rs-build':
+    case 'ts-build': {
       if (!isStrArr(q.answer) || q.answer.length === 0 || !isStrArr(q.bank)) return err(at, 'needs answer and bank as string lists');
       if (!Array.isArray(q.code)) return err(at, 'needs code[]');
       const slots: number[] = [];
@@ -106,11 +136,13 @@ export function validateCodeQuestion(q: CodeQuestion, at: string, err: Err) {
       return;
     }
     case 'rs-error':
+    case 'ts-error':
       if (!hasCode(q.code)) return err(at, 'needs visible code');
       if (!isInt(q.answer) || q.answer < 1 || q.answer > visibleLines(q.code).length) err(at, 'answer must be a visible line number');
       if (!isCodeError(q.error, lang)) err(at, badError(lang));
       return;
     case 'rs-fix':
+    case 'ts-fix':
       if (!hasCode(q.code)) return err(at, 'needs visible code');
       if (!isCodeError(q.error, lang)) err(at, badError(lang));
       if (!validateOpts(q.opts, at, err)) return;
@@ -125,7 +157,8 @@ export function validateCodeQuestion(q: CodeQuestion, at: string, err: Err) {
       });
       if (!inRange(q.answer, q.opts.length)) err(at, 'answer out of range');
       return;
-    case 'rs-type': {
+    case 'rs-type':
+    case 'ts-type': {
       if (!hasCode(q.code)) return err(at, 'needs visible code');
       if (q.code.join('\n').split(BLANK).length !== 2) err(at, `code needs exactly one ${BLANK} blank`);
       const blankLine = q.code.find((l) => l.includes(BLANK));

@@ -44,6 +44,14 @@ export function insertAfterVisibleLine(code: readonly string[], visible: number,
   return [...code.slice(0, programLine), line, ...code.slice(programLine)];
 }
 
+/** Index of the first whole-word `name` in `line` (`$` counts as a word character, as in JS
+ * identifiers), or -1. ts-infer's validator and CodePanel's `mark` use it. */
+export function findWord(line: string, name: string): number {
+  if (!name) return -1;
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(?<![\\w$])${escaped}(?![\\w$])`).exec(line)?.index ?? -1;
+}
+
 /** The rs-type blank. */
 export const BLANK = '___';
 

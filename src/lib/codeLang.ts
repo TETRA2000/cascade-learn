@@ -38,6 +38,9 @@ export const LANG: Record<CodeLang, LangProfile> = {
   },
 };
 
+/** The runtime-throw title (TS only): ts-predict's `throws` option text and OutputPanel's heading. */
+export const THROWS_TITLE = 'Throws at runtime';
+
 /** A question-type key's language, by its `ts-`/`rs-` prefix. */
 export function langOfKey(type: string): CodeLang {
   return type.startsWith('ts-') ? 'ts' : 'rust';

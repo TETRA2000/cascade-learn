@@ -5,8 +5,10 @@ export interface FeedbackText {
   title: string;
   /** Bold line under the title ("Answer: …"), or null when there is none to show. */
   detail: string | null;
-  /** rustc's message, for questions about a compile error. Absent otherwise. */
+  /** The compiler's message (rustc, tsc), for questions about a compile error. Absent otherwise. */
   compiler?: string;
+  /** Node's message, for a TS program whose answer is that it throws at runtime. Absent otherwise. */
+  runtime?: string;
 }
 
 export const optionLetter = (i: number) => String.fromCharCode(65 + i);

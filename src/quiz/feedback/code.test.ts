@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { Question } from '../../content';
 import { freshAnswer } from '../grade';
 import { rsBuild, rsCompiles, rsError, rsFix, rsPairs, rsPredict, rsPredictError, rsType } from '../rustFixtures';
+import { tsCompiles, tsInfer, tsPredict, tsPredictError, tsPredictThrows } from '../tsFixtures';
 import type { AnswerState } from '../types';
 import { feedbackText } from './index';
 
@@ -28,5 +29,24 @@ describe('Rust feedback', () => {
 
   it('always reports mismatches for rs-pairs', () => {
     expect(fb(rsPairs, { ok: true, misses: 2 })).toEqual({ title: 'All pairs matched!', detail: '2 mismatches along the way.' });
+  });
+});
+
+describe('TypeScript feedback', () => {
+  it('gives Node’s message for a throws answer and tsc’s for an error answer', () => {
+    expect(feedbackText(tsPredictThrows, { ...freshAnswer(tsPredictThrows), checked: true, ok: false, sel: 0 }, 0)).toMatchObject({
+      detail: 'Answer: D',
+      runtime: tsPredictThrows.thrown,
+    });
+    expect(feedbackText(tsPredictError, { ...freshAnswer(tsPredictError), checked: true, ok: true, sel: tsPredictError.answer }, 0).compiler).toBe(
+      tsPredictError.error,
+    );
+    expect(feedbackText(tsInfer, { ...freshAnswer(tsInfer), checked: true, ok: false, sel: 1 }, 0)).toEqual({ title: 'Not quite', detail: 'Answer: A' });
+  });
+
+  it('sets neither message for an output answer, and tsc’s for ts-compiles', () => {
+    expect(fb(tsPredict, { ok: true, sel: 0 })).toEqual({ title: 'Nice — that’s right!', detail: null });
+    expect(fb(tsPredictThrows, { ok: true, sel: 3 }).compiler).toBeUndefined();
+    expect(fb(tsCompiles, { ok: false, sel: 'a' })).toEqual({ title: 'Not quite', detail: 'Answer: B', compiler: tsCompiles.error });
   });
 });

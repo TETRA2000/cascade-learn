@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { rsBuild, rsCompiles, rsError, rsFix, rsPairs, rsPredict, rsPredictError, rsType } from '../quiz/rustFixtures';
+import { tsCompiles, tsInfer, tsPredict, tsPredictError, tsPredictThrows } from '../quiz/tsFixtures';
 import type { CodeCourseDemo, CodeQuestion } from './types';
 import type { CodeLang } from '../lib/codeLang';
 import { validateCodeDemo, validateCodeQuestion } from './validateCode';
@@ -110,5 +111,59 @@ describe('validateRustQuestion', () => {
     ],
   ])('rejects %s', (_name, q, message) => {
     expect(checkQ(q)).toContain(message);
+  });
+});
+
+describe('validateTsQuestion', () => {
+  it('accepts every fixture', () => {
+    for (const q of [tsPredict, tsPredictError, tsPredictThrows, tsInfer, tsCompiles]) expect(checkQ(q)).toEqual([]);
+  });
+
+  it('validates ts-predict outcomes', () => {
+    expect(checkQ({ ...tsPredictThrows, thrown: undefined })).toContain('q: thrown is required exactly when the answer is the throws option');
+    expect(checkQ({ ...tsPredict, opts: [...tsPredict.opts.slice(0, 2), { text: 'Throws', kind: 'throws' }] })).toContain(
+      'q: the throws option must read "Throws at runtime"',
+    );
+    expect(checkQ({ ...tsPredictError, opts: [...tsPredictError.opts.slice(0, 3), { text: 'Type error', kind: 'error' }] })).toContain(
+      'q: at most one error option and one throws option',
+    );
+    expect(checkQ({ ...rsPredict, opts: [...rsPredict.opts.slice(0, 2), { text: 'Throws at runtime', kind: 'throws' }] })).toContain(
+      'q: opt 2 needs text and kind "output" or "error"',
+    );
+  });
+
+  it('checks the rest of ts-predict', () => {
+    expect(checkQ({ ...tsPredict, thrown: 'TypeError: x' })).toContain('q: thrown is required exactly when the answer is the throws option');
+    expect(checkQ({ ...tsPredictThrows, thrown: '' })).toContain('q: thrown must be a non-empty string');
+    expect(checkQ({ ...tsPredictError, error: 'error[E0382]: moved' })).toContain('q: error must look like "error TS0000: message"');
+    expect(checkQ({ ...tsPredict, opts: [tsPredict.opts[0]!, tsPredict.opts[1]!, { text: 'Doesn’t compile', kind: 'error' }] })).toContain(
+      'q: the error option must read "Type error"',
+    );
+    expect(checkQ({ ...rsPredict, thrown: 'TypeError: x' })).toContain('q: thrown is only for TypeScript');
+  });
+
+  it('validates ts-infer', () => {
+    expect(checkQ(tsInfer)).toEqual([]);
+    expect(checkQ({ ...tsInfer, name: 'y' })).toContain('q: name "y" does not appear on line 3');
+    expect(checkQ({ ...tsInfer, code: tsInfer.code.map((l, i) => (i === 2 ? l.replace('x.', 'max.') : l)) })).toContain(
+      'q: name "x" does not appear on line 3',
+    );
+    expect(checkQ({ ...tsInfer, line: 99 })).toContain('q: line must be a visible line number');
+    expect(checkQ({ ...tsInfer, opts: ['string', 'string', 'number'] })).toContain('q: opts must be unique and non-empty');
+  });
+
+  it('checks the rest of ts-infer', () => {
+    expect(checkQ({ ...tsInfer, name: 'x.length' })).toContain('q: name must be an identifier');
+    expect(checkQ({ ...tsInfer, opts: ['string', '', 'number'] })).toContain('q: opts must be unique and non-empty');
+    expect(checkQ({ ...tsInfer, opts: ['string', 'number'] })).toContain('q: needs 3 or 4 opts');
+    expect(checkQ({ ...tsInfer, answer: 4 })).toContain('q: answer out of range');
+    expect(checkQ({ ...tsInfer, code: ['# function f(x: string) {', 'x;', '# }'], line: 1 })).toEqual([]);
+    expect(checkQ({ ...tsInfer, code: ['# const x = 1;', 'const y = 2;'], line: 1 })).toContain('q: name "x" does not appear on line 1');
+  });
+
+  it('pairs the shared ts- types with the Rust rules', () => {
+    expect(checkQ(tsCompiles)).toEqual([]);
+    expect(checkQ({ ...tsCompiles, error: 'error[E0382]: x' })).toContain('q: error must look like "error TS0000: message"');
+    expect(checkQ({ ...tsCompiles, answer: 'c' })).toContain("q: answer must be 'a' or 'b'");
   });
 });

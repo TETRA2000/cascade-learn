@@ -2,7 +2,7 @@
 // which snippets to compile, what each must do, and how to read a compiler's JSON diagnostics.
 // The checker scripts do the I/O.
 import type { Question, Unit } from '../src/content/types';
-import { applyDiff, fillBlank, fillSlots, visibleLineNumber } from '../src/lib/code.ts';
+import { applyDiff, fillBlank, fillSlots, insertAfterVisibleLine, programLineOfVisible, visibleLineNumber } from '../src/lib/code.ts';
 
 export type Expect =
   | { kind: 'compiles' }
@@ -37,6 +37,12 @@ export function errorCode(message: string): string | null {
   return /^error\[(E\d{4})\]/.exec(message)?.[1] ?? /^error (TS\d+):/.exec(message)?.[1] ?? null;
 }
 
+/** ts-infer's hidden check for option `i`: compiles only when `name`'s type at that point is exactly `type`.
+ * `__Eq` is declared by the TS checker; a mismatch is TS2322 (`true` is not assignable to `false`). */
+export function inferAssertion(i: number, name: string, type: string): string {
+  return `# const __ok${i}: __Eq<typeof ${name}, ${type}> = true;`;
+}
+
 function resultExpect(r: { output?: string[]; error?: string; thrown?: string }): Expect {
   if (r.thrown !== undefined) return { kind: 'throws', thrown: r.thrown, output: r.output };
   if (r.error !== undefined) return { kind: 'error', code: errorCode(r.error) };
@@ -60,25 +66,45 @@ export function collectSnippets(units: readonly Unit[], questions: readonly Ques
 
   for (const q of questions) {
     switch (q.type) {
-      case 'rs-predict': {
+      case 'rs-predict':
+      case 'ts-predict': {
         const pick = q.opts[q.answer];
         if (!pick) break;
-        add(q.id, q.code, pick.kind === 'error' ? { kind: 'error', code: errorCode(q.error ?? '') } : { kind: 'output', output: pick.text.split('\n') });
+        if (pick.kind === 'error') add(q.id, q.code, { kind: 'error', code: errorCode(q.error ?? '') });
+        else if (pick.kind === 'throws') add(q.id, q.code, { kind: 'throws', thrown: q.thrown ?? '' });
+        else add(q.id, q.code, { kind: 'output', output: pick.text.split('\n') });
         break;
       }
-      case 'rs-compiles': {
+      case 'ts-infer': {
+        const programLine = programLineOfVisible(q.code, q.line);
+        if (programLine === null) {
+          problems.push(`${q.id}: line ${q.line} is not a visible line`);
+          break;
+        }
+        q.opts.forEach((type, i) => {
+          const code = insertAfterVisibleLine(q.code, q.line, inferAssertion(i, q.name, type))!;
+          const expect: Expect = i === q.answer ? { kind: 'compiles' } : { kind: 'error', code: 'TS2322', programLine: programLine + 1 };
+          add(`${q.id}/option ${String.fromCharCode(65 + i)}`, code, expect);
+        });
+        break;
+      }
+      case 'rs-compiles':
+      case 'ts-compiles': {
         const other = q.answer === 'a' ? 'b' : 'a';
         add(`${q.id}/${q.answer}`, q[q.answer], { kind: 'compiles' });
         add(`${q.id}/${other}`, q[other], { kind: 'error', code: errorCode(q.error) });
         break;
       }
       case 'rs-build':
+      case 'ts-build':
         add(q.id, fillSlots(q.code, q.answer), q.output ? { kind: 'output', output: q.output } : { kind: 'compiles' });
         break;
       case 'rs-error':
+      case 'ts-error':
         add(q.id, q.code, { kind: 'error', code: errorCode(q.error), line: q.answer });
         break;
       case 'rs-fix':
+      case 'ts-fix':
         add(q.id, q.code, { kind: 'error', code: errorCode(q.error) });
         q.opts.forEach((o, i) => {
           const where = `${q.id}/option ${String.fromCharCode(65 + i)}`;
@@ -88,10 +114,12 @@ export function collectSnippets(units: readonly Unit[], questions: readonly Ques
         });
         break;
       case 'rs-type':
+      case 'ts-type':
         q.accept.forEach((value) => add(`${q.id}/${value}`, fillBlank(q.code, value), { kind: 'compiles' }));
         break;
-      // rs-pairs and every CSS question type have nothing to compile.
+      // *-pairs and every CSS question type have nothing to compile.
       case 'rs-pairs':
+      case 'ts-pairs':
       case 'predict':
       case 'pairs':
       case 'versus':

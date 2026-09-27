@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { Question, Unit } from '../src/content/types';
 import { rsBuild, rsCompiles, rsError, rsFix, rsPairs, rsPredict, rsType } from '../src/quiz/rustFixtures';
-import { collectSnippets, errorCode, firstError, judge, type Snippet } from './code-check-lib.ts';
+import { tsCompiles, tsInfer, tsPredict, tsPredictError, tsPredictThrows } from '../src/quiz/tsFixtures';
+import { collectSnippets, errorCode, firstError, inferAssertion, judge, type Snippet } from './code-check-lib.ts';
 
 describe('errorCode', () => {
   it('reads the code from an authored error', () => {
@@ -168,5 +169,43 @@ describe('collectSnippets', () => {
   it('collects a thrown demo', () => {
     const units = [{ key: 'u', name: 'U', blurb: 'B', cards: [{ title: 'T', body: 'B', demo: { kind: 'code', code: ['x;'], output: ['a'], thrown: 'TypeError: t' } }] }] as Unit[];
     expect(collectSnippets(units, []).snippets[0]!.expect).toEqual({ kind: 'throws', thrown: 'TypeError: t', output: ['a'] });
+  });
+});
+
+describe('collectSnippets (TypeScript)', () => {
+  it('collects ts-infer as one snippet per option with the assertion after the line', () => {
+    const { snippets } = collectSnippets([], [tsInfer]);
+    expect(snippets.map((s) => s.expect)).toEqual([
+      { kind: 'compiles' },
+      { kind: 'error', code: 'TS2322', programLine: 4 },
+      { kind: 'error', code: 'TS2322', programLine: 4 },
+      { kind: 'error', code: 'TS2322', programLine: 4 },
+    ]);
+    expect(snippets[1]!.code[3]).toBe('# const __ok1: __Eq<typeof x, string | number> = true;');
+  });
+
+  it('places the assertion by visible line, after hidden lines', () => {
+    const q = { ...tsInfer, code: ['# function f(x: string | number) {', 'if (typeof x === "number") {', '  x;', '}', '# }'], line: 2 };
+    const { snippets } = collectSnippets([], [q]);
+    expect(snippets[0]!.code[3]).toBe(inferAssertion(0, 'x', 'string'));
+    expect(snippets[1]!.expect).toEqual({ kind: 'error', code: 'TS2322', programLine: 4 });
+    expect(snippets.map((s) => s.where)).toEqual(['ts-infer-1/option A', 'ts-infer-1/option B', 'ts-infer-1/option C', 'ts-infer-1/option D']);
+  });
+
+  it('collects ts-predict throws and error answers', () => {
+    const { snippets } = collectSnippets([], [tsPredictThrows, tsPredictError]);
+    expect(snippets.map((s) => s.expect)).toEqual([
+      { kind: 'throws', thrown: tsPredictThrows.thrown },
+      { kind: 'error', code: errorCode(tsPredictError.error!) },
+    ]);
+  });
+
+  it('pairs the shared ts- types with their Rust cases', () => {
+    const { snippets } = collectSnippets([], [tsPredict, tsCompiles]);
+    expect(snippets.map((s) => [s.where, s.expect])).toEqual([
+      ['ts-predict-1', { kind: 'output', output: ['5'] }],
+      ['ts-compiles-1/b', { kind: 'compiles' }],
+      ['ts-compiles-1/a', { kind: 'error', code: 'TS2322' }],
+    ]);
   });
 });

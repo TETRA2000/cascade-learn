@@ -1,0 +1,7 @@
+/* `name: type`, as the editor's hover shows it. */
+.type {
+  font-family: var(--font-code);
+  font-size: 14px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

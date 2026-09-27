@@ -20,7 +20,11 @@ export type CssTypeKey = (typeof CSS_TYPE_KEYS)[number];
 export const RUST_TYPE_KEYS = ['rs-predict', 'rs-pairs', 'rs-compiles', 'rs-build', 'rs-error', 'rs-fix', 'rs-type'] as const;
 export type RustTypeKey = (typeof RUST_TYPE_KEYS)[number];
 
-export type QuestionTypeKey = CssTypeKey | RustTypeKey;
+/** TypeScript question types in difficulty order; ts/question-types.json must match. */
+export const TS_TYPE_KEYS = ['ts-predict', 'ts-pairs', 'ts-infer', 'ts-compiles', 'ts-build', 'ts-error', 'ts-fix', 'ts-type'] as const;
+export type TsTypeKey = (typeof TS_TYPE_KEYS)[number];
+
+export type QuestionTypeKey = CssTypeKey | RustTypeKey | TsTypeKey;
 
 /** Each course's question types, in the order its question-types.json must list them. */
 export const TYPE_KEYS: Record<CourseId, readonly QuestionTypeKey[]> = {

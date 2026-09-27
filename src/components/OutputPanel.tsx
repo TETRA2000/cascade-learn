@@ -1,4 +1,4 @@
-import { LANG, type CodeLang } from '../lib/codeLang';
+import { LANG, THROWS_TITLE, type CodeLang } from '../lib/codeLang';
 import { XCircleIcon } from './icons';
 import styles from './OutputPanel.module.css';
 
@@ -40,7 +40,7 @@ export function OutputPanel({
         <section className={`${styles.panel} ${styles.error}`} aria-label="Runtime error">
           <p className={styles.title}>
             <XCircleIcon size={18} />
-            Throws at runtime
+            {THROWS_TITLE}
           </p>
           <pre className={styles.body}>{thrown}</pre>
         </section>

@@ -9,6 +9,8 @@ import type {
   Question,
   RustBuildQuestion,
   RustPairsQuestion,
+  TsBuildQuestion,
+  TsPairsQuestion,
 } from './types';
 
 export function isCodeDemo(d: Demo): d is CodeCourseDemo {
@@ -25,11 +27,11 @@ export function langOf(q: CodeQuestion): CodeLang {
 }
 
 /** Match pairs in any course: self-completing, never costs hearts. */
-export function isPairs(q: Question): q is PairsQuestion | RustPairsQuestion {
-  return q.type === 'pairs' || q.type === 'rs-pairs';
+export function isPairs(q: Question): q is PairsQuestion | RustPairsQuestion | TsPairsQuestion {
+  return q.type === 'pairs' || q.type === 'rs-pairs' || q.type === 'ts-pairs';
 }
 
 /** Word bank in any course: slots filled from bank chips. */
-export function isBuild(q: Question): q is BuildQuestion | RustBuildQuestion {
-  return q.type === 'build' || q.type === 'rs-build';
+export function isBuild(q: Question): q is BuildQuestion | RustBuildQuestion | TsBuildQuestion {
+  return q.type === 'build' || q.type === 'rs-build' || q.type === 'ts-build';
 }

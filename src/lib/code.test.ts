@@ -3,6 +3,7 @@ import {
   applyDiff,
   fillBlank,
   fillSlots,
+  findWord,
   insertAfterVisibleLine,
   normalizeToken,
   parseDiff,
@@ -88,5 +89,15 @@ describe('visible ↔ program lines', () => {
   it('inserts a line right after a visible line', () => {
     expect(insertAfterVisibleLine(code, 1, '# X')).toEqual(['# fn main() {', 'let a = 1;', '# X', '#', 'let b = a;', '# }']);
     expect(insertAfterVisibleLine(code, 9, '# X')).toBeNull();
+  });
+});
+
+describe('findWord', () => {
+  it('finds the first whole-word occurrence, treating $ as part of a name', () => {
+    expect(findWord('console.log(max, x.length);', 'x')).toBe(17);
+    expect(findWord('const max = 1;', 'x')).toBe(-1);
+    expect(findWord('const a$ = $a + a;', 'a')).toBe(16);
+    expect(findWord('const $el = el$;', '$el')).toBe(6);
+    expect(findWord('x', '')).toBe(-1);
   });
 });

@@ -1,6 +1,9 @@
-import { screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { freshAnswer } from '../../grade';
 import { renderQuiz } from '../../testUtils';
+import { tsPredictThrows } from '../../tsFixtures';
+import { CodePredict } from './CodePredict';
 
 // rs-predict-1 prints "5 6" (option A)
 describe('Predict the output (Rust)', () => {
@@ -22,5 +25,15 @@ describe('Predict the output (Rust)', () => {
     expect(screen.getByRole('button', { name: 'Option A: 5 6, correct answer' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Option B: 6 6, your answer, incorrect' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.queryByText('rustc says')).not.toBeInTheDocument();
+  });
+});
+
+// Component-level: TS isn't a bundled course yet.
+describe('Predict the output (TypeScript)', () => {
+  it('renders the error and throws options as text in a TypeScript code region', () => {
+    render(<CodePredict question={tsPredictThrows} answer={freshAnswer(tsPredictThrows)} act={vi.fn()} />);
+    expect(screen.getByLabelText('TypeScript code')).toHaveTextContent('const words: string[] = [];');
+    expect(screen.getByRole('button', { name: 'Option C: Type error' })).toHaveTextContent('Type error');
+    expect(screen.getByRole('button', { name: 'Option D: Throws at runtime' })).toHaveTextContent('Throws at runtime');
   });
 });

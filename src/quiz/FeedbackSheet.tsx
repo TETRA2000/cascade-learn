@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
-import type { Question } from '../content';
+import { isCodeQuestion, langOf, type Question } from '../content';
 import { CheckCircleIcon, XCircleIcon } from '../components/icons';
 import { RichText } from '../components/RichText';
+import { LANG } from '../lib/codeLang';
 import { feedbackText } from './feedback';
 import type { AnswerState } from './types';
 import { useArmed } from './useArmed';
@@ -19,7 +20,7 @@ interface Props {
 
 /** Slides up after Check. Must be rendered inside an always-present aria-live region. */
 export function FeedbackSheet({ question, answer, index, guardMs, onContinue }: Props) {
-  const { title, detail, compiler } = feedbackText(question, answer, index);
+  const { title, detail, compiler, runtime } = feedbackText(question, answer, index);
   const continueRef = useRef<HTMLButtonElement>(null);
   const armed = useArmed('sheet', guardMs);
 
@@ -38,12 +39,8 @@ export function FeedbackSheet({ question, answer, index, guardMs, onContinue }: 
       <p className={styles.explain}>
         <RichText text={question.explain} />
       </p>
-      {compiler && (
-        <figure className={styles.compiler}>
-          <figcaption className={styles.compilerLabel}>rustc says</figcaption>
-          <pre className={styles.compilerText}>{compiler}</pre>
-        </figure>
-      )}
+      {compiler && isCodeQuestion(question) && <Says who={LANG[langOf(question)].compiler} text={compiler} />}
+      {runtime && <Says who="Node" text={runtime} />}
       <button
         ref={continueRef}
         type="button"
@@ -54,5 +51,15 @@ export function FeedbackSheet({ question, answer, index, guardMs, onContinue }: 
         Continue
       </button>
     </section>
+  );
+}
+
+/** What a tool reported (the compiler, or Node at runtime), in a monospace block. */
+function Says({ who, text }: { who: string; text: string }) {
+  return (
+    <figure className={styles.says}>
+      <figcaption className={styles.saysLabel}>{who} says</figcaption>
+      <pre className={styles.saysText}>{text}</pre>
+    </figure>
   );
 }
