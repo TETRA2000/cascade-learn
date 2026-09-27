@@ -1,28 +1,28 @@
 // App navigation + progress state. Pure reducer; App hydrates it from and saves it to a ProgressStore.
-import { courseById, unitByKey, type Course, type CourseId, type LessonKey } from '../content';
+import { courseById, findCourse, unitByKey, type Course, type CourseId, type LessonKey } from '../content';
 import { initialSelection } from '../lib/demo';
+import { emptyCourseProgress, type CourseProgress, type Progress } from '../storage/progress';
 
 export type Tab = 'learn' | 'practice';
 
 export type Screen =
+  | { name: 'courses' }
   | { name: 'home' }
   | { name: 'learn'; unitKey: string; card: number; selection: number[] }
   | { name: 'quiz'; lessonKey: LessonKey };
 
 export interface AppState {
-  /** The active course. */
-  course: CourseId;
   screen: Screen;
   tab: Tab;
-  /** Units whose last card the learner has reached and finished. */
-  completedUnits: Record<string, true>;
-  /** Practice runs (by LessonKey) finished at least once. */
-  completedSets: Partial<Record<LessonKey, true>>;
-  /** XP banked from finished practice runs. */
-  totalXp: number;
+  /** The active course; null until the learner picks one. Always a course this build ships. */
+  course: CourseId | null;
+  /** Finished units, finished practice runs and banked XP, per course. */
+  courses: Partial<Record<CourseId, CourseProgress>>;
 }
 
 export type Action =
+  | { type: 'openCourses' }
+  | { type: 'selectCourse'; course: CourseId }
   | { type: 'selectTab'; tab: Tab }
   | { type: 'openUnit'; unitKey: string }
   | { type: 'gotoCard'; card: number }
@@ -33,13 +33,31 @@ export type Action =
   | { type: 'goHome' };
 
 export const initialState: AppState = {
-  course: 'css',
-  screen: { name: 'home' },
+  screen: { name: 'courses' },
   tab: 'learn',
-  completedUnits: {},
-  completedSets: {},
-  totalXp: 0,
+  course: null,
+  courses: {},
 };
+
+/** Hydrate from storage. A stored course this build doesn't ship falls back to the picker. */
+export function stateFromProgress(p: Progress): AppState {
+  const course = findCourse(p.activeCourse)?.id ?? null;
+  return { ...initialState, course, courses: p.courses, screen: course ? { name: 'home' } : { name: 'courses' } };
+}
+
+export function progressFromState(s: AppState): Progress {
+  return { activeCourse: s.course, courses: s.courses };
+}
+
+/** A course's progress (the active course by default); empty when there is none yet. */
+export function courseProgress(s: AppState, id: CourseId | null = s.course): CourseProgress {
+  return (id && s.courses[id]) || emptyCourseProgress();
+}
+
+function updateCourse(s: AppState, change: (p: CourseProgress) => CourseProgress): AppState {
+  if (!s.course) return s;
+  return { ...s, courses: { ...s.courses, [s.course]: change(courseProgress(s)) } };
+}
 
 function cardScreen(course: Course, unitKey: string, card: number): Screen | null {
   const unit = unitByKey(course, unitKey);
@@ -50,18 +68,26 @@ function cardScreen(course: Course, unitKey: string, card: number): Screen | nul
 
 export function appReducer(state: AppState, action: Action): AppState {
   const { screen } = state;
+  const course = state.course ? courseById(state.course) : null;
   switch (action.type) {
+    case 'openCourses':
+      return { ...state, screen: { name: 'courses' } };
+
+    case 'selectCourse':
+      if (!findCourse(action.course)) return state;
+      return { ...state, course: action.course, screen: { name: 'home' }, tab: 'learn' };
+
     case 'selectTab':
       return { ...state, tab: action.tab };
 
     case 'openUnit': {
-      const next = cardScreen(courseById(state.course), action.unitKey, 0);
+      const next = course && cardScreen(course, action.unitKey, 0);
       return next ? { ...state, screen: next } : state;
     }
 
     case 'gotoCard': {
-      if (screen.name !== 'learn') return state;
-      const next = cardScreen(courseById(state.course), screen.unitKey, action.card);
+      if (screen.name !== 'learn' || !course) return state;
+      const next = cardScreen(course, screen.unitKey, action.card);
       return next ? { ...state, screen: next } : state;
     }
 
@@ -74,22 +100,20 @@ export function appReducer(state: AppState, action: Action): AppState {
 
     case 'finishUnit': {
       if (screen.name !== 'learn') return state;
-      const completedUnits = { ...state.completedUnits, [screen.unitKey]: true as const };
-      const next: Screen = action.practice
-        ? { name: 'quiz', lessonKey: `topic:${screen.unitKey}` }
-        : { name: 'home' };
-      return { ...state, completedUnits, screen: next, tab: action.practice ? state.tab : 'learn' };
+      const done = updateCourse(state, (p) => ({ ...p, completedUnits: { ...p.completedUnits, [screen.unitKey]: true } }));
+      const next: Screen = action.practice ? { name: 'quiz', lessonKey: `topic:${screen.unitKey}` } : { name: 'home' };
+      return { ...done, screen: next, tab: action.practice ? state.tab : 'learn' };
     }
 
     case 'startQuiz':
       return { ...state, screen: { name: 'quiz', lessonKey: action.lessonKey } };
 
     case 'completeQuiz':
-      return {
-        ...state,
-        completedSets: { ...state.completedSets, [action.lessonKey]: true },
-        totalXp: state.totalXp + action.xp,
-      };
+      return updateCourse(state, (p) => ({
+        ...p,
+        completedSets: { ...p.completedSets, [action.lessonKey]: true },
+        xp: p.xp + action.xp,
+      }));
 
     case 'goHome':
       return { ...state, screen: { name: 'home' } };

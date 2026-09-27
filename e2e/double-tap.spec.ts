@@ -4,6 +4,7 @@ import { expect, test } from '@playwright/test';
 // replaces it in the same spot (Check and Continue share the bottom edge).
 test('double-clicking Continue does not grade the next question', async ({ page }) => {
   await page.goto('/');
+  await page.getByRole('button', { name: /^CSS,/ }).click();
   await page.getByRole('button', { name: 'Practice' }).click();
   await page.getByRole('button', { name: 'Tune to target, 3 questions' }).click();
   for (let i = 0; i < 4; i++) await page.getByRole('button', { name: 'Increase value' }).click();
@@ -17,6 +18,7 @@ test('double-clicking Continue does not grade the next question', async ({ page 
 
 test('double-clicking Check still shows the feedback', async ({ page }) => {
   await page.goto('/');
+  await page.getByRole('button', { name: /^CSS,/ }).click();
   await page.getByRole('button', { name: 'Practice' }).click();
   await page.getByRole('button', { name: 'Predict the render, 4 questions' }).click();
   await page.getByRole('button', { name: /^Option A:/ }).click();

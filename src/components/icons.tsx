@@ -1,5 +1,6 @@
 // Inline SVG icons from the prototype. All decorative (aria-hidden); pair with text.
 import type { SVGProps } from 'react';
+import type { CourseIconName } from '../content';
 
 type IconProps = SVGProps<SVGSVGElement> & { size?: number };
 
@@ -122,4 +123,45 @@ export function PlusIcon({ size = 24, ...rest }: IconProps) {
       <path d="M5 12h14M12 5v14" />
     </Svg>
   );
+}
+
+export function ChevronLeftIcon({ size = 22, ...rest }: IconProps) {
+  return (
+    <Svg size={size} {...stroke} strokeWidth={2.5} {...rest}>
+      <path d="M15 6l-6 6 6 6" />
+    </Svg>
+  );
+}
+
+export function ChevronDownIcon({ size = 16, ...rest }: IconProps) {
+  return (
+    <Svg size={size} {...stroke} strokeWidth={2.5} {...rest}>
+      <path d="M6 9l6 6 6-6" />
+    </Svg>
+  );
+}
+
+/** Curly braces. */
+export function CssIcon({ size = 24, ...rest }: IconProps) {
+  return (
+    <Svg size={size} {...stroke} strokeWidth={2} {...rest}>
+      <path d="M8 4c-2 0-3 1-3 3v2c0 1.5-1 3-2 3 1 0 2 1.5 2 3v2c0 2 1 3 3 3M16 4c2 0 3 1 3 3v2c0 1.5 1 3 2 3-1 0-2 1.5-2 3v2c0 2-1 3-3 3" />
+    </Svg>
+  );
+}
+
+/** A cog, after Rust's gear logo. */
+export function RustIcon({ size = 24, ...rest }: IconProps) {
+  return (
+    <Svg size={size} {...stroke} strokeWidth={2} {...rest}>
+      <circle cx="12" cy="12" r="6" />
+      <circle cx="12" cy="12" r="2" />
+      <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" />
+    </Svg>
+  );
+}
+
+/** The icon a course names in courses.json. */
+export function CourseIcon({ name, ...rest }: IconProps & { name: CourseIconName }) {
+  return name === 'rust' ? <RustIcon {...rest} /> : <CssIcon {...rest} />;
 }

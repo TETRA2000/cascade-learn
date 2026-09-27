@@ -1,12 +1,17 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { App } from './App';
 import { LEGACY_STORAGE_KEY, STORAGE_KEY } from './storage/progress';
 
 const heading = () => screen.getByRole('heading', { level: 1 });
 
+const startIn = (course: string, courses = {}) =>
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ activeCourse: course, courses }));
+
 describe('Home', () => {
+  beforeEach(() => startIn('css'));
+
   it('shows the Learn tab with the first unit as the hero and 5 hearts', () => {
     render(<App />);
     expect(screen.getByText('Start here')).toBeInTheDocument();
@@ -32,6 +37,8 @@ describe('Home', () => {
 });
 
 describe('Learn flow', () => {
+  beforeEach(() => startIn('css'));
+
   it('walks a unit with Back / Next and live knobs, then Done marks it complete', async () => {
     const user = userEvent.setup();
     render(<App />);
@@ -121,6 +128,7 @@ describe('Persistence', () => {
   });
 
   it('saves progress when a unit is finished', async () => {
+    startIn('css');
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: 'Grid basics, 4 cards' }));
@@ -135,7 +143,40 @@ describe('Persistence', () => {
   it('starts fresh when stored progress is corrupt', () => {
     localStorage.setItem(STORAGE_KEY, '{oops');
     render(<App />);
-    expect(screen.getByText('0 XP')).toBeInTheDocument();
-    expect(screen.getByText('Start here')).toBeInTheDocument();
+    expect(heading()).toHaveTextContent('Choose a course');
+  });
+});
+
+describe('Course picker', () => {
+  it('opens on first launch and starts the chosen course', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    expect(heading()).toHaveTextContent('Choose a course');
+    expect(heading()).toHaveFocus();
+    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /^CSS, 0 of 5 units, 0 XP$/ }));
+    expect(heading()).toHaveTextContent('How CSS works');
+    expect(screen.getByText('CSS, one tap at a time')).toBeInTheDocument();
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toMatchObject({ activeCourse: 'css' });
+  });
+
+  it('switches course from the header chip and marks the current one with text', async () => {
+    const user = userEvent.setup();
+    startIn('css', { css: { completedUnits: { basics: true }, completedSets: {}, xp: 40 } });
+    render(<App />);
+    expect(screen.getByText('40 XP')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'CSS, change course' }));
+    expect(heading()).toHaveTextContent('Choose a course');
+    const current = screen.getByRole('button', { name: 'CSS, 1 of 5 units, 40 XP, current' });
+    expect(current).toHaveAttribute('aria-current', 'true');
+    expect(current).toHaveTextContent('Current');
+    await user.click(screen.getByRole('button', { name: 'Back' }));
+    expect(heading()).toHaveTextContent('The box model');
+  });
+
+  it('falls back to the picker when the stored course is not in this build', () => {
+    startIn('go');
+    render(<App />);
+    expect(heading()).toHaveTextContent('Choose a course');
   });
 });

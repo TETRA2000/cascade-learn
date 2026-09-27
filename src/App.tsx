@@ -1,33 +1,32 @@
 import { useEffect, useReducer } from 'react';
 import { courseById } from './content';
 import { Quiz } from './quiz/Quiz';
+import { Courses } from './screens/Courses';
 import { Home } from './screens/Home';
 import { Learn } from './screens/Learn';
-import { appReducer, initialState } from './state/app';
-import { emptyCourseProgress, localProgressStore, type ProgressStore } from './storage/progress';
+import { appReducer, stateFromProgress } from './state/app';
+import { localProgressStore, type ProgressStore } from './storage/progress';
 import styles from './App.module.css';
 
 const defaultStore = localProgressStore();
 
 export function App({ store = defaultStore }: { store?: ProgressStore }) {
-  // CSS-only bridge between v2 storage and the single-course AppState.
-  const [state, dispatch] = useReducer(appReducer, store, (s) => {
-    const css = s.load().courses.css ?? emptyCourseProgress();
-    return { ...initialState, completedUnits: css.completedUnits, completedSets: css.completedSets, totalXp: css.xp };
-  });
-  const { screen, completedUnits, completedSets, totalXp } = state;
-  const course = courseById(state.course);
+  const [state, dispatch] = useReducer(appReducer, store, (s) => stateFromProgress(s.load()));
+  const { screen, course: activeCourse, courses: progress } = state;
+  const course = activeCourse ? courseById(activeCourse) : null;
 
+  // Save on progress changes only, not on every navigation.
   useEffect(() => {
-    store.save({ activeCourse: 'css', courses: { css: { completedUnits, completedSets, xp: totalXp } } });
-  }, [store, completedUnits, completedSets, totalXp]);
+    store.save({ activeCourse, courses: progress });
+  }, [store, activeCourse, progress]);
 
   return (
     <div className={styles.frame}>
-      {screen.name === 'home' && <Home course={course} state={state} dispatch={dispatch} />}
-      {screen.name === 'learn' && (
+      {(screen.name === 'courses' || !course) && <Courses state={state} dispatch={dispatch} />}
+      {course && screen.name === 'home' && <Home course={course} state={state} dispatch={dispatch} />}
+      {course && screen.name === 'learn' && (
         <Learn
-          key={screen.unitKey}
+          key={`${course.id}:${screen.unitKey}`}
           course={course}
           unitKey={screen.unitKey}
           card={screen.card}
@@ -35,9 +34,9 @@ export function App({ store = defaultStore }: { store?: ProgressStore }) {
           dispatch={dispatch}
         />
       )}
-      {screen.name === 'quiz' && (
+      {course && screen.name === 'quiz' && (
         <Quiz
-          key={screen.lessonKey}
+          key={`${course.id}:${screen.lessonKey}`}
           courseId={course.id}
           lessonKey={screen.lessonKey}
           onExit={() => dispatch({ type: 'goHome' })}

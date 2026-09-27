@@ -2,9 +2,10 @@ import type { Dispatch, ReactNode } from 'react';
 import { questionsOfType, type Course } from '../content';
 import { Button } from '../components/Button';
 import { HeartCount } from '../components/HeartCount';
-import { BookIcon, CheckCircleIcon, ChevronRightIcon, TargetIcon } from '../components/icons';
+import { BookIcon, CheckCircleIcon, ChevronDownIcon, ChevronRightIcon, CourseIcon, TargetIcon } from '../components/icons';
 import { HEARTS_PER_LESSON } from '../state/rules';
-import type { Action, AppState, Tab } from '../state/app';
+import { courseProgress, type Action, type AppState, type Tab } from '../state/app';
+import { totalXp } from '../storage/progress';
 import styles from './Home.module.css';
 
 interface Props {
@@ -20,10 +21,20 @@ export function Home({ course, state, dispatch }: Props) {
         <header className={styles.header}>
           <div className={styles.brand}>
             <span className={styles.wordmark}>Cascade</span>
-            <span className={styles.tagline}>CSS, one tap at a time</span>
+            <span className={styles.tagline}>{course.tagline}</span>
           </div>
+          <button
+            type="button"
+            className={styles.courseChip}
+            aria-label={`${course.name}, change course`}
+            onClick={() => dispatch({ type: 'openCourses' })}
+          >
+            <CourseIcon name={course.icon} size={18} />
+            {course.name}
+            <ChevronDownIcon size={14} />
+          </button>
           <div className={styles.stats}>
-            <p className={styles.xp}>{state.totalXp} XP</p>
+            <p className={styles.xp}>{totalXp(state)} XP</p>
             <HeartCount count={HEARTS_PER_LESSON} />
           </div>
         </header>
@@ -57,7 +68,7 @@ function TabButton(props: { tab: Tab; current: Tab; dispatch: Dispatch<Action>; 
 }
 
 function LearnTab({ course, state, dispatch }: Props) {
-  const done = state.completedUnits;
+  const done = courseProgress(state).completedUnits;
   const nextUnit = course.units.find((u) => !done[u.key]);
   const hero = nextUnit ?? course.units[0]!;
   const kicker = !nextUnit ? 'All lessons done — review any time' : Object.keys(done).length ? 'Up next' : 'Start here';
@@ -92,7 +103,7 @@ function LearnTab({ course, state, dispatch }: Props) {
 }
 
 function PracticeTab({ course, state, dispatch }: Props) {
-  const done = state.completedSets;
+  const done = courseProgress(state).completedSets;
   return (
     <div className={styles.tabBody}>
       <Hero
